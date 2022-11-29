@@ -1,0 +1,4 @@
+#ensure all files never get their line endings converted to CRLF from LF by git:
+* text eol=lf
+#ensure CANoe configs don't get their line endings converted
+*.cfg -text
