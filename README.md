@@ -63,7 +63,7 @@ To build the demos, you'll need SIL Kit packages ``SilKit-x.y.z-$platform`` for 
 The adapters and demos are built using ``cmake``:
 
     mkdir build
-    cmake -S. -Bbuild -DSK_DIR=/path/to/SilKit-x.y.z-$platform/
+    cmake -S. -Bbuild -DSILKIT_PACKAGE_DIR=/path/to/SilKit-x.y.z-$platform/
     cmake --build build --parallel
 
 The adapters and demo executables will be available in ``build/bin`` (depending on the configured build directory).

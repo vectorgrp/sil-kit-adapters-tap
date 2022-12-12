@@ -18,20 +18,20 @@ if (WIN32)
     target_compile_definitions(asio INTERFACE WINVER=0x0601 _WIN32_WINNT=0x0601) # Windows 7
 endif()
 
-if(NOT SK_DIR)
-    message(FATAL_ERROR "Please set the PATH to the SIL Kit in SK_DIR: e.g."
-        " cmake -D SK_DIR=../SilKit-x.y.z-Platform/")
+if(NOT SILKIT_PACKAGE_DIR)
+    message(FATAL_ERROR "Please set the PATH to the SIL Kit in SILKIT_PACKAGE_DIR: e.g."
+        " cmake -D SILKIT_PACKAGE_DIR=../SilKit-x.y.z-Platform/")
 endif()
-message(STATUS "Searching SilKit package in ${SK_DIR}")
+message(STATUS "Searching SilKit package in ${SILKIT_PACKAGE_DIR}")
 find_package(SilKit 4.0.7
     REQUIRED
     CONFIG
     NO_CMAKE_PACKAGE_REGISTRY
     NO_DEFAULT_PATH
-    PATHS "${SK_DIR}"
+    PATHS "${SILKIT_PACKAGE_DIR}"
 )
 if(NOT TARGET SilKit::SilKit)
-    message(FATAL_ERROR "Could not find SilKit package in ${SK_DIR}")
+    message(FATAL_ERROR "Could not find SilKit package in ${SILKIT_PACKAGE_DIR}")
 endif()
 
 set(SK_QEMU_DEMOS_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
