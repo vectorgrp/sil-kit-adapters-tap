@@ -45,7 +45,7 @@ int main(int argc, char**)
     const std::string registryURI = "silkit://localhost:8501";
 
     const std::string ethernetControllerName = participantName + "_Eth1";
-    const std::string ethernetNetworkName ="qemu_demo";
+    const std::string ethernetNetworkName ="tap_demo";
 
     try
     {

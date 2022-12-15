@@ -16,84 +16,267 @@
 #include <asio/ts/buffer.hpp>
 #include <asio/ts/io_context.hpp>
 #include <asio/ts/net.hpp>
+#include <asio/posix/stream_descriptor.hpp>
+
+#include <linux/if_tun.h>
 
 using namespace SilKit::Services::Ethernet;
 
 using namespace std::chrono_literals;
 
-class QemuSocketClient
+class TapConnection
 {
 public:
-    QemuSocketClient(asio::io_context& io_context, const std::string& host, const std::string& service,
+    TapConnection(asio::io_context& io_context, const std::string& tapDevName,
                      std::function<void(std::vector<uint8_t>)> onNewFrameHandler)
-        : _socket{io_context}
-        , _resolver{io_context}
+        : _tapDeviceStream{io_context}
         , _onNewFrameHandler(std::move(onNewFrameHandler))
     {
-        asio::connect(_socket, _resolver.resolve(host, service));
-        std::cout << "connect success" << std::endl;
-        DoReceiveFrameFromQemu();
+        _tapDeviceStream.assign(GetTapDeviceFileDescriptor(tapDevName.c_str()));
+        DoReceiveFrameFromTapDevice();      
+        //ReadFromStream();
     }
 
     template<class container>
-    void SendEthernetFrameToQemu(const container& data)
-    {
-        std::array<std::uint8_t, 4> frameSizeBytes = {};
-        demo::WriteUintBe(asio::buffer(frameSizeBytes), std::uint32_t(data.size()));
+    void SendEthernetFrameToTapDevice(const container& data)
+    {   
+        //TODO: introduce write_some
+        
+        std::array<std::uint8_t, 8192> sendBuffer = {};
+        demo::WriteUintBe(asio::buffer(sendBuffer), std::uint32_t(data.size()));
 
-        asio::write(_socket, asio::buffer(frameSizeBytes));
-        asio::write(_socket, asio::buffer(data.data(),data.size()));
+        _tapDeviceStream.write_some(asio::buffer(sendBuffer)); 
+        _tapDeviceStream.write_some(asio::buffer(data.data(),data.size()));
     }
 
 private:
-    void DoReceiveFrameFromQemu()
+    int GetTapDeviceFileDescriptor(const char *tapDeviceName)
     {
-        asio::async_read(_socket, asio::buffer(_frame_size_buffer.data(), _frame_size_buffer.size()),
-                         [this](const std::error_code ec, const std::size_t bytes_received) {
-                             if (ec || bytes_received != _frame_size_buffer.size())
-                             {
-                                 throw demo::IncompleteReadError{};
-                             }
+        struct ifreq ifr;
+        int tapFileDescriptor;
+        int errorCode;
+         
+        if ((tapFileDescriptor = open("/dev/net/tun", O_RDWR)) < 0) 
+        {            
+            return tapFileDescriptor;
+        }
+        
+        memset(&ifr, 0, sizeof(ifr));
+        ifr.ifr_flags = (short int)IFF_TAP | IFF_NO_PI;
 
-                             std::uint32_t frame_size = 0;
-                             for (unsigned byte_index = 0; byte_index < 4; ++byte_index)
-                             {
-                                 frame_size |= static_cast<std::uint32_t>(_frame_size_buffer[4 - 1 - byte_index])
-                                               << (byte_index * 8u);
-                             }
+        if (*tapDeviceName)
+        {         
+            strncpy(ifr.ifr_name, tapDeviceName, IFNAMSIZ);
+        }
+        
+        errorCode = ioctl(tapFileDescriptor, TUNSETIFF, reinterpret_cast<void*>(&ifr));
+        if (errorCode < 0)
+        {
+            close(tapFileDescriptor);
+            return errorCode;
+        }
+        
+        std::cout << "tap decvice succesfully opened" << std::endl;
+        return tapFileDescriptor;
+    }
 
-                             if (frame_size > _frame_data_buffer.size())
-                             {
-                                 throw demo::InvalidFrameSizeError{};
-                             }
+private:
+    void ReadFromStream()
+    {   
+    async_read(
+        _tapDeviceStream,
+        asio::buffer(mReadBuffer.payload.data(), mReadBuffer.payload.size()),
+        asio::transfer_at_least(14),
+        [this](const std::error_code& ec, std::size_t bytesRead)
+        {
+        if (ec /* && !IsErrorToTryAgain(ec) */)
+        {
+            //Restart();
+        }
+        else
+        {
+            mReadBuffer.size = static_cast<uint16_t>(bytesRead);
+            SendToSilKit();
+        }
+        });
+    }
 
-                             asio::async_read(
-                                 _socket, asio::buffer(_frame_data_buffer.data(), frame_size),
-                                 [this, frame_size](const std::error_code ec, const std::size_t bytes_received) {
-                                     if (ec || bytes_received != frame_size)
+private:
+    void SendToSilKit()
+    {     
+        std::memcpy(mSendBufferWithLength, &mReadBuffer.size, sizeof(mReadBuffer.size));
+        std::memcpy(mSendBufferWithLength + sizeof(mReadBuffer.size), mReadBuffer.payload.data(), mReadBuffer.size);
+
+        SendFromBuffer(
+            mSendBufferWithLength, 
+            sizeof(mReadBuffer.size) + mReadBuffer.size,
+            0,
+            [this]()
+            {
+                //_onNewFrameHandler(std::move(mSendBufferWithLength));
+                ReadFromStream();
+            });     
+    }
+
+private:
+    void ReceiveIntoBuffer(uint8_t* data, std::size_t toReceive, std::size_t received, std::function<void(void)> onSuccess)
+    {
+        //TODO: needs to be adapted to SIL Kit
+
+        // mSocket.async_read_some(
+        // buffer(data + received, toReceive - received),
+        // [=](const boost::system::error_code& ec, std::size_t bytesReceived) mutable
+        // {
+        //     if (ec && !IsErrorToTryAgain(ec))
+        //     {            
+        //     return;
+        //     }
+
+        //     received += bytesReceived;
+
+        //     if (received < toReceive)
+        //     {
+        //     ReceiveIntoBuffer(data, toReceive, received, onSuccess);
+        //     }
+        //     else
+        //     {
+        //     onSuccess();
+        //     }
+        // });
+    }
+
+private:
+  void ReceiveFromSilKit()
+  {
+    ReceiveIntoBuffer(
+      reinterpret_cast<uint8_t*>(&mReceiveBuffer.size),
+      sizeof(mReceiveBuffer.size), 
+      0,
+      [this]()
+      {
+        if (mReceiveBuffer.size > mReceiveBuffer.payload.max_size())
+        {
+          //Restart();
+        }
+        else
+        {
+          ReceiveIntoBuffer(
+            mReceiveBuffer.payload.data(),
+            mReceiveBuffer.size,
+            0,
+            [this]()
+            {
+              WriteToStream();
+            });
+        }
+      });
+  }
+  
+private:
+  void WriteToStream()
+  {
+    async_write(
+      _tapDeviceStream,
+      asio::buffer(mReceiveBuffer.payload.data(), mReceiveBuffer.size),
+      [this](const std::error_code& ec, std::size_t /*bytesWritten*/ )
+      {
+        // if (ec && !IsErrorToTryAgain(ec)) 
+        // {
+        //    Restart();
+        // }
+        // else
+        {
+          ReceiveFromSilKit();
+        }
+      });
+  }
+
+private:
+  void SendFromBuffer(uint8_t* data, std::size_t toTransfer, std::size_t transferred, std::function<void(void)> onSuccess)
+  {
+    // Adapt to SilKit
+
+    auto frame_data = std::vector<std::uint8_t>(toTransfer - transferred);
+        asio::buffer_copy(
+            asio::buffer(frame_data),
+            asio::buffer(data + transferred, toTransfer - transferred),
+            toTransfer - transferred);
+
+    _onNewFrameHandler(std::move(frame_data));
+
+    transferred += toTransfer - transferred;
+    if (transferred < toTransfer)
+    {
+        SendFromBuffer(data, toTransfer, transferred, onSuccess);
+    }
+    else
+    {
+        
+        onSuccess();
+    }
+
+    // mSocket.async_write_some(
+    //   buffer(data + transferred, toTransfer - transferred),
+    //   [=](const boost::system::error_code& ec, std::size_t bytesTransferred) mutable
+    //   {
+    //     if (ec && !IsErrorToTryAgain(ec))
+    //     {
+    //       Restart();
+    //       return;
+    //     }
+
+    //     transferred += bytesTransferred;
+
+    //     if (transferred < toTransfer)
+    //     {
+    //       SendFromBuffer(data, toTransfer, transferred, onSuccess);
+    //     }
+    //     else
+    //     {
+    //       onSuccess();
+    //     }
+    // });
+  }
+
+private:
+    void DoReceiveFrameFromTapDevice()
+    {
+
+                             _tapDeviceStream.async_read_some(asio::buffer(_frame_data_buffer.data(), _frame_data_buffer.size()),
+                                 [this](const std::error_code ec, const std::size_t bytes_received) {
+                                     if (ec)
                                      {
                                          throw demo::IncompleteReadError{};
                                      }
 
-                                     auto frame_data = std::vector<std::uint8_t>(frame_size);
+                                     auto frame_data = std::vector<std::uint8_t>(bytes_received);
                                      asio::buffer_copy(
                                          asio::buffer(frame_data),
                                          asio::buffer(_frame_data_buffer.data(), _frame_data_buffer.size()),
-                                         frame_size);
+                                         bytes_received);
 
                                      _onNewFrameHandler(std::move(frame_data));
 
-                                     DoReceiveFrameFromQemu();
+                                     DoReceiveFrameFromTapDevice();
                                  });
-                         });
+                                  
     }
 
 private:
-    asio::ip::tcp::socket _socket;
-    asio::ip::tcp::resolver _resolver;
+    struct EthernetFrameBuffer
+    {
+        std::array<uint8_t, 1600> payload;
+        uint16_t size;
+    };
 
-    std::array<uint8_t, 4> _frame_size_buffer = {};
-    std::array<uint8_t, 4096> _frame_data_buffer = {};
+    EthernetFrameBuffer mReceiveBuffer;
+    EthernetFrameBuffer mReadBuffer;
+    uint8_t mSendBufferWithLength[1602];
+
+    asio::posix::stream_descriptor _tapDeviceStream;    
+    
+    //std::array<uint8_t, 4> _frame_size_buffer = {};
+    std::array<uint8_t, 8192> _frame_data_buffer = {};
 
     std::function<void(std::vector<uint8_t>)> _onNewFrameHandler;
 };
@@ -119,26 +302,19 @@ int main(int argc, char** argv)
     const std::string participantConfigurationString =
         R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": "Info" } ] } })";
 
-    const std::string participantName = "EthernetQemu";
+    const std::string participantName = "EthernetTapDevice";
     const std::string registryURI = "silkit://localhost:8501";
 
     const std::string ethernetControllerName = participantName + "_Eth1";
-    const std::string ethernetNetworkName = "qemu_demo";
+    const std::string ethernetNetworkName = "tap_demo";
 
-    const std::string qemuHostname = [argc, argv]() -> std::string {
+    const std::string tapDevName = [argc, argv]() -> std::string {
         if (argc >= 2)
         {
             return argv[1];
         }
-        return "localhost";
-    }();
-    const std::string qemuService = [argc, argv]() -> std::string {
-        if (argc >= 3)
-        {
-            return argv[2];
-        }
-        return "12345";
-    }();
+        return "tap10";
+    }(); 
 
     asio::io_context ioContext;
 
@@ -152,7 +328,7 @@ int main(int argc, char** argv)
         std::cout << "Creating ethernet controller '" << ethernetControllerName << "'" << std::endl;
         auto* ethController = participant->CreateEthernetController(ethernetControllerName,ethernetNetworkName);
 
-        const auto onReceiveEthernetFrameFromQemu = [ethController](std::vector<std::uint8_t> data) {
+        const auto onReceiveEthernetFrameFromTapDevice = [ethController](std::vector<std::uint8_t> data) {
             if (data.size() < 60)
             {
                 data.resize(60, 0);
@@ -164,18 +340,18 @@ int main(int argc, char** argv)
                       << std::endl;
         };
 
-        std::cout << "Creating QEMU ethernet connector for '" << qemuHostname << ":" << qemuService << "'" << std::endl;
-        QemuSocketClient client{ioContext, qemuHostname, qemuService, onReceiveEthernetFrameFromQemu};
+        std::cout << "Creating TAP device ethernet connector for '" << tapDevName << "'" << std::endl;
+        TapConnection tapConnection{ioContext, tapDevName, onReceiveEthernetFrameFromTapDevice};
 
-        const auto onReceiveEthernetMessageFromIb = [&client](IEthernetController* /*controller*/,
+        const auto onReceiveEthernetMessageFromSilKit = [&tapConnection](IEthernetController* /*controller*/,
                                                               const EthernetFrameEvent& msg) {
             auto rawFrame = msg.frame.raw;
-            client.SendEthernetFrameToQemu(rawFrame);
+            tapConnection.SendEthernetFrameToTapDevice(rawFrame);
 
             std::cout << "SIL Kit >> QEMU: Ethernet frame (" << rawFrame.size() << " bytes)" << std::endl;
         };
 
-        ethController->AddFrameHandler(onReceiveEthernetMessageFromIb);
+        ethController->AddFrameHandler(onReceiveEthernetMessageFromSilKit);
         ethController->AddFrameTransmitHandler(&EthAckCallback);
 
         ethController->Activate();
