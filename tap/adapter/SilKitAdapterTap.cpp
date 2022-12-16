@@ -42,16 +42,7 @@ public:
         if (data.size() != sizeSent )
         {                
             throw demo::InvalidBufferSize{};                                     
-        } 
-
-        std::cout << "SizeSent: " << sizeSent << " data.size(): " << data.size() << std::endl;
-
-        std::cout << "Data from SilKit to TapDevice: " << std::endl;
-        for (const auto byte:data)
-        {
-            std::cout << std::hex << std::setw(3) << (unsigned)byte;
         }
-        std::cout << std::endl;      
     }
 
     private:
@@ -68,13 +59,7 @@ public:
                 asio::buffer_copy(
                     asio::buffer(frame_data),
                     asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),
-                    bytes_received);
-
-                for (const auto byte:frame_data)
-                {
-                    std::cout << std::hex << std::setw(3) << (unsigned)byte;
-                }
-                std::cout << std::endl;
+                    bytes_received);                
                 
                 _onNewFrameHandler(std::move(frame_data));                                     
 
@@ -110,7 +95,7 @@ private:
             return errorCode;
         }
         
-        std::cout << "tap decvice succesfully opened" << std::endl;
+        std::cout << "TAP decvice succesfully opened" << std::endl;
         return tapFileDescriptor;
     }
 
@@ -154,7 +139,7 @@ int main(int argc, char** argv)
         {
             return argv[1];
         }
-        return "tap10";
+        return "silkit_tap";
     }(); 
 
     asio::io_context ioContext;
@@ -177,7 +162,7 @@ int main(int argc, char** argv)
             const auto frameSize = data.size();
             static intptr_t transmitId = 0;
             ethController->SendFrame(EthernetFrame{std::move(data)}, reinterpret_cast < void * >(++transmitId));
-            std::cout << "QEMU >> SIL Kit: Ethernet frame (" << frameSize << " bytes, txId=" << transmitId << ")"
+            std::cout << "TAP device >> SIL Kit: Ethernet frame (" << frameSize << " bytes, txId=" << transmitId << ")"
                       << std::endl;
         };
 
@@ -189,7 +174,7 @@ int main(int argc, char** argv)
             auto rawFrame = msg.frame.raw;
             tapConnection.SendEthernetFrameToTapDevice(rawFrame);
 
-            std::cout << "SIL Kit >> QEMU: Ethernet frame (" << rawFrame.size() << " bytes)" << std::endl;
+            std::cout << "SIL Kit >> TAP device: Ethernet frame (" << rawFrame.size() << " bytes)" << std::endl;
         };
 
         ethController->AddFrameHandler(onReceiveEthernetMessageFromSilKit);

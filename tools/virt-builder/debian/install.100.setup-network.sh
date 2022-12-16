@@ -17,7 +17,7 @@ iface internet0 inet dhcp
 auto silkit0
 allow-hotplug silkit0
 iface silkit0 inet static
-  address 192.168.12.34
+  address 192.168.7.2
   netmask 255.255.255.0
 EOF
 
