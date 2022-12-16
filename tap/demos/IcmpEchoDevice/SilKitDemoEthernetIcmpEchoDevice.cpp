@@ -45,7 +45,7 @@ int main(int argc, char**)
     const std::string registryURI = "silkit://localhost:8501";
 
     const std::string ethernetControllerName = participantName + "_Eth1";
-    const std::string ethernetNetworkName ="qemu_demo";
+    const std::string ethernetNetworkName ="tap_demo";
 
     try
     {
@@ -57,8 +57,8 @@ int main(int argc, char**)
         std::cout << "Creating ethernet controller '" << ethernetControllerName << "'" << std::endl;
         auto* ethController = participant->CreateEthernetController(ethernetControllerName, ethernetNetworkName);
 
-        static constexpr auto ethernetAddress = demo::EthernetAddress{0x01, 0x23, 0x45, 0x67, 0x89, 0xab};
-        static constexpr auto ip4Address = demo::Ip4Address{192, 168, 12, 35};
+        static constexpr auto ethernetAddress = demo::EthernetAddress{0x52, 0x54, 0x56, 0x53, 0x4B, 0x55};
+        static constexpr auto ip4Address = demo::Ip4Address{192, 168, 7, 35};
         auto demoDevice = demo::Device{ethernetAddress, ip4Address, [ethController](std::vector<std::uint8_t> data) {
                                            const auto frameSize = data.size();
                                            static intptr_t transmitId = 0;

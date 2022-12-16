@@ -6,8 +6,6 @@ qemu-system-x86_64              \
   -nographic                                              \
   -serial mon:stdio\
   -nic user,hostfwd=tcp::10022-:22,mac=00:11:22:33:44:55  \
-  -chardev socket,id=ttySPI,server=on,wait=off,host=0.0.0.0,port=23456\
-  -device isa-serial,chardev=ttySPI,id=serialSilKit,index=1\
   -netdev tap,id=mynet0,ifname=qemu_demo_tap,script=no,downscript=no \
   -net nic,macaddr=52:54:56:53:4B:51,netdev=mynet0                      \
   -object filter-dump,id=tap_dump,netdev=mynet0,file=/tmp/qemu_linux_tap_dump \

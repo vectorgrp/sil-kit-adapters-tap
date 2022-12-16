@@ -5,5 +5,5 @@ Logging:
       Type: Stdout
 EthernetControllers:
  - Name: "Eth1/Listening_ECU"
-   Network: "qemu_demo"
+   Network: "tap_demo"
 	 
