@@ -39,15 +39,55 @@ public:
 
     template<class container>
     void SendEthernetFrameToTapDevice(const container& data)
-    {   
-        //TODO: introduce write_some
-        
-        std::array<std::uint8_t, 8192> sendBuffer = {};
-        demo::WriteUintBe(asio::buffer(sendBuffer), std::uint32_t(data.size()));
+    {
+        auto sizeSent = _tapDeviceStream.write_some(asio::buffer(data.data(), data.size()));
+        if (data.size() != sizeSent )
+        {
+                
+            throw demo::InvalidBufferSize{};
+                                     
+        } 
 
-        _tapDeviceStream.write_some(asio::buffer(sendBuffer)); 
-        _tapDeviceStream.write_some(asio::buffer(data.data(),data.size()));
+        std::cout << "SizeSent: " << sizeSent << " data.size(): " << data.size() << std::endl;
+
+        std::cout << "Data from SilKit to TapDevice: " << std::endl;
+        for (const auto byte:data)
+        {
+            std::cout << std::hex << std::setw(3) << (unsigned)byte;
+        }
+        std::cout << std::endl;
+      
     }
+
+    private:
+    void DoReceiveFrameFromTapDevice()
+    {
+            _tapDeviceStream.async_read_some(asio::buffer(mReadBuffer.payload.data(), mReadBuffer.payload.size()),
+                             
+                                 [this](const std::error_code ec, const std::size_t bytes_received) {
+                                     if (ec)
+                                     {
+                                         throw demo::IncompleteReadError{};
+                                     }
+
+                                     auto frame_data = std::vector<std::uint8_t>(bytes_received);
+                                     asio::buffer_copy(
+                                         asio::buffer(frame_data),
+                                         asio::buffer(mReadBuffer.payload.data(), mReadBuffer.payload.size()),
+                                         bytes_received);
+
+                                        for (const auto byte:frame_data)
+                                        {
+                                            std::cout << std::hex << std::setw(3) << (unsigned)byte;
+                                        }
+                                        std::cout << std::endl;
+                                     
+                                     _onNewFrameHandler(std::move(frame_data));                                     
+
+                                     DoReceiveFrameFromTapDevice();
+                                 });                                  
+    }
+
 
 private:
     int GetTapDeviceFileDescriptor(const char *tapDeviceName)
@@ -80,6 +120,27 @@ private:
         return tapFileDescriptor;
     }
 
+
+private:
+    struct EthernetFrameBuffer
+    {
+        std::array<uint8_t, 1600> payload;
+        uint16_t size;
+    };
+
+    //EthernetFrameBuffer mReceiveBuffer;
+    EthernetFrameBuffer mReadBuffer;
+    uint8_t mSendBufferWithLength[1602];
+
+    asio::posix::stream_descriptor _tapDeviceStream;    
+    
+    //std::array<uint8_t, 4> _frame_size_buffer = {};
+    //std::array<uint8_t, 8192> _frame_data_buffer = {};
+
+    std::function<void(std::vector<uint8_t>)> _onNewFrameHandler;
+
+// tapServer ported tapStream-read functions (deactivated)
+#if 0
 private:
     void ReadFromStream()
     {   
@@ -112,13 +173,66 @@ private:
             sizeof(mReadBuffer.size) + mReadBuffer.size,
             0,
             [this]()
-            {
-                //_onNewFrameHandler(std::move(mSendBufferWithLength));
+            {                
                 ReadFromStream();
+                //_onNewFrameHandler(std::move(mSendBufferWithLength));
             });     
     }
 
+
+
 private:
+  void SendFromBuffer(uint8_t* data, std::size_t toTransfer, std::size_t transferred, std::function<void(void)> onSuccess)
+  {
+    // Adapt to SilKit
+
+    auto frame_data = std::vector<std::uint8_t>(toTransfer - transferred);
+        asio::buffer_copy(
+            asio::buffer(frame_data),
+            asio::buffer(data + transferred, toTransfer - transferred),
+            toTransfer - transferred);
+
+    _onNewFrameHandler(std::move(frame_data));
+
+    transferred += toTransfer - transferred;
+    if (transferred < toTransfer)
+    {
+        SendFromBuffer(data, toTransfer, transferred, onSuccess);
+    }
+    else
+    {
+        
+        onSuccess();
+    }
+
+    // mSocket.async_write_some(
+    //   buffer(data + transferred, toTransfer - transferred),
+    //   [=](const boost::system::error_code& ec, std::size_t bytesTransferred) mutable
+    //   {
+    //     if (ec && !IsErrorToTryAgain(ec))
+    //     {
+    //       Restart();
+    //       return;
+    //     }
+
+    //     transferred += bytesTransferred;
+
+    //     if (transferred < toTransfer)
+    //     {
+    //       SendFromBuffer(data, toTransfer, transferred, onSuccess);
+    //     }
+    //     else
+    //     {
+    //       onSuccess();
+    //     }
+    // });
+  }
+#endif
+
+
+// tapServer ported tapStream-write functions (deactivated)
+#if 0
+    private:
     void ReceiveIntoBuffer(uint8_t* data, std::size_t toReceive, std::size_t received, std::function<void(void)> onSuccess)
     {
         //TODO: needs to be adapted to SIL Kit
@@ -191,94 +305,8 @@ private:
       });
   }
 
-private:
-  void SendFromBuffer(uint8_t* data, std::size_t toTransfer, std::size_t transferred, std::function<void(void)> onSuccess)
-  {
-    // Adapt to SilKit
+  #endif
 
-    auto frame_data = std::vector<std::uint8_t>(toTransfer - transferred);
-        asio::buffer_copy(
-            asio::buffer(frame_data),
-            asio::buffer(data + transferred, toTransfer - transferred),
-            toTransfer - transferred);
-
-    _onNewFrameHandler(std::move(frame_data));
-
-    transferred += toTransfer - transferred;
-    if (transferred < toTransfer)
-    {
-        SendFromBuffer(data, toTransfer, transferred, onSuccess);
-    }
-    else
-    {
-        
-        onSuccess();
-    }
-
-    // mSocket.async_write_some(
-    //   buffer(data + transferred, toTransfer - transferred),
-    //   [=](const boost::system::error_code& ec, std::size_t bytesTransferred) mutable
-    //   {
-    //     if (ec && !IsErrorToTryAgain(ec))
-    //     {
-    //       Restart();
-    //       return;
-    //     }
-
-    //     transferred += bytesTransferred;
-
-    //     if (transferred < toTransfer)
-    //     {
-    //       SendFromBuffer(data, toTransfer, transferred, onSuccess);
-    //     }
-    //     else
-    //     {
-    //       onSuccess();
-    //     }
-    // });
-  }
-
-private:
-    void DoReceiveFrameFromTapDevice()
-    {
-
-                             _tapDeviceStream.async_read_some(asio::buffer(_frame_data_buffer.data(), _frame_data_buffer.size()),
-                                 [this](const std::error_code ec, const std::size_t bytes_received) {
-                                     if (ec)
-                                     {
-                                         throw demo::IncompleteReadError{};
-                                     }
-
-                                     auto frame_data = std::vector<std::uint8_t>(bytes_received);
-                                     asio::buffer_copy(
-                                         asio::buffer(frame_data),
-                                         asio::buffer(_frame_data_buffer.data(), _frame_data_buffer.size()),
-                                         bytes_received);
-
-                                     _onNewFrameHandler(std::move(frame_data));
-
-                                     DoReceiveFrameFromTapDevice();
-                                 });
-                                  
-    }
-
-private:
-    struct EthernetFrameBuffer
-    {
-        std::array<uint8_t, 1600> payload;
-        uint16_t size;
-    };
-
-    EthernetFrameBuffer mReceiveBuffer;
-    EthernetFrameBuffer mReadBuffer;
-    uint8_t mSendBufferWithLength[1602];
-
-    asio::posix::stream_descriptor _tapDeviceStream;    
-    
-    //std::array<uint8_t, 4> _frame_size_buffer = {};
-    std::array<uint8_t, 8192> _frame_data_buffer = {};
-
-    std::function<void(std::vector<uint8_t>)> _onNewFrameHandler;
 };
 
 void EthAckCallback(IEthernetController* /*controller*/, const EthernetFrameTransmitEvent& ack)
