@@ -1,4 +1,4 @@
-# Vector SIL Kit Adapters for TAP devices
+# Vector SIL Kit Adapters for TAP devices (Linux only)
 This collection of software is provided to illustrate how the [Vector SIL Kit](https://github.com/vectorgrp/sil-kit/)
 can be attached to a TAP device.
 

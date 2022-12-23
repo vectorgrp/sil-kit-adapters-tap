@@ -14,8 +14,6 @@
 
 using namespace SilKit::Services::Ethernet;
 
-using namespace std::chrono_literals;
-
 void EthAckCallback(IEthernetController* /*controller*/, const EthernetFrameTransmitEvent& ack)
 {
     if (ack.status == EthernetTransmitStatus::Transmitted)

@@ -32,9 +32,9 @@ This is needed because the QEMU execution blocks its self created device. Theref
 
 There is a helper script available which can help you with with this bridging.    
 
-The application *optionally* takes tap device name as command line argument:
+The application *optionally* takes the following optional arguments as command line argument:
 
-    ./build/bin/SilKitAdapterTap [tapname]
+    ./build/bin/SilKitAdapterTap [--tap-name 'silkit_tap'][--registry-uri 'silkit://localhost:8501'][--participant-name 'EthernetTapDevice'][--network-name 'tap_demo']    
 
 ## SilKitDemoEthernetIcmpEchoDevice
 This demo application implements a very simple SIL Kit participant with a single simulated ethernet controller.

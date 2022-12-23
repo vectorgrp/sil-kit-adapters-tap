@@ -4,6 +4,11 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <linux/if_tun.h>
+
+#include <asio/ts/buffer.hpp>
+#include <asio/ts/io_context.hpp>
+#include <asio/posix/stream_descriptor.hpp>
 
 #include "silkit/SilKit.hpp"
 #include "silkit/config/all.hpp"
@@ -12,16 +17,7 @@
 
 #include "Exceptions.hpp"
 
-#include <asio/ts/buffer.hpp>
-#include <asio/ts/io_context.hpp>
-#include <asio/ts/net.hpp>
-#include <asio/posix/stream_descriptor.hpp>
-
-#include <linux/if_tun.h>
-
 using namespace SilKit::Services::Ethernet;
-
-using namespace std::chrono_literals;
 
 class TapConnection
 {
@@ -32,7 +28,7 @@ public:
         , _onNewFrameHandler(std::move(onNewFrameHandler))
     {
         _tapDeviceStream.assign(GetTapDeviceFileDescriptor(tapDevName.c_str()));
-        DoReceiveFrameFromTapDevice();        
+        ReceiveEthernetFrameFromTapDevice();        
     }
 
     template<class container>
@@ -46,7 +42,7 @@ public:
     }
 
     private:
-    void DoReceiveFrameFromTapDevice()
+    void ReceiveEthernetFrameFromTapDevice()
     {
         _tapDeviceStream.async_read_some(asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),                             
             [this](const std::error_code ec, const std::size_t bytes_received) {
@@ -63,10 +59,9 @@ public:
                 
                 _onNewFrameHandler(std::move(frame_data));                                     
 
-                DoReceiveFrameFromTapDevice();
+                ReceiveEthernetFrameFromTapDevice();
             });                                  
     }
-
 
 private:
     int GetTapDeviceFileDescriptor(const char *tapDeviceName)
@@ -95,7 +90,7 @@ private:
             return errorCode;
         }
         
-        std::cout << "TAP decvice succesfully opened" << std::endl;
+        std::cout << "TAP device successfully opened" << std::endl;
         return tapFileDescriptor;
     }
 
@@ -125,22 +120,28 @@ void EthAckCallback(IEthernetController* /*controller*/, const EthernetFrameTran
 
 int main(int argc, char** argv)
 {
+    const auto getArgDefault = [ argc , argv ](const std::string& argument, const std::string& defaultValue)-> auto {
+        return [argc, argv, argument, defaultValue]() -> std::string {
+            auto found = std::find_if(argv, argv + argc, [argument](const char* arg) -> bool {                
+                return arg == argument;
+            });
+
+            if (found != argv + argc && found + 1 != argv + argc)
+            {
+                return *(found + 1);
+            }
+            return defaultValue;                            
+        };
+    };
+
+    const std::string tapDevName = getArgDefault("--tap-name","silkit_tap")();
+    const std::string registryURI = getArgDefault("--registry-uri", "silkit://localhost:8501")();
+    const std::string participantName = getArgDefault("--participant-name", "EthernetTapDevice")() ;
+    const std::string ethernetNetworkName = getArgDefault("--network-name","tap_demo")();
+    const std::string ethernetControllerName = participantName + "_Eth1";
+
     const std::string participantConfigurationString =
         R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": "Info" } ] } })";
-
-    const std::string participantName = "EthernetTapDevice";
-    const std::string registryURI = "silkit://localhost:8501";
-
-    const std::string ethernetControllerName = participantName + "_Eth1";
-    const std::string ethernetNetworkName = "tap_demo";
-
-    const std::string tapDevName = [argc, argv]() -> std::string {
-        if (argc >= 2)
-        {
-            return argv[1];
-        }
-        return "silkit_tap";
-    }(); 
 
     asio::io_context ioContext;
 
@@ -162,8 +163,7 @@ int main(int argc, char** argv)
             const auto frameSize = data.size();
             static intptr_t transmitId = 0;
             ethController->SendFrame(EthernetFrame{std::move(data)}, reinterpret_cast < void * >(++transmitId));
-            std::cout << "TAP device >> SIL Kit: Ethernet frame (" << frameSize << " bytes, txId=" << transmitId << ")"
-                      << std::endl;
+            std::cout << "TAP device >> SIL Kit: Ethernet frame (" << frameSize << " bytes, txId=" << transmitId << ")" << std::endl;
         };
 
         std::cout << "Creating TAP device ethernet connector for '" << tapDevName << "'" << std::endl;
@@ -173,13 +173,11 @@ int main(int argc, char** argv)
                                                               const EthernetFrameEvent& msg) {
             auto rawFrame = msg.frame.raw;
             tapConnection.SendEthernetFrameToTapDevice(rawFrame);
-
             std::cout << "SIL Kit >> TAP device: Ethernet frame (" << rawFrame.size() << " bytes)" << std::endl;
         };
 
         ethController->AddFrameHandler(onReceiveEthernetMessageFromSilKit);
         ethController->AddFrameTransmitHandler(&EthAckCallback);
-
         ethController->Activate();
 
         ioContext.run();
