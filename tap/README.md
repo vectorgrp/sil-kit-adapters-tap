@@ -30,8 +30,7 @@ virtual interface.
 It is necessary to create a second tap device in your linux host system and bridge it to the tap device of QEMU. 
 This is needed because the QEMU execution blocks its self created device. Therefore the SIL Kit Adapter needs t own tap device to connect to.
 
-There is a helper script available which helps you with this bridging:
-    ./tools/setupNetworkBridge.sh
+There is a helper script available which can help you with with this bridging.    
 
 The application *optionally* takes tap device name as command line argument:
 
@@ -53,6 +52,8 @@ Now is a good point to start the ``sil-kit-registry``, ``SilKitAdapterTap`` - wh
 interface with the SIL Kit - and the ``SilKitDemoEthernetIcmpEchoDevice`` in separate terminals:
 
     wsl$ ./path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://127.0.0.1:8501'
+    
+    wsl$ ./tools/setupNetworkBridge.sh
     
     wsl$ ./build/bin/SilKitAdapterTap
     
