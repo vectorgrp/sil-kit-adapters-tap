@@ -10,6 +10,6 @@ target_link_libraries(SilKitDemoEthernetIcmpEchoDevice
         SilKit::SilKit
 )
 set_target_properties(SilKitDemoEthernetIcmpEchoDevice PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY $<$<BOOL:ALWAYS>:${SK_QEMU_DEMOS_RUNTIME_OUTPUT_DIRECTORY}>
+    RUNTIME_OUTPUT_DIRECTORY $<$<BOOL:ALWAYS>:${SILKIT_ADAPTERS_TAP_OUTPUT_DIRECTORY}>
 )
 
