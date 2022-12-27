@@ -1,0 +1,23 @@
+on:
+  push:
+    branches:
+      - 'main'
+jobs:
+  sync_repo:
+    name: Sync branch to remote public GitHub
+    runs-on: Linux
+    environment: repo-sync-action/public-github
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          clean: true
+          fetch-depth: 0
+
+      - uses: vikabgm/repo-sync-action@733d66afe80c643d3f3a11fa60064943843e43d7
+        with:
+          app-key:          ${{ secrets.VECTOR_APP_KEY }}
+          app-id:           ${{ secrets.VECTOR_APP_ID }}
+          remote-repo-url:  ${{ secrets.REMOTE_REPO_URL }}
+          remote-branch:    ${{ secrets.REMOTE_BRANCH }}
+          local-branch:     origin/main
