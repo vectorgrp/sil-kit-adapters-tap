@@ -26,6 +26,8 @@
 #include <asio/ts/internet.hpp>
 #include <asio/ts/socket.hpp>
 
+using namespace exceptions;
+
 namespace demo {
 
 class Device

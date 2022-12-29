@@ -18,6 +18,7 @@
 #include "Exceptions.hpp"
 
 using namespace SilKit::Services::Ethernet;
+using namespace exceptions;
 
 class TapConnection
 {
@@ -37,7 +38,7 @@ public:
         auto sizeSent = _tapDeviceStream.write_some(asio::buffer(data.data(), data.size()));
         if (data.size() != sizeSent )
         {                
-            throw demo::InvalidBufferSize{};                                     
+            throw InvalidFrameSizeError{};                                     
         }
     }
 
@@ -48,7 +49,7 @@ public:
             [this](const std::error_code ec, const std::size_t bytes_received) {
                 if (ec)
                 {
-                    throw demo::IncompleteReadError{};
+                    throw IncompleteReadError{};
                 }
 
                 auto frame_data = std::vector<std::uint8_t>(bytes_received);
@@ -106,12 +107,12 @@ void EthAckCallback(IEthernetController* /*controller*/, const EthernetFrameTran
 {
     if (ack.status == EthernetTransmitStatus::Transmitted)
     {
-        std::cout << "SIL Kit >> Demo: ACK for ETH Message with transmitId=" 
+        std::cout << "SIL Kit >> TAP device: ACK for ETH Message with transmitId=" 
                   << reinterpret_cast<intptr_t>(ack.userContext) << std::endl;
     }
     else
     {
-        std::cout << "SIL Kit >> Demo: NACK for ETH Message with transmitId="
+        std::cout << "SIL Kit >> TAP device: NACK for ETH Message with transmitId="
                   << reinterpret_cast<intptr_t>(ack.userContext)
                   << ": " << ack.status
                   << std::endl;

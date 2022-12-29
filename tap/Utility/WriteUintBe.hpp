@@ -8,6 +8,8 @@
 
 #include <asio/ts/buffer.hpp>
 
+using namespace exceptions;
+
 namespace demo {
 
 template <typename T>
