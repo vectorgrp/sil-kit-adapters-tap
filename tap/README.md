@@ -1,40 +1,51 @@
 # Ethernet Demo and Adapter Setup
-This demo consists of two separate components: the QEMU based guest image contains a live
+This demo consists of several components: The QEMU based guest image contains a live
 Linux kernel that reacts to ICMP echo requests on its virtual network interface.
 The SIL Kit component contains a tap connection which is bridged to the tap device representing the virtual QEMU network interface
-and implements a transport to a virtual SIL Kit Ethernet bus named "tap_demo".
+and implements a transport to a virtual SIL Kit Ethernet bus named "tap_demo". The application SilKitDemoEthernetIcmpEchoDevice, which is a SIL Kit participant as well, will reply to an ARP request and respond to ICMPv4 echo requests. 
 
-    +-------[ QEMU ]---------+                                               +------[ SIL Kit ]-------------+
-    | Debian 11              | <== [qemu_demo_tap bridged to silkit_tap] ==> |  TapConnection to silkit_tap |
-    |   virtual NIC silkit0  |                                               |   <=> virtual Eth1           |
-    +------------------------+                                               +---------------+--------------+
-                                                                                             |
-                                                                               Vector CANoe <=> 
+The following sketch shows the general setup: 
+
+    +-------[ QEMU ]---------+                                               +------[ SIL Kit Adapter TAP ]------+
+    | virtual NIC silkit0    | <=   qemu_demo_tap bridged to silkit_tap   => |  TapConnection to silkit_tap      |
+    |   <=> qemu_demo_tap    |                                               |     <=> virtual (SIL Kit) Eth1    |
+    +------------------------+                                               +-----------------------------------+
+                                                                                             <=>
+                                                                                           SIL Kit
+                                                                                             <=>                 
+    +--[ SilKitDemoEthernetIcmpEchoDevice ]--+                                +-------[ SIL Kit Registry ]--------+
+    |                                        | <= ------- SIL Kit -------- => |                                   |
+    +----------------------------------------+                                |                                   |
+                                                                              |                                   |
+    +------------[ Vector CANoe ]------------+                                |                                   |
+    |                                        | <= ------- SIL Kit -------- => |                                   |
+    +----------------------------------------+                                +-----------------------------------+
+  
+
 
 ## SilKitAdapterTap
-This application allows the user to attach simulated ethernet interface (``nic``) of a QEMU virtual machine to the
-SIL Kit.
+This application allows the user to attach a TAP device of any Linux system to the Vector SIL Kit.
 
-The application uses the tap device backend provided by QEMU.
+In this specific demo the application uses a TAP device which is bridged (further information will follow below) to the TAP device backend provided by QEMU.
 It can be configured for the QEMU virtual machine using the following command line argument of QEMU:
 
     -netdev tap,id=mynet0,ifname=qemu_demo_tap,script=no,downscript=no
 
-The argument of ``ifname=`` specifies a tap device for the QEMU ethernet traffic happening on its virtual ethernet interface.
+The argument of ``ifname=`` specifies a TAP device for the QEMU ethernet traffic happening on its virtual ethernet interface.
 
 All *outgoing* ethernet frames on that particular virtual ethernet interface inside of the virtual machine are sent to
-the defined tap device.
-Any *incoming* data to the tap device is presented to the virtual machine as an incoming ethernet frame on the
+the defined TAP device.
+Any *incoming* data to the TAP device is presented to the virtual machine as an incoming ethernet frame on the
 virtual interface.
 
-It is necessary to create a second tap device in your linux host system and bridge it to the tap device of QEMU. 
-This is needed because the QEMU execution blocks its self created device. Therefore the SIL Kit Adapter needs t own tap device to connect to.
+It is necessary to create a second TAP device in your linux host system and bridge it to the TAP device of QEMU. 
+This is needed because the QEMU execution blocks its self created device. Therefore the SIL Kit Adapter needs its own TAP device to connect to.
 
 There is a helper script available which can help you with with this bridging.    
 
-The application *optionally* takes the following optional arguments as command line argument:
+The application *optionally* takes the following command line arguments:
 
-    ./build/bin/SilKitAdapterTap [--tap-name 'silkit_tap'][--registry-uri 'silkit://localhost:8501'][--participant-name 'EthernetTapDevice'][--network-name 'tap_demo']    
+    ./build/bin/SilKitAdapterTap [--tap-name 'silkit_tap'] [--registry-uri 'silkit://localhost:8501'] [--participant-name 'EthernetTapDevice'] [--network-name 'tap_demo']    
 
 ## SilKitDemoEthernetIcmpEchoDevice
 This demo application implements a very simple SIL Kit participant with a single simulated ethernet controller.
@@ -49,17 +60,17 @@ The application will reply to an ARP request and respond to ICMPv4 Echo Requests
 ## Running the Demo Applications
 
 Now is a good point to start the ``sil-kit-registry``, ``SilKitAdapterTap`` - which connects the QEMU virtual ethernet
-interface with the SIL Kit - and the ``SilKitDemoEthernetIcmpEchoDevice`` in separate terminals:
+interface to the SIL Kit - and the ``SilKitDemoEthernetIcmpEchoDevice`` in separate terminals:
 
     wsl$ ./path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://127.0.0.1:8501'
     
-    wsl$ ./tools/setupNetworkBridge.sh
+    wsl$ sudo ./tools/setupNetworkBridge.sh
     
     wsl$ ./build/bin/SilKitAdapterTap
     
     wsl$ ./build/bin/SilKitDemoEthernetIcmpEchoDevice
     
-The demo applications will produce output when they send and receive Ethernet frames from QEMU or the Vector SIL Kit.
+The applications will produce output when they send and receive Ethernet frames from QEMU or the Vector SIL Kit.
 
 ## Starting CANoe 16
 You can also start ``CANoe 16 SP3`` or newer and load the ``Tap_adapter_CANoe.cfg`` from the ``CANoe`` directory and start the
@@ -79,19 +90,17 @@ The ping requests should all receive responses.
 
 You should see output similar to the following from the ``SilKitAdapterTap`` application:
 
-    SIL Kit >> Demo: ACK for ETH Message with transmitId=5
-    TAP device >> SIL Kit: Ethernet frame (98 bytes, txId=5)
+    SIL Kit >> TAP device: ACK for ETH Message with transmitId=14
+    TAP device >> SIL Kit: Ethernet frame (98 bytes, txId=14)
     SIL Kit >> TAP device: Ethernet frame (98 bytes)
-    SIL Kit >> Demo: ACK for ETH Message with transmitId=6
-    TAP device >> SIL Kit: Ethernet frame (98 bytes, txId=6)
+    SIL Kit >> TAP device: ACK for ETH Message with transmitId=15
+    TAP device >> SIL Kit: Ethernet frame (98 bytes, txId=15)
     SIL Kit >> TAP device: Ethernet frame (98 bytes)
-    SIL Kit >> Demo: ACK for ETH Message with transmitId=7
-    TAP device >> SIL Kit: Ethernet frame (98 bytes, txId=7)
+    SIL Kit >> TAP device: ACK for ETH Message with transmitId=16
+    TAP device >> SIL Kit: Ethernet frame (98 bytes, txId=16)
     SIL Kit >> TAP device: Ethernet frame (98 bytes)
-    SIL Kit >> Demo: ACK for ETH Message with transmitId=8
-    TAP device >> SIL Kit: Ethernet frame (70 bytes, txId=8)
-    SIL Kit >> Demo: ACK for ETH Message with transmitId=9
-    TAP device >> SIL Kit: Ethernet frame (98 bytes, txId=9)
+    SIL Kit >> TAP device: ACK for ETH Message with transmitId=17
+    TAP device >> SIL Kit: Ethernet frame (98 bytes, txId=17)
     SIL Kit >> TAP device: Ethernet frame (98 bytes)
 
     
