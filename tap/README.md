@@ -1,15 +1,12 @@
 # Ethernet Demo and Adapter Setup
-This demo consists of several components: The QEMU based guest image contains a live
-Linux kernel that reacts to ICMP echo requests on its virtual network interface.
-The SIL Kit component contains a tap connection which is bridged to the tap device representing the virtual QEMU network interface
-and implements a transport to a virtual SIL Kit Ethernet bus named "tap_demo". The application SilKitDemoEthernetIcmpEchoDevice, which is a SIL Kit participant as well, will reply to an ARP request and respond to ICMPv4 echo requests. 
+This demo consists of a TAP device "silkit_tap" which is connected to the SIL Kit via ``SilKitAdapterTap`` as a SIL Kit participant. In a second step this TAP device is moved to a Linux network name space and gets a IP configured which is in the same range as the one of the ``SilKitDemoEthernetIcmpEchoDevice``. The Linux ping application is used within this created network name space to ping ``SilKitDemoEthernetIcmpEchoDevice`` through the TAP device via SIL Kit. The application ``SilKitDemoEthernetIcmpEchoDevice``, which is a SIL Kit participant as well, will reply to an ARP request and respond to ICMPv4 echo requests. 
 
 The following sketch shows the general setup: 
 
-    +-------[ QEMU ]---------+                                               +------[ SIL Kit Adapter TAP ]------+
-    | virtual NIC silkit0    | <=   qemu_demo_tap bridged to silkit_tap   => |  TapConnection to silkit_tap      |
-    |   <=> qemu_demo_tap    |                                               |     <=> virtual (SIL Kit) Eth1    |
-    +------------------------+                                               +-----------------------------------+
+    +-----[ Ping from NetNs ]----+                                               +------[ SIL Kit Adapter TAP ]------+
+    |  silkit_tap added to NetNs | <= ----------- silkit_tap -------------   =>  |  TapConnection to silkit_tap      |
+    |   <=> ping / response      |                                               |     <=> virtual (SIL Kit) Eth1    |
+    +----------------------------+                                               +-----------------------------------+
                                                                                              <=>
                                                                                            SIL Kit
                                                                                              <=>                 
@@ -22,70 +19,31 @@ The following sketch shows the general setup:
     +----------------------------------------+                                +-----------------------------------+
   
 
-
-## SilKitAdapterTap
-This application allows the user to attach a TAP device of any Linux system to the Vector SIL Kit.
-
-In this specific demo the application uses a TAP device which is bridged (further information will follow below) to the TAP device backend provided by QEMU.
-It can be configured for the QEMU virtual machine using the following command line argument of QEMU:
-
-    -netdev tap,id=mynet0,ifname=qemu_demo_tap,script=no,downscript=no
-
-The argument of ``ifname=`` specifies a TAP device for the QEMU ethernet traffic happening on its virtual ethernet interface.
-
-All *outgoing* ethernet frames on that particular virtual ethernet interface inside of the virtual machine are sent to
-the defined TAP device.
-Any *incoming* data to the TAP device is presented to the virtual machine as an incoming ethernet frame on the
-virtual interface.
-
-It is necessary to create a second TAP device in your linux host system and bridge it to the TAP device of QEMU. 
-This is needed because the QEMU execution blocks its self created device. Therefore the SIL Kit Adapter needs its own TAP device to connect to.
-
-There is a helper script available which can help you with with this bridging.    
-
-The application *optionally* takes the following command line arguments:
-
-    ./build/bin/SilKitAdapterTap [--tap-name 'silkit_tap'] [--registry-uri 'silkit://localhost:8501'] [--participant-name 'EthernetTapDevice'] [--network-name 'tap_demo']    
-
 ## SilKitDemoEthernetIcmpEchoDevice
 This demo application implements a very simple SIL Kit participant with a single simulated ethernet controller.
 The application will reply to an ARP request and respond to ICMPv4 Echo Requests directed to it's hardcoded MAC address
 (``52:54:56:53:4B:55``) and IPv4 address (``192.168.7.35``).
 
 
-
-
 # Running the Demos
 
 ## Running the Demo Applications
 
-Now is a good point to start the ``sil-kit-registry``, ``SilKitAdapterTap`` - which connects the QEMU virtual ethernet
-interface to the SIL Kit - and the ``SilKitDemoEthernetIcmpEchoDevice`` in separate terminals:
+Now is a good point to start the ``sil-kit-registry``, the ``SilKitDemoEthernetIcmpEchoDevice`` and the demo helper script ``start_ping_demo`` - which creates the TAP device, connects it to the adapter and afterwards adds it to the network namespace and starts pinging the echos device from there - in separate terminals:
 
-    wsl$ ./path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://127.0.0.1:8501'
+    ./path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://127.0.0.1:8501'
+        
+    ./build/bin/SilKitDemoEthernetIcmpEchoDevice
+
+    sudo ./tap/demos/start_ping_demo.sh
     
-    wsl$ sudo ./tools/setupNetworkBridge.sh
-    
-    wsl$ ./build/bin/SilKitAdapterTap
-    
-    wsl$ ./build/bin/SilKitDemoEthernetIcmpEchoDevice
-    
-The applications will produce output when they send and receive Ethernet frames from QEMU or the Vector SIL Kit.
+The applications will produce output when they send and receive Ethernet frames from the TAP device or the Vector SIL Kit. The console output of ``SilKitAdapterTap`` is redirected to ``/build/bin/SilKitAdapterTap.out``.
 
 ## Starting CANoe 16
 You can also start ``CANoe 16 SP3`` or newer and load the ``Tap_adapter_CANoe.cfg`` from the ``CANoe`` directory and start the
 measurement.
 
 ## ICMP Ping and Pong
-When the virtual machine boots, the network interface created for hooking up with the Vector SIL Kit (``silkit0``) is ``up``.
-It automatically assigns the static IP ``192.168.7.2/24`` to the interface.
-
-Apart from SSH you can also log into the QEMU guest with the user ``root`` with password ``root``.
-
-Then ping the demo device four times:
-
-    root@silkit-qemu-demos-guest:~# ping -c4 192.168.7.35
-
 The ping requests should all receive responses.
 
 You should see output similar to the following from the ``SilKitAdapterTap`` application:
@@ -107,13 +65,13 @@ You should see output similar to the following from the ``SilKitAdapterTap`` app
 And output similar to the following from the ``SilKitDemoEthernetIcmpEchoDevice`` application:
 
     SIL Kit >> Demo: Ethernet frame (98 bytes)
-    EthernetHeader(destination=EthernetAddress(52:54:56:53:4b:55),source=EthernetAddress(52:54:56:53:4b:51),etherType=EtherType::Ip4)
-    Ip4Header(totalLength=84,identification=26992,dontFragment=1,moreFragments=0,fragmentOffset=0,timeToLive=64,protocol=Ip4Protocol::ICMP,checksum=16835,sourceAddress=192.168.7.2,destinationAddress=192.168.7.35) + 64 bytes payload
-    Icmp4Header(type=Icmp4Type::EchoRequest,code=,checksum=35916) + 60 bytes payload
-    Reply: EthernetHeader(destination=EthernetAddress(52:54:56:53:4b:51),source=EthernetAddress(52:54:56:53:4b:55),etherType=EtherType::Ip4)
-    Reply: Ip4Header(totalLength=84,identification=26992,dontFragment=1,moreFragments=0,fragmentOffset=0,timeToLive=64,protocol=Ip4Protocol::ICMP,checksum=16835,sourceAddress=192.168.7.35,destinationAddress=192.168.7.2)
-    Reply: Icmp4Header(type=Icmp4Type::EchoReply,code=,checksum=35916)
-    SIL Kit >> Demo: ACK for ETH Message with transmitId=4
-    Demo >> SIL Kit: Ethernet frame (98 bytes, txId=4)
+    EthernetHeader(destination=EthernetAddress(52:54:56:53:4b:55),source=EthernetAddress(02:d5:de:c1:7f:82),etherType=EtherType::Ip4)
+    Ip4Header(totalLength=84,identification=28274,dontFragment=1,moreFragments=0,fragmentOffset=0,timeToLive=64,protocol=Ip4Protocol::ICMP,checksum=15553,sourceAddress=192.168.7.2,destinationAddress=192.168.7.35) + 64 bytes payload
+    Icmp4Header(type=Icmp4Type::EchoRequest,code=,checksum=33586) + 60 bytes payload
+    Reply: EthernetHeader(destination=EthernetAddress(02:d5:de:c1:7f:82),source=EthernetAddress(52:54:56:53:4b:55),etherType=EtherType::Ip4)
+    Reply: Ip4Header(totalLength=84,identification=28274,dontFragment=1,moreFragments=0,fragmentOffset=0,timeToLive=64,protocol=Ip4Protocol::ICMP,checksum=15553,sourceAddress=192.168.7.35,destinationAddress=192.168.7.2)
+    Reply: Icmp4Header(type=Icmp4Type::EchoReply,code=,checksum=33586)
+    SIL Kit >> Demo: ACK for ETH Message with transmitId=718
+    Demo >> SIL Kit: Ethernet frame (98 bytes, txId=718)
 
 If CANoe is connected to the SIL Kit, all Ethernet traffic should be visible there as well.
