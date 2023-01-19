@@ -52,7 +52,7 @@ It is also necessary that the TAP device exists before the the ``SilKitAdapterTa
 
 The application *optionally* takes the following command line arguments:
 
-    ./build/bin/SilKitAdapterTap [--tap-name 'silkit_tap'] [--registry-uri 'silkit://localhost:8501'] [--participant-name 'EthernetTapDevice'] [--network-name 'tap_demo']    
+    ./build/bin/SilKitAdapterTap [--tap-name 'silkit_tap'] [--registry-uri 'silkit://localhost:8501'] [--participant-name 'EthernetTapDevice'] [--network-name 'tap_demo'] [--log 'Info']
 
 
 ## TAP Demo

@@ -45,24 +45,8 @@ measurement.
 
 ## ICMP Ping and Pong
 The ping requests should all receive responses.
-
-You should see output similar to the following from the ``SilKitAdapterTap`` application:
-
-    SIL Kit >> TAP device: ACK for ETH Message with transmitId=14
-    TAP device >> SIL Kit: Ethernet frame (98 bytes, txId=14)
-    SIL Kit >> TAP device: Ethernet frame (98 bytes)
-    SIL Kit >> TAP device: ACK for ETH Message with transmitId=15
-    TAP device >> SIL Kit: Ethernet frame (98 bytes, txId=15)
-    SIL Kit >> TAP device: Ethernet frame (98 bytes)
-    SIL Kit >> TAP device: ACK for ETH Message with transmitId=16
-    TAP device >> SIL Kit: Ethernet frame (98 bytes, txId=16)
-    SIL Kit >> TAP device: Ethernet frame (98 bytes)
-    SIL Kit >> TAP device: ACK for ETH Message with transmitId=17
-    TAP device >> SIL Kit: Ethernet frame (98 bytes, txId=17)
-    SIL Kit >> TAP device: Ethernet frame (98 bytes)
-
     
-And output similar to the following from the ``SilKitDemoEthernetIcmpEchoDevice`` application:
+You should see output output similar to the following from the ``SilKitDemoEthernetIcmpEchoDevice`` application:
 
     SIL Kit >> Demo: Ethernet frame (98 bytes)
     EthernetHeader(destination=EthernetAddress(52:54:56:53:4b:55),source=EthernetAddress(02:d5:de:c1:7f:82),etherType=EtherType::Ip4)

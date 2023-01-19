@@ -100,24 +100,8 @@ private:
     std::array<uint8_t, 1600> _ethernetFrameBuffer;
     asio::posix::stream_descriptor _tapDeviceStream;
     std::function<void(std::vector<uint8_t>)> _onNewFrameHandler;
-
 };
 
-void EthAckCallback(IEthernetController* /*controller*/, const EthernetFrameTransmitEvent& ack)
-{
-    if (ack.status == EthernetTransmitStatus::Transmitted)
-    {
-        std::cout << "SIL Kit >> TAP device: ACK for ETH Message with transmitId=" 
-                  << reinterpret_cast<intptr_t>(ack.userContext) << std::endl;
-    }
-    else
-    {
-        std::cout << "SIL Kit >> TAP device: NACK for ETH Message with transmitId="
-                  << reinterpret_cast<intptr_t>(ack.userContext)
-                  << ": " << ack.status
-                  << std::endl;
-    }
-}
 
 int main(int argc, char** argv)
 {
@@ -140,7 +124,9 @@ int main(int argc, char** argv)
     const std::string participantName = getArgDefault("--participant-name", "EthernetTapDevice")() ;
     const std::string ethernetNetworkName = getArgDefault("--network-name","tap_demo")();
     const std::string ethernetControllerName = participantName + "_Eth1";
+    const std::string logLvl = getArgDefault("--log","Info")();
 
+    // TODO: in context of SKA-9 pass log level parameter also to participant configuration
     const std::string participantConfigurationString =
         R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": "Info" } ] } })";
 
@@ -148,7 +134,7 @@ int main(int argc, char** argv)
 
     try
     {
-        auto participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
+        auto participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);        
 
         std::cout << "Creating participant '" << participantName << "' at " << registryURI << std::endl;
         auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
@@ -156,7 +142,7 @@ int main(int argc, char** argv)
         std::cout << "Creating ethernet controller '" << ethernetControllerName << "'" << std::endl;
         auto* ethController = participant->CreateEthernetController(ethernetControllerName,ethernetNetworkName);
 
-        const auto onReceiveEthernetFrameFromTapDevice = [ethController](std::vector<std::uint8_t> data) {
+        const auto onReceiveEthernetFrameFromTapDevice = [logLvl, ethController](std::vector<std::uint8_t> data) {
             if (data.size() < 60)
             {
                 data.resize(60, 0);
@@ -164,21 +150,46 @@ int main(int argc, char** argv)
             const auto frameSize = data.size();
             static intptr_t transmitId = 0;
             ethController->SendFrame(EthernetFrame{std::move(data)}, reinterpret_cast < void * >(++transmitId));
-            std::cout << "TAP device >> SIL Kit: Ethernet frame (" << frameSize << " bytes, txId=" << transmitId << ")" << std::endl;
+
+            if (logLvl.compare("Debug") == 0 || logLvl.compare("Trace") == 0)
+            {
+                std::cout << "TAP device >> SIL Kit: Ethernet frame (" << frameSize << " bytes, txId=" << transmitId << ")" << std::endl;
+            }            
         };
 
         std::cout << "Creating TAP device ethernet connector for '" << tapDevName << "'" << std::endl;
         TapConnection tapConnection{ioContext, tapDevName, onReceiveEthernetFrameFromTapDevice};
 
-        const auto onReceiveEthernetMessageFromSilKit = [&tapConnection](IEthernetController* /*controller*/,
+        const auto onReceiveEthernetMessageFromSilKit = [logLvl, &tapConnection](IEthernetController* /*controller*/,
                                                               const EthernetFrameEvent& msg) {
             auto rawFrame = msg.frame.raw;
             tapConnection.SendEthernetFrameToTapDevice(rawFrame);
-            std::cout << "SIL Kit >> TAP device: Ethernet frame (" << rawFrame.size() << " bytes)" << std::endl;
+
+            if (logLvl.compare("Debug") == 0 || logLvl.compare("Trace") == 0)
+            {
+                std::cout << "SIL Kit >> TAP device: Ethernet frame (" << rawFrame.size() << " bytes)" << std::endl;
+            }            
+        };
+
+        const auto onEthAckCallback = [logLvl](IEthernetController* /*controller*/, 
+                                        const EthernetFrameTransmitEvent& ack) {
+            if (logLvl.compare("Debug") == 0 || logLvl.compare("Trace") == 0)
+            {
+                if (ack.status == EthernetTransmitStatus::Transmitted)
+                {
+                    std::cout << "SIL Kit >> TAP device: ACK for ETH Message with transmitId=" 
+                            << reinterpret_cast<intptr_t>(ack.userContext) << std::endl;
+                }
+                else
+                {
+                    std::cout << "SIL Kit >> TAP device: NACK for ETH Message with transmitId="
+                            << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status << std::endl;
+                }
+            }    
         };
 
         ethController->AddFrameHandler(onReceiveEthernetMessageFromSilKit);
-        ethController->AddFrameTransmitHandler(&EthAckCallback);
+        ethController->AddFrameTransmitHandler(onEthAckCallback);
         ethController->Activate();
 
         ioContext.run();
