@@ -33,7 +33,7 @@ To build the demos, you'll need SIL Kit packages ``SilKit-x.y.z-$platform`` for 
 The adapters and demos are built using ``cmake``:
 
     mkdir build
-    cmake -S. -Bbuild -DSILKIT_PACKAGE_DIR=/path/to/SilKit-x.y.z-$platform/
+    cmake -S. -Bbuild -DSILKIT_PACKAGE_DIR=/path/to/SilKit-x.y.z-$platform/ -D CMAKE_BUILD_TYPE=Release
     cmake --build build --parallel
 
 The adapters and demo executables will be available in ``build/bin`` (depending on the configured build directory).
@@ -44,7 +44,7 @@ This application allows the user to attach a TAP device of any Linux system to t
 
 Before you start the adapter there always needs to be a sil-kit-registry running already. Start it e.g. like this:
 
-    ./path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://127.0.0.1:8501'
+    ./path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
 
 It is also necessary that the TAP device exists before the the ``SilKitAdapterTap`` is started. 
 

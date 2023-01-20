@@ -31,7 +31,7 @@ The application will reply to an ARP request and respond to ICMPv4 Echo Requests
 
 Now is a good point to start the ``sil-kit-registry``, the ``SilKitDemoEthernetIcmpEchoDevice`` and the demo helper script ``start_ping_demo`` - which creates the TAP device, connects it to the adapter and afterwards adds it to the network namespace and starts pinging the echos device from there - in separate terminals:
 
-    ./path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://127.0.0.1:8501'
+    ./path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
         
     ./build/bin/SilKitDemoEthernetIcmpEchoDevice
 
