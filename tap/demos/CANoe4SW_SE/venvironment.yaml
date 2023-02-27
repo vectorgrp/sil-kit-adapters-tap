@@ -6,7 +6,7 @@ global-settings:
    access-mode: network-based
 
 sil-kit:
-  participant-name: CANoe4SW_SE_CalcClient
+  participant-name: CANoe4SW_SE
   config-file-path: ../SilKitConfig_CANoe.silkit.yaml
 
 ethernet-networks:
