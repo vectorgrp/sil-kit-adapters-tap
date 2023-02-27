@@ -1,0 +1,8 @@
+Description: Configuration for CANoe participant for SIL Kit Adapter TAP demo
+Middleware:
+  RegistryUri: silkit://172.20.234.25:8501
+# Logging:
+  # Sinks:
+  # - Type: File
+    # Level: Trace
+    # LogName: TraceLogFile

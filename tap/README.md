@@ -39,10 +39,6 @@ Now is a good point to start the ``sil-kit-registry``, the ``SilKitDemoEthernetI
     
 The applications will produce output when they send and receive Ethernet frames from the TAP device or the Vector SIL Kit. The console output of ``SilKitAdapterTap`` is redirected to ``/build/bin/SilKitAdapterTap.out``.
 
-## Starting CANoe 16
-You can also start ``CANoe 16 SP3`` or newer and load the ``Tap_adapter_CANoe.cfg`` from the ``CANoe`` directory and start the
-measurement.
-
 ## ICMP Ping and Pong
 The ping requests should all receive responses.
     
@@ -58,4 +54,16 @@ You should see output output similar to the following from the ``SilKitDemoEther
     SIL Kit >> Demo: ACK for ETH Message with transmitId=718
     Demo >> SIL Kit: Ethernet frame (98 bytes, txId=718)
 
-If CANoe is connected to the SIL Kit, all Ethernet traffic should be visible there as well.
+
+## Adding CANoe (16 SP3 or newer) as a participant
+If CANoe is connected to the SIL Kit, all ethernet traffic is visible there as well. You can also execute a test unit which checks if the ICMP Ping and Pong is happening as expected.
+
+Before you can connect CANoe to the SIL Kit network you should adapt the ``RegistryUri`` in ``/tap/demos/SilKitConfig_CANoe.silkit.json`` to the IP address of your system where your sil-kit-registry is running (in case of a WSL2 Ubuntu image e.g. the IP address of Eth0). The configuration file is referenced by both following CANoe use cases (Desktop Edition and Server Edition).
+
+### CANoe Desktop Edition
+Load the ``Tap_adapter_CANoe.cfg`` from the ``demos/CANoe`` directory and start the measurement. Optionally you can also start the test unit execution of included test configuration. While the demo is running these tests should be successful.
+
+### CANoe4SW Server Edition (Windows)
+You can also run the same test set with ``CANoe4SW SE`` by executing the following powershell script ``demos/CANoe4SW_SE/run.ps1``. The test cases are executed automatically and you should see a short test report in powershell after execution.
+
+

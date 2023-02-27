@@ -1,9 +1,0 @@
-Description: Configuration for CANoe participant for SIL Kit Adapter QEMU Ethernet Demo
-Logging:
-  Sinks:
-    - Level: Info    
-      Type: Stdout
-EthernetControllers:
- - Name: "Eth1/Listening_ECU"
-   Network: "tap_demo"
-	 

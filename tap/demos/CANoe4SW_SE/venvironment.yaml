@@ -1,0 +1,25 @@
+version: 1.1.0
+
+global-settings:
+ time-source: internal-realtime
+ ethernet-settings:
+   access-mode: network-based
+
+sil-kit:
+  participant-name: CANoe4SW_SE_CalcClient
+  config-file-path: ../SilKitConfig_CANoe.silkit.yaml
+
+ethernet-networks:
+  - name: tap_demo    
+    mapping: external-sil-kit
+
+simulation-nodes:
+  - name: SilKitDummyNode
+    network-assignments:
+      - network: tap_demo
+        
+        
+      
+    
+      
+    

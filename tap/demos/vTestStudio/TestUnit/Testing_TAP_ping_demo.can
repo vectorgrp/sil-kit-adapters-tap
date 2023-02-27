@@ -1,0 +1,36 @@
+/*@!Encoding:1252*/
+includes
+{
+  
+}
+
+variables
+{
+  int result;
+  char networkName[10] = "tap_demo";
+  dword timeout;
+}
+
+void CheckTestResult(char testName[], int result)
+{
+  if (result != 1)
+  {
+    TestStepFail(testName, "FAILED: No message within timeout");
+  }
+  TestStepPass(testName, "SUCCESS");
+}
+
+export testcase Ethernet_WaitForTapMessage()
+{
+  SetBusContext(GetBusNameContext(networkName));  
+  result = TestWaitForEthernetPacket(IpGetAddressAsNumber("192.168.7.2"), 0, 0, 0, 0, 0x0020, timeout);  
+  CheckTestResult("Ethernet_WaitForTapMessage", result);
+}
+
+export testcase Ethernet_WaitForEchoMessage()
+{
+  SetBusContext(GetBusNameContext(networkName));  
+  result = TestWaitForEthernetPacket(IpGetAddressAsNumber("192.168.7.35"), 0, 0, 0, 0, 0x0020, timeout);
+  CheckTestResult("Ethernet_WaitForEchoMessage", result);
+}
+

@@ -1,0 +1,353 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <FileFormatVersion>13</FileFormatVersion>
+  <ProjectModelRoot>
+    <UniqueId>73a4a3rl7m7a</UniqueId>
+    <EmbeddedSysVars>
+      <ExternalFiles />
+      <MainFile>
+      </MainFile>
+      <PersistencyGuid>d6p2fs0bpe6m</PersistencyGuid>
+    </EmbeddedSysVars>
+    <CANoeEmbeddedSysVars>
+      <ExternalFiles />
+      <MainFile>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;systemvariables version="4"&gt;
+  &lt;namespace name="" comment="" interface=""&gt;
+    &lt;namespace name="CANoe" comment="" interface=""&gt;
+      &lt;variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" separateTransmissions="true" name="UnknownSysVar" comment="Name of the system variable that could not be updated (not defined)" bitcount="0" isSigned="true" encoding="65001" type="string" /&gt;
+    &lt;/namespace&gt;
+    &lt;namespace name="_CCS" comment="" interface=""&gt;
+      &lt;struct name="V2GMessageStruct" isUnion="False" definedBinaryLayout="False" comment=""&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="InverseVersion" comment="" bitcount="32" isSigned="true" encoding="65001" type="int" /&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="Version" comment="" bitcount="32" isSigned="true" encoding="65001" type="int" /&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="Type" comment="" bitcount="32" isSigned="true" encoding="65001" type="int"&gt;
+          &lt;valuetable name="" definesMinMax="false"&gt;
+            &lt;valuetableentry value="32769" lowerBound="32769" upperBound="32769" description="EXI" displayString="EXI" /&gt;
+            &lt;valuetableentry value="32770" lowerBound="32770" upperBound="32770" description="EXI_Obsolete" displayString="EXI_Obsolete" /&gt;
+            &lt;valuetableentry value="36864" lowerBound="36864" upperBound="36864" description="SDP Request" displayString="SDP Request" /&gt;
+            &lt;valuetableentry value="36865" lowerBound="36865" upperBound="36865" description="SDP Response" displayString="SDP Response" /&gt;
+            &lt;valuetableentry value="56065" lowerBound="56065" upperBound="56065" description="XML_ISO" displayString="XML_ISO" /&gt;
+          &lt;/valuetable&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="Length" comment="" bitcount="32" isSigned="true" encoding="65001" type="int" /&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="Payload" comment="" bitcount="0" isSigned="true" encoding="65001" type="string" /&gt;
+      &lt;/struct&gt;
+      &lt;variable anlyzLocal="1" readOnly="false" valueSequence="false" unit="" name="V2GMessage" comment="" bitcount="128" isSigned="true" encoding="65001" type="struct" structDefinition="_CCS::V2GMessageStruct" /&gt;
+    &lt;/namespace&gt;
+    &lt;namespace name="_Security" comment="" interface=""&gt;
+      &lt;struct name="SecurityErrorEventStruct" isUnion="False" definedBinaryLayout="True" comment=""&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="PDUName" comment="" bitcount="256" isSigned="false" encoding="65001" type="string" startValue="" /&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="DataID" comment="" bitcount="32" isSigned="false" encoding="65001" type="int" startValue="0" /&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="Network" comment="" bitcount="256" isSigned="false" encoding="65001" type="string" startValue="" /&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="UsedFreshness" comment="" bitcount="64" isSigned="false" encoding="65001" type="longlong" startValue="0" /&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="CalculatedAuthentication" comment="" bitcount="64" isSigned="false" encoding="65001" type="longlong" startValue="0" /&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="RxFreshness" comment="" bitcount="64" isSigned="false" encoding="65001" type="longlong" startValue="0" /&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="RxAuthentication" comment="" bitcount="64" isSigned="false" encoding="65001" type="longlong" startValue="0" /&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="Flags" comment="" bitcount="64" isSigned="false" encoding="65001" type="longlong" startValue="0" /&gt;
+      &lt;/struct&gt;
+      &lt;struct name="TLSMasterSecretStruct" isUnion="False" definedBinaryLayout="False" comment=""&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="Key" comment="" bitcount="0" isSigned="true" encoding="65001" type="string" /&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="Type" comment="" bitcount="32" isSigned="true" encoding="65001" type="int"&gt;
+          &lt;valuetable name="" definesMinMax="false"&gt;
+            &lt;valuetableentry value="0" lowerBound="0" upperBound="0" description="NotSupported" displayString="NotSupported" /&gt;
+            &lt;valuetableentry value="1" lowerBound="1" upperBound="1" description="ByteStreamMasterSecret" displayString="ByteStreamMasterSecret" /&gt;
+            &lt;valuetableentry value="2" lowerBound="2" upperBound="2" description="NSSKeyLogMasterSecret" displayString="NSSKeyLogMasterSecret" /&gt;
+          &lt;/valuetable&gt;
+        &lt;/structMember&gt;
+      &lt;/struct&gt;
+      &lt;variable anlyzLocal="2" readOnly="true" valueSequence="false" unit="" separateTransmissions="true" name="SecurityErrorEvent" comment="" bitcount="864" isSigned="true" encoding="65001" type="struct" structDefinition="_Security::SecurityErrorEventStruct" /&gt;
+      &lt;variable anlyzLocal="2" readOnly="false" valueSequence="false" unit="" name="TLSMasterSecret" comment="" bitcount="32" isSigned="true" encoding="65001" type="struct" structDefinition="_Security::TLSMasterSecretStruct" /&gt;
+    &lt;/namespace&gt;
+    &lt;namespace name="_Statistics" comment="" interface=""&gt;
+      &lt;namespace name="tap_demo" comment="" interface=""&gt;
+        &lt;variable anlyzLocal="1" readOnly="false" valueSequence="false" unit="" name="SilKitDummyEcu" comment="" bitcount="1344" isSigned="true" encoding="65001" type="struct" structDefinition="_Statistics::EthernetStruct" /&gt;
+      &lt;/namespace&gt;
+      &lt;struct name="EthernetStruct" isUnion="False" definedBinaryLayout="True" comment=""&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="RxBitRate" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="MBit/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="RxBitRateMin" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="MBit/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="RxBitRateMax" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="MBit/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="RxBitRateAvg" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="MBit/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="TxBitRate" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="MBit/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="TxBitRateMin" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="MBit/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="TxBitRateMax" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="MBit/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="TxBitRateAvg" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="MBit/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="RxPacketsOK" comment="" bitcount="32" isSigned="true" encoding="65001" type="int"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="total" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="TxPacketsOK" comment="" bitcount="32" isSigned="true" encoding="65001" type="int"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="total" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="RxPacketsError" comment="" bitcount="32" isSigned="true" encoding="65001" type="int"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="total" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="TxPacketsError" comment="" bitcount="32" isSigned="true" encoding="65001" type="int"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="total" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="RxPacketRate" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="fr/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="RxPacketRateMin" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="fr/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="RxPacketRateMax" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="fr/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="RxPacketRateAvg" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="fr/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="TxPacketRate" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="fr/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="TxPacketRateMin" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="fr/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="TxPacketRateMax" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="fr/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="TxPacketRateAvg" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="fr/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="RxBytes" comment="" bitcount="32" isSigned="true" encoding="65001" type="int"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="total" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="TxBytes" comment="" bitcount="32" isSigned="true" encoding="65001" type="int"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="total" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="LinkSpeed" comment="" bitcount="64" isSigned="true" encoding="65001" type="float" minValue="0"&gt;
+          &lt;linearencoding factor="1" offset="0" unit="MBit/s" /&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="ConnectionStatus" comment="" bitcount="32" isSigned="true" encoding="65001" type="int"&gt;
+          &lt;valuetable name="" definesMinMax="false"&gt;
+            &lt;valuetableentry value="1" lowerBound="1" upperBound="1" description="Link down" displayString="Link down" /&gt;
+            &lt;valuetableentry value="2" lowerBound="2" upperBound="2" description="Link up" displayString="Link up" /&gt;
+          &lt;/valuetable&gt;
+        &lt;/structMember&gt;
+        &lt;structMember relativeOffset="0" byteOrder="0" isOptional="False" isHidden="False" name="SQI" comment="" bitcount="32" isSigned="true" encoding="65001" type="int" minValue="0" minValuePhys="0" /&gt;
+      &lt;/struct&gt;
+    &lt;/namespace&gt;
+    &lt;namespace name="Test_Configuration_1" comment="" interface=""&gt;
+      &lt;variable anlyzLocal="2" readOnly="true" valueSequence="false" unit="" name="RunState" comment="" bitcount="32" isSigned="true" encoding="65001" type="int" startValue="0"&gt;
+        &lt;valuetable name="" definesMinMax="false"&gt;
+          &lt;valuetableentry value="0" lowerBound="0" upperBound="0" description="NotRunning" displayString="NotRunning" /&gt;
+          &lt;valuetableentry value="1" lowerBound="1" upperBound="1" description="Running" displayString="Running" /&gt;
+          &lt;valuetableentry value="2" lowerBound="2" upperBound="2" description="Finished" displayString="Finished" /&gt;
+        &lt;/valuetable&gt;
+      &lt;/variable&gt;
+      &lt;variable anlyzLocal="2" readOnly="true" valueSequence="false" unit="" name="VerdictSummary" comment="" bitcount="32" isSigned="true" encoding="65001" type="int" startValue="0"&gt;
+        &lt;valuetable name="" definesMinMax="false"&gt;
+          &lt;valuetableentry value="0" lowerBound="0" upperBound="0" description="None" displayString="None" /&gt;
+          &lt;valuetableentry value="1" lowerBound="1" upperBound="1" description="Passed" displayString="Passed" /&gt;
+          &lt;valuetableentry value="2" lowerBound="2" upperBound="2" description="Inconclusive" displayString="Inconclusive" /&gt;
+          &lt;valuetableentry value="3" lowerBound="3" upperBound="3" description="Failed" displayString="Failed" /&gt;
+          &lt;valuetableentry value="4" lowerBound="4" upperBound="4" description="ErrorInTestSystem" displayString="ErrorInTestSystem" /&gt;
+        &lt;/valuetable&gt;
+      &lt;/variable&gt;
+    &lt;/namespace&gt;
+  &lt;/namespace&gt;
+&lt;/systemvariables&gt;</MainFile>
+      <PersistencyGuid>6eimd3vd5jad</PersistencyGuid>
+    </CANoeEmbeddedSysVars>
+    <EmbeddedBasicDiagnosisFiles />
+    <EmbeddedEthernetPortsFile>
+      <Content>22 serialization::archive 16 0 0 1 11 8 tap_demo 8 tap_demo 0 0 1 1 14 SilKitDummyEcu</Content>
+      <PersistencyGuid>tcukkm40ssik</PersistencyGuid>
+    </EmbeddedEthernetPortsFile>
+    <ExternalReferences />
+    <Libraries />
+    <ProjectRoot>
+      <TestUnits>
+        <FolderName>Test Units</FolderName>
+        <SubFolders>
+          <TestUnit>
+            <FolderName>TestUnit</FolderName>
+            <Files>
+              <ProjectFile>
+                <FileName>Testing_TAP_ping_demo.can</FileName>
+                <PersistencyGuid>d6845va9uorl</PersistencyGuid>
+              </ProjectFile>
+              <ProjectFile>
+                <FileName>TestTable.vtt</FileName>
+                <PersistencyGuid>98tcsn9aq4bf</PersistencyGuid>
+              </ProjectFile>
+            </Files>
+            <PersistencyGuid>efun8m63vna0</PersistencyGuid>
+            <FilesExcludedFromTestTree />
+            <FilesExcludedFromBuild />
+            <ExcludeFromBuild>False</ExcludeFromBuild>
+            <EmbeddedTUVariantProperties>
+              <Content>&lt;TUVariantPropertyModel&gt;
+  &lt;FileFormatVersion&gt;1&lt;/FileFormatVersion&gt;
+  &lt;TUVariantPropertyValues&gt;
+    &lt;VariantPropertyRefs /&gt;
+  &lt;/TUVariantPropertyValues&gt;
+&lt;/TUVariantPropertyModel&gt;</Content>
+              <PersistencyGuid>hombks3up4qb</PersistencyGuid>
+            </EmbeddedTUVariantProperties>
+            <EmbeddedTUProperties>
+              <Content>&lt;TUProperties&gt;
+  &lt;Caption&gt;&lt;/Caption&gt;
+  &lt;Description&gt;&lt;/Description&gt;
+  &lt;Version&gt;&lt;/Version&gt;
+  &lt;PreBuildEvent&gt;&lt;/PreBuildEvent&gt;
+  &lt;PostBuildEvent&gt;&lt;/PostBuildEvent&gt;
+  &lt;TestDesigners&gt;
+    &lt;Columns /&gt;
+    &lt;TestDesignerEntries /&gt;
+  &lt;/TestDesigners&gt;
+  &lt;TUInfos /&gt;
+&lt;/TUProperties&gt;</Content>
+              <PersistencyGuid>kcn7rg6bvtk6</PersistencyGuid>
+            </EmbeddedTUProperties>
+            <ModellingLibraries>
+              <Files />
+            </ModellingLibraries>
+            <SystemModelingLibraries />
+          </TestUnit>
+        </SubFolders>
+      </TestUnits>
+    </ProjectRoot>
+    <ProjectSettings>
+      <NetGenerateNsNetwork>False</NetGenerateNsNetwork>
+      <NetGenerateNsDatabase>False</NetGenerateNsDatabase>
+      <NetGenerateNsNode>False</NetGenerateNsNode>
+      <NetGenerateNsFrame>False</NetGenerateNsFrame>
+      <BuildDirLocal>
+      </BuildDirLocal>
+      <BuildDirPackAndGo>
+      </BuildDirPackAndGo>
+      <BuildMode>Local</BuildMode>
+      <IncludeSources>False</IncludeSources>
+      <CreateExecutableFolder>False</CreateExecutableFolder>
+      <ExportTraceabilityMatrix>False</ExportTraceabilityMatrix>
+      <GenerateXmlDocumentation>False</GenerateXmlDocumentation>
+      <EncryptCaplFiles>False</EncryptCaplFiles>
+      <TdeBreakOnFailDefault>True</TdeBreakOnFailDefault>
+      <TdePartialPathSeparator>_</TdePartialPathSeparator>
+      <TdeTcAnUseId>False</TdeTcAnUseId>
+      <StateChartAlgorithm>BreadthFirst</StateChartAlgorithm>
+      <TteTcBreakOnFailDefault>True</TteTcBreakOnFailDefault>
+      <TteTsBreakOnFailDefault>True</TteTsBreakOnFailDefault>
+      <IsIdAwareProject>True</IsIdAwareProject>
+      <FullNavigationSupported>True</FullNavigationSupported>
+      <UsesPDULayer>False</UsesPDULayer>
+      <UseAllNetworks>False</UseAllNetworks>
+      <UseOutputDirAsWorkingDir>False</UseOutputDirAsWorkingDir>
+      <NetVersion>Net47</NetVersion>
+      <TdeGenerateDescriptionFromComments>False</TdeGenerateDescriptionFromComments>
+      <IsDiagramIdAwareProject>False</IsDiagramIdAwareProject>
+      <ExportDiagramsAsImage>False</ExportDiagramsAsImage>
+      <CaplWarnings>
+        <CaplWarning>
+          <ID>1448</ID>
+          <Enabled>False</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2001</ID>
+          <Enabled>True</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2002</ID>
+          <Enabled>False</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2005</ID>
+          <Enabled>False</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2008</ID>
+          <Enabled>True</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2013</ID>
+          <Enabled>True</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2020</ID>
+          <Enabled>True</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2032</ID>
+          <Enabled>True</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2038</ID>
+          <Enabled>True</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2039</ID>
+          <Enabled>False</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2040</ID>
+          <Enabled>True</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2041</ID>
+          <Enabled>True</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2054</ID>
+          <Enabled>False</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2055</ID>
+          <Enabled>True</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2065</ID>
+          <Enabled>False</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2135</ID>
+          <Enabled>True</Enabled>
+        </CaplWarning>
+        <CaplWarning>
+          <ID>2201</ID>
+          <Enabled>False</Enabled>
+        </CaplWarning>
+      </CaplWarnings>
+      <AdditionalLicenseInfos />
+    </ProjectSettings>
+    <SUTEnvironment>
+      <SUTSystemVariables>
+        <FolderName>SUT System Variables</FolderName>
+      </SUTSystemVariables>
+      <DiagnosticTargets>
+        <FolderName>Diagnostic Targets</FolderName>
+      </DiagnosticTargets>
+      <SUTNetworks>
+        <FolderName>SUT Networks</FolderName>
+        <SubFolders>
+          <Channel>
+            <FolderName>tap_demo</FolderName>
+            <ChannelNum>1</ChannelNum>
+            <ChannelType>Ethernet</ChannelType>
+          </Channel>
+        </SubFolders>
+      </SUTNetworks>
+      <COLibParts>
+        <FolderName>CO Lib Parts</FolderName>
+      </COLibParts>
+      <ComCoDataSource>VcodmFiles</ComCoDataSource>
+      <SourceOfDescriptionFiles>VTestStudio</SourceOfDescriptionFiles>
+      <EnvironmentMakeConfiguration />
+    </SUTEnvironment>
+  </ProjectModelRoot>
+</Project>

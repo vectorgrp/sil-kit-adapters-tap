@@ -21,7 +21,7 @@ echo "Creating tap device silkit_tap"
 ip tuntap add dev silkit_tap mode tap
 
 echo "Starting SilKitAdapterTap..."
-nohup bash -c "/"$SCRIPT_DIR"/../../build/bin/SilKitAdapterTap & disown %1" &> /$SCRIPT_DIR/../../build/bin/SilKitAdapterTap.out
+nohup bash -c "/"$SCRIPT_DIR"/../../build/bin/SilKitAdapterTap --network-name 'tap_demo' & disown %1" &> /$SCRIPT_DIR/../../build/bin/SilKitAdapterTap.out
 sleep 2
 echo "SilKitAdapterTap has been started"
 

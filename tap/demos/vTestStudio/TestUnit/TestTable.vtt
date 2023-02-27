@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--Vector Test Table Editor-->
+<ttroot version="26" xmlns="http://www.vector-informatik.de/ITE/TestTable/1.0">
+  <tt>
+    <capltestcase>
+      <title />
+      <name>Ethernet_WaitForTapMessage</name>
+      <tcid>1fed096d-b37c-4c7b-aad9-f96d146c2a5e</tcid>
+    </capltestcase>
+    <capltestcase>
+      <title />
+      <name>Ethernet_WaitForEchoMessage</name>
+      <tcid>58c774e1-efa6-4d4e-8c43-aba7badb2a72</tcid>
+    </capltestcase>
+  </tt>
+  <ttlib>
+    <ts_definitions />
+    <tc_definitions />
+    <function_definitions />
+  </ttlib>
+</ttroot>
