@@ -66,4 +66,7 @@ Load the ``Tap_adapter_CANoe.cfg`` from the ``demos/CANoe`` directory and start 
 ### CANoe4SW Server Edition (Windows)
 You can also run the same test set with ``CANoe4SW SE`` by executing the following powershell script ``demos/CANoe4SW_SE/run.ps1``. The test cases are executed automatically and you should see a short test report in powershell after execution.
 
+### CANoe4SW Server Edition (Linux)
+You can also run the same test set with ``CANoe4SW SE (Linux)``. At first you have to execute the powershell script ``demos/CANoe4SW_SE/createEnvForLinux.ps1`` on your windows system by using tools of ``CANoe4SW SE (Windows)`` to prepare your test environment for Linux. In ``demos/CANoe4SW_SE/run.sh`` you should adapt ``canoe4sw_se_install_dir`` to the path of your ``CANoe4SW SE`` installation in your WSL2. Afterwards you can execute ``demos/CANoe4SW_SE/run.sh`` in your WSL2. The test cases are executed automatically and you should see a short test report in your terminal after execution.
+
 
