@@ -3,14 +3,20 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 echo "Setting up network and ping the echo demo device via SIL Kit Adapter TAP..."
 
+# cleanup trap for child processes 
+trap 'kill $(jobs -p); exit' EXIT SIGHUP;
+
 # check if user is root
 if [[ $EUID -ne 0 ]]; then
     echo "This script must be run as root / via sudo!"
     exit 1
 fi
 
-killall -w -q -15 SilKitAdapterTap &> /dev/null
-echo "SilKitAdapterTap has been stopped"
+#Make a temporary fifo to use as std:cin which is not fd#0 (this shell's std:cin) to prevent unintended closure of the background-launched processes
+tmp_fifo=$(mktemp -u)
+mkfifo $tmp_fifo
+exec 3<>$tmp_fifo
+rm $tmp_fifo
 
 echo "Recreating tap_demo_ns network namespace"
 if test -f "/var/run/netns/tap_demo_ns"; then
@@ -21,7 +27,7 @@ echo "Creating tap device silkit_tap"
 ip tuntap add dev silkit_tap mode tap
 
 echo "Starting SilKitAdapterTap..."
-nohup bash -c "/"$SCRIPT_DIR"/../../build/bin/SilKitAdapterTap --network-name 'tap_demo' & disown %1" &> /$SCRIPT_DIR/../../build/bin/SilKitAdapterTap.out
+<&3 $SCRIPT_DIR/../../build/bin/SilKitAdapterTap --network-name 'tap_demo' &> /$SCRIPT_DIR/../../build/bin/SilKitAdapterTap.out &
 sleep 2
 echo "SilKitAdapterTap has been started"
 
