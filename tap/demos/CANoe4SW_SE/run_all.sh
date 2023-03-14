@@ -1,7 +1,11 @@
 #!/bin/bash
 scriptDir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-# Hint: needs to be adapted to actual location
-silKitDir=/home/vector/SilKit/SilKit-4.0.17-ubuntu-18.04-x86_64-gcc/
+silKitDir=/home/vector/SilKit/SilKit-4.0.19-ubuntu-18.04-x86_64-gcc/
+
+if [ ! -d "$silKitDir" ]; then
+    echo "The var 'silKitDir' needs to be set to actual location of your SilKit"
+    exit 1
+fi
 
 # check if user is root
 if [[ $EUID -ne 0 ]]; then
@@ -17,7 +21,7 @@ rm $tmp_fifo
 
 <&3 $silKitDir/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501' &> $scriptDir/sil-kit-registry.out &
 
-<&3 $scriptDir/../start_ping_demo.sh &> $scriptDir/start_ping_demo.out &
+<&3 $scriptDir/../start_adapter_and_ping_demo.sh &> $scriptDir/start_adapter_and_ping_demo.out &
 
 <&3 $scriptDir/../../../build/bin/SilKitDemoEthernetIcmpEchoDevice &> $scriptDir/SilKitDemoEthernetIcmpEchoDevice.out &
 
