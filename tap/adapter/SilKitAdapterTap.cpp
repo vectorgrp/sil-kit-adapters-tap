@@ -14,8 +14,12 @@
 #include "silkit/config/all.hpp"
 #include "silkit/services/ethernet/all.hpp"
 #include "silkit/services/ethernet/string_utils.hpp"
+#include "silkit/services/logging/all.hpp"
 
 #include "Exceptions.hpp"
+#include "Parsing.hpp"
+
+#include "SilKitAdapterTap.hpp"
 
 using namespace SilKit::Services::Ethernet;
 using namespace exceptions;
@@ -24,9 +28,11 @@ class TapConnection
 {
 public:
     TapConnection(asio::io_context& io_context, const std::string& tapDevName,
-                     std::function<void(std::vector<uint8_t>)> onNewFrameHandler)
+                     std::function<void(std::vector<uint8_t>)> onNewFrameHandler,
+                  SilKit::Services::Logging::ILogger* logger)
         : _tapDeviceStream{io_context}
         , _onNewFrameHandler(std::move(onNewFrameHandler))
+        , _logger(logger)
     {
         _tapDeviceStream.assign(GetTapDeviceFileDescriptor(tapDevName.c_str()));
         ReceiveEthernetFrameFromTapDevice();        
@@ -42,7 +48,7 @@ public:
         }
     }
 
-    private:
+private:
     void ReceiveEthernetFrameFromTapDevice()
     {
         _tapDeviceStream.async_read_some(asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),                             
@@ -91,7 +97,7 @@ private:
             return errorCode;
         }
         
-        std::cout << "TAP device successfully opened" << std::endl;
+        _logger->Info("TAP device successfully opened");
         return tapFileDescriptor;
     }
 
@@ -100,35 +106,28 @@ private:
     std::array<uint8_t, 1600> _ethernetFrameBuffer;
     asio::posix::stream_descriptor _tapDeviceStream;
     std::function<void(std::vector<uint8_t>)> _onNewFrameHandler;
+    SilKit::Services::Logging::ILogger* _logger;
 };
 
+using namespace adapters;
 
 int main(int argc, char** argv)
 {
-    const auto getArgDefault = [ argc , argv ](const std::string& argument, const std::string& defaultValue)-> auto {
-        return [argc, argv, argument, defaultValue]() -> std::string {
-            auto found = std::find_if(argv, argv + argc, [argument](const char* arg) -> bool {                
-                return arg == argument;
-            });
+    if (findArg(argc, argv, "--help", argv) != NULL)
+    {
+        print_help(true);
+        return NO_ERROR;
+    }
 
-            if (found != argv + argc && found + 1 != argv + argc)
-            {
-                return *(found + 1);
-            }
-            return defaultValue;                            
-        };
-    };
-
-    const std::string tapDevName = getArgDefault("--tap-name","silkit_tap")();
-    const std::string registryURI = getArgDefault("--registry-uri", "silkit://localhost:8501")();
-    const std::string participantName = getArgDefault("--participant-name", "EthernetTapDevice")() ;
-    const std::string ethernetNetworkName = getArgDefault("--network-name","tap_demo")();
-    const std::string ethernetControllerName = participantName + "_Eth1";
-    const std::string logLvl = getArgDefault("--log","Info")();
-
-    // TODO: in context of SKA-9 pass log level parameter also to participant configuration
+    const std::string loglevel = getArgDefault(argc, argv, "--log", "Info");
     const std::string participantConfigurationString =
-        R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": "Info" } ] } })";
+        R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": ")" + loglevel + R"("} ] } })";
+    const std::string registryURI = getArgDefault(argc, argv, "--registry-uri", "silkit://localhost:8501");
+
+    const std::string tapDevName = getArgDefault(argc,argv,"--tap-name","silkit_tap");
+    const std::string participantName = getArgDefault(argc, argv, "--name", "EthernetTapDevice");
+    const std::string ethernetNetworkName = getArgDefault(argc, argv, "--network", "tap_demo");
+    const std::string ethernetControllerName = participantName + "_Eth1";
 
     asio::io_context ioContext;
 
@@ -138,11 +137,15 @@ int main(int argc, char** argv)
 
         std::cout << "Creating participant '" << participantName << "' at " << registryURI << std::endl;
         auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
+        
+        auto logger = participant->GetLogger();
 
-        std::cout << "Creating ethernet controller '" << ethernetControllerName << "'" << std::endl;
+        std::ostringstream SILKitInfoMessage;
+        SILKitInfoMessage << "Creating ethernet controller '" << ethernetControllerName << "'";
+        logger->Info(SILKitInfoMessage.str());
         auto* ethController = participant->CreateEthernetController(ethernetControllerName,ethernetNetworkName);
 
-        const auto onReceiveEthernetFrameFromTapDevice = [logLvl, ethController](std::vector<std::uint8_t> data) {
+        const auto onReceiveEthernetFrameFromTapDevice = [&logger, ethController](std::vector<std::uint8_t> data) {
             if (data.size() < 60)
             {
                 data.resize(60, 0);
@@ -151,41 +154,40 @@ int main(int argc, char** argv)
             static intptr_t transmitId = 0;
             ethController->SendFrame(EthernetFrame{std::move(data)}, reinterpret_cast < void * >(++transmitId));
 
-            if (logLvl.compare("Debug") == 0 || logLvl.compare("Trace") == 0)
-            {
-                std::cout << "TAP device >> SIL Kit: Ethernet frame (" << frameSize << " bytes, txId=" << transmitId << ")" << std::endl;
-            }            
+            std::ostringstream SILKitDebugMessage;
+            SILKitDebugMessage << "TAP device >> SIL Kit: Ethernet frame (" << frameSize << " bytes, txId=" << transmitId << ")";
+            logger->Debug(SILKitDebugMessage.str());
         };
 
-        std::cout << "Creating TAP device ethernet connector for '" << tapDevName << "'" << std::endl;
-        TapConnection tapConnection{ioContext, tapDevName, onReceiveEthernetFrameFromTapDevice};
+        SILKitInfoMessage.str("");
+        SILKitInfoMessage << "Creating TAP device ethernet connector for '" << tapDevName << "'";
+        logger->Info(SILKitInfoMessage.str());
+        TapConnection tapConnection{ioContext, tapDevName, onReceiveEthernetFrameFromTapDevice, logger};
 
-        const auto onReceiveEthernetMessageFromSilKit = [logLvl, &tapConnection](IEthernetController* /*controller*/,
+        const auto onReceiveEthernetMessageFromSilKit = [&logger, &tapConnection](IEthernetController* /*controller*/,
                                                               const EthernetFrameEvent& msg) {
             auto rawFrame = msg.frame.raw;
             tapConnection.SendEthernetFrameToTapDevice(rawFrame);
 
-            if (logLvl.compare("Debug") == 0 || logLvl.compare("Trace") == 0)
-            {
-                std::cout << "SIL Kit >> TAP device: Ethernet frame (" << rawFrame.size() << " bytes)" << std::endl;
-            }            
+            std::ostringstream SILKitDebugMessage;
+            SILKitDebugMessage << "SIL Kit >> TAP device: Ethernet frame (" << rawFrame.size() << " bytes)" << std::endl;
+            logger->Debug(SILKitDebugMessage.str());
         };
 
-        const auto onEthAckCallback = [logLvl](IEthernetController* /*controller*/, 
+        const auto onEthAckCallback = [&logger](IEthernetController* /*controller*/, 
                                         const EthernetFrameTransmitEvent& ack) {
-            if (logLvl.compare("Debug") == 0 || logLvl.compare("Trace") == 0)
+            std::ostringstream SILKitDebugMessage;
+            if (ack.status == EthernetTransmitStatus::Transmitted)
             {
-                if (ack.status == EthernetTransmitStatus::Transmitted)
-                {
-                    std::cout << "SIL Kit >> TAP device: ACK for ETH Message with transmitId=" 
-                            << reinterpret_cast<intptr_t>(ack.userContext) << std::endl;
-                }
-                else
-                {
-                    std::cout << "SIL Kit >> TAP device: NACK for ETH Message with transmitId="
-                            << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status << std::endl;
-                }
-            }    
+                SILKitDebugMessage << "SIL Kit >> TAP device: ACK for ETH Message with transmitId=" 
+                        << reinterpret_cast<intptr_t>(ack.userContext);
+            }
+            else
+            {
+                SILKitDebugMessage << "SIL Kit >> TAP device: NACK for ETH Message with transmitId="
+                        << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status;
+            }
+            logger->Debug(SILKitDebugMessage.str());
         };
 
         ethController->AddFrameHandler(onReceiveEthernetMessageFromSilKit);
@@ -202,15 +204,15 @@ int main(int argc, char** argv)
         std::cerr << "Invalid configuration: " << error.what() << std::endl;
         std::cout << "Press enter to stop the process..." << std::endl;
         std::cin.ignore();
-        return -2;
+        return CLI_ERROR;
     }
     catch (const std::exception& error)
     {
         std::cerr << "Something went wrong: " << error.what() << std::endl;
         std::cout << "Press enter to stop the process..." << std::endl;
         std::cin.ignore();
-        return -3;
+        return OTHER_ERROR;
     }
 
-    return 0;
+    return NO_ERROR;
 }

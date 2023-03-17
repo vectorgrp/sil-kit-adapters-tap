@@ -50,10 +50,14 @@ It is also necessary that the TAP device exists before the the ``SilKitAdapterTa
 
 **Hint:** If your TAP device has been created by a third party application (you want the SIL Kit to connect to) it is possible that this TAP device resource is 'flagged' as busy/blocked. In this case you just can create another TAP device for usage with the ``SilKitAdapterTap`` by yourself and bridge (``brctl``) it with the TAP device of your third party application.
 
-The application *optionally* takes the following command line arguments:
+The application *optionally* takes the following command line arguments (default between curly braces):
 
-    ./build/bin/SilKitAdapterTap [--tap-name 'silkit_tap'] [--registry-uri 'silkit://localhost:8501'] [--participant-name 'EthernetTapDevice'] [--network-name 'tap_demo'] [--log 'Info']
-
+    SilKitAdapterTap [--name <participant's name{EthernetTapDevice}>]
+      [--registry-uri silkit://<host{localhost}>:<port{8501}>]
+      [--log <Trace|Debug|Warn|{Info}|Error|Critical|off>]
+      [--tap-name <tap device's name{silkit_tap}>]
+      [--network <SIL Kit ethernet network{tap_demo}>]
+      [--help]
 
 ## TAP Demo
 The aim of this demo is to showcase a simple adapter forwarding ethernet traffic from and to a TAP device through
