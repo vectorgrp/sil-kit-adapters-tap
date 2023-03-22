@@ -27,7 +27,7 @@ echo "Creating tap device silkit_tap"
 ip tuntap add dev silkit_tap mode tap
 
 echo "Starting SilKitAdapterTap..."
-<&3 $SCRIPT_DIR/../../build/bin/SilKitAdapterTap --network-name 'tap_demo' &> /$SCRIPT_DIR/../../build/bin/SilKitAdapterTap.out &
+<&3 $SCRIPT_DIR/../../build/bin/SilKitAdapterTap --network 'tap_demo' &> /$SCRIPT_DIR/../../build/bin/SilKitAdapterTap.out &
 sleep 2
 echo "SilKitAdapterTap has been started"
 
