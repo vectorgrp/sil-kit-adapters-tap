@@ -11,7 +11,7 @@ variables
   const dword IPV4_STR_SIZE = 16;    // IPv4 string size
   char ipv4AddrTapStr[IPV4_STR_SIZE] = "192.168.7.2";
   char ipv4AddrEchoStr[IPV4_STR_SIZE] = "192.168.7.35";
-  dword timeout;
+  dword timeout = 2000;
 }
 
 void CheckTestResult(char testName[], int result)
