@@ -3,23 +3,64 @@
 #include "Parsing.hpp"
 #include <iostream>
 #include <algorithm>
+#include <array>
+#include <cstring>
 
+const std::string adapters::tapNameArg = "--tap-name";
+const std::string adapters::networkArg = "--network";
+const std::string adapters::regUriArg = "--registry-uri";
+const std::string adapters::logLevelArg = "--log";
+const std::string adapters::participantNameArg = "--name";
+const std::string adapters::helpArg = "--help";
+
+const std::array<std::string, 5> switchesWithArgument = {adapters::networkArg, adapters::tapNameArg, adapters::regUriArg,
+                                                         adapters::logLevelArg, adapters::participantNameArg};
+
+const std::array<std::string, 1> switchesWithoutArguments = {adapters::helpArg};
+
+bool adapters::thereAreUnknownArguments(int argc, char** argv)
+{
+    //skip the executable calling:
+    argc -= 1;
+    argv += 1;
+    while (argc)
+    {
+        if (strncmp(*argv, "--", 2) != 0)
+            return true;
+        if (std::find(switchesWithArgument.begin(), switchesWithArgument.end(), *argv) != switchesWithArgument.end())
+        {
+            //switches with argument have an argument to ignore, so skip "2"
+            argc -= 2;
+            argv += 2;
+        }
+        else if (std::find(switchesWithoutArguments.begin(), switchesWithoutArguments.end(), *argv)
+                 != switchesWithoutArguments.end())
+        {
+            //switches without argument don't have an argument to ignore, so skip "1"
+            argc -= 1;
+            argv += 1;
+        }
+        else
+            return true;
+    }
+    return false;
+}
 
 void adapters::print_help(bool userRequested)
 {
     std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl
-              << "SilKitAdapterTap [--name <participant's name{EthernetTapDevice}>]\n"
-                 "  [--registry-uri silkit://<host{localhost}>:<port{8501}>]\n"
-                 "  [--log <Trace|Debug|Warn|{Info}|Error|Critical|off>]\n"
-                 "  [--tap-name <tap device's name{silkit_tap}>]\n"
-                 "  [--network <SIL Kit ethernet network{tap_demo}>]\n";
+              << "SilKitAdapterTap ["<<participantNameArg<<" <participant's name{EthernetTapDevice}>]\n"
+                 "  ["<<regUriArg<<" silkit://<host{localhost}>:<port{8501}>]\n"
+                 "  ["<<logLevelArg<<" <Trace|Debug|Warn|{Info}|Error|Critical|off>]\n"
+                 "  ["<<tapNameArg<<" <tap device's name{silkit_tap}>]\n"
+                 "  ["<<networkArg<<" <SIL Kit ethernet network{tap_demo}>]\n";
     std::cout << "\n"
                  "Example:\n"
-                 "SilKitAdapterTap --name EthernetTapBridge "
-                 "--network tap_bridge";
+                 "SilKitAdapterTap "<<participantNameArg<<" EthernetTapBridge "
+             <<  networkArg<<" tap_bridge ";
     if (!userRequested)
         std::cout << "\n"
-                     "Pass --help to get this message.\n";
+                     "Pass "<<helpArg<<" to get this message.\n";
 };
 
 char** adapters::findArg(int argc, char** argv, const std::string& argument, char** args)

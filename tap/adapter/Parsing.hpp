@@ -6,6 +6,13 @@
 #include "Exceptions.hpp"
 
 namespace adapters {
+
+/// <summary>
+/// Returns wether or not there are unknown arguments in the provided command line.
+/// </summary>
+/// <returns></returns>
+bool thereAreUnknownArguments(int argc, char** argv);
+
 /// <summary>
 /// Prints the help message containing all switches and arguments.
 /// 
@@ -74,13 +81,37 @@ void foreachArgDo(int argc, char** argv, const std::string& argument, const Acti
 }
 
 /// <summary>
-/// string containing the argument preceding ethernet adaptation information.
+/// string containing the argument preceding the TAP device name.
 /// </summary>
-extern std::string ethArg;
+extern const std::string tapNameArg;
 
 /// <summary>
-/// string containing the argument preceding chardev adaptation information.
+/// string containing the argument preceding the SIL Kit Ethernet network name.
 /// </summary>
-extern std::string chardevArg;
+extern const std::string networkArg;
+
+/// <summary>
+/// string containing the argument preceding the URI to the SIL Kit registry.
+/// </summary>
+extern const std::string regUriArg;
+
+/// <summary>
+/// string containing the argument preceding the logging verbosity level.
+/// </summary>
+extern const std::string logLevelArg;
+
+/// <summary>
+/// string containing the argument preceding the participant name.
+/// </summary>
+extern const std::string participantNameArg;
+
+/// <summary>
+/// string containing the argument requesting the help message.
+/// </summary>
+extern const std::string helpArg;
+
+class InvalidCli : public std::exception
+{
+};
 
 } // namespace adapters

@@ -111,28 +111,45 @@ private:
 
 using namespace adapters;
 
+void promptForExit()
+{
+    std::cout << "Press enter to stop the process..." << std::endl;
+    std::cin.ignore();
+}
+
+template <class exception>
+void throwIf(bool b)
+{
+    if (b)
+        throw exception();
+}
+
+inline auto& throwInvalidCliIf = throwIf<InvalidCli>;
+
 int main(int argc, char** argv)
 {
-    if (findArg(argc, argv, "--help", argv) != NULL)
+    if (findArg(argc, argv, helpArg, argv) != NULL)
     {
         print_help(true);
         return NO_ERROR;
     }
 
-    const std::string loglevel = getArgDefault(argc, argv, "--log", "Info");
+    const std::string loglevel = getArgDefault(argc, argv, logLevelArg, "Info");
     const std::string participantConfigurationString =
         R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": ")" + loglevel + R"("} ] } })";
-    const std::string registryURI = getArgDefault(argc, argv, "--registry-uri", "silkit://localhost:8501");
+    const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
 
-    const std::string tapDevName = getArgDefault(argc,argv,"--tap-name","silkit_tap");
-    const std::string participantName = getArgDefault(argc, argv, "--name", "EthernetTapDevice");
-    const std::string ethernetNetworkName = getArgDefault(argc, argv, "--network", "tap_demo");
+    const std::string tapDevName = getArgDefault(argc, argv, tapNameArg, "silkit_tap");
+    const std::string participantName = getArgDefault(argc, argv, participantNameArg, "EthernetTapDevice");
+    const std::string ethernetNetworkName = getArgDefault(argc, argv, networkArg, "tap_demo");
     const std::string ethernetControllerName = participantName + "_Eth1";
 
     asio::io_context ioContext;
 
     try
     {
+        throwInvalidCliIf(thereAreUnknownArguments(argc, argv));  
+
         auto participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);        
 
         std::cout << "Creating participant '" << participantName << "' at " << registryURI << std::endl;
@@ -196,21 +213,25 @@ int main(int argc, char** argv)
 
         ioContext.run();
 
-        std::cout << "Press enter to stop the process..." << std::endl;
-        std::cin.ignore();
+        promptForExit();
     }
     catch (const SilKit::ConfigurationError& error)
     {
         std::cerr << "Invalid configuration: " << error.what() << std::endl;
-        std::cout << "Press enter to stop the process..." << std::endl;
-        std::cin.ignore();
+        promptForExit();
+        return CLI_ERROR;
+    }
+    catch (const InvalidCli&)
+    {
+        adapters::print_help();
+        std::cerr << std::endl << "Invalid command line arguments." << std::endl;
+        promptForExit();
         return CLI_ERROR;
     }
     catch (const std::exception& error)
     {
         std::cerr << "Something went wrong: " << error.what() << std::endl;
-        std::cout << "Press enter to stop the process..." << std::endl;
-        std::cin.ignore();
+        promptForExit();
         return OTHER_ERROR;
     }
 
