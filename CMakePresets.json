@@ -1,0 +1,89 @@
+﻿{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "linux-base",            
+            "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/_build/${presetName}",
+            "installDir": "${sourceDir}/_install/${presetName}",
+            "cacheVariables": {                
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+                    "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}",
+                    "rsyncCommandArgs": [ "--exclude", "_build" ]
+                }
+            }
+        },
+        {
+            "name": "linux-debug",
+            "displayName": "Linux Debug",            
+            "inherits": "linux-base",            
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }            
+        },
+        {
+            "name": "linux-release",
+            "displayName": "Linux Release",            
+            "inherits": "linux-base",            
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }            
+        }        
+    ],
+
+    "buildPresets": [
+        {
+            "name": "linux-base",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+
+        {
+            "name": "linux-debug",
+            "inherits": "linux-base",
+            "configurePreset": "linux-debug"
+        },
+        {
+            "name": "linux-release",
+            "inherits": "linux-base",
+            "configurePreset": "linux-release"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "linux-base",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+
+        {
+            "name": "linux-debug",
+            "inherits": "linux-base",
+            "configurePreset": "linux-debug"
+        },
+        {
+            "name": "linux-release",
+            "inherits": "linux-base",
+            "configurePreset": "linux-release"
+        }
+    ]
+}

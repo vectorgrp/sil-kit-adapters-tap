@@ -1,0 +1,36 @@
+name: build CMake preset
+description: Build the given SIL Kit Adapters CMake preset
+
+inputs:
+  preset-name:
+    description: "The preset name from CMakePresets.json."
+    required: true
+  cmake-args:
+    description: "Additional CMake arguments"
+    required: false
+
+runs:
+  using: composite
+  steps:
+
+    - name: Setup host
+      if: runner.os == 'Linux'
+      run: sudo apt install -y ninja-build clang-12 llvm-12
+      id: setup-host-linux
+      shell: bash
+
+    - name: Configure ${{ inputs.preset-name }}
+      run: cmake --preset ${{ inputs.preset-name }} ${{ inputs.cmake-args }}
+      id: cmake-configure
+      shell: bash
+
+    - name: Build ${{ inputs.preset-name }}
+      id: cmake-build
+      run: cmake --build --preset ${{ inputs.preset-name }}
+      shell: bash
+      
+    - name: Pack ${{ inputs.preset-name }}
+      id: cmake-pack
+      run: cmake --build --preset ${{ inputs.preset-name }} --target package
+      shell: bash
+
