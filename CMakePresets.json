@@ -10,7 +10,9 @@
             "installDir": "${sourceDir}/_install/${presetName}",
             "cacheVariables": {                
                 "CMAKE_C_COMPILER": "gcc",
-                "CMAKE_CXX_COMPILER": "g++"
+                "CMAKE_CXX_COMPILER": "g++",
+                "SILKIT_VERSION": "4.0.17",
+                "SILKIT_FLAVOR": "ubuntu-18.04-x86_64-gcc"
             },
             "condition": {
                 "type": "equals",

@@ -19,7 +19,7 @@ jobs:
         uses: ./.github/actions/build-cmake-preset
         with:
           preset-name: linux-release
-          cmake-args:  "-D SILKIT_ADAPTERS_TAG_VERSION=${{  github.ref_name }}"
+          cmake-args:  "-D PACKAGE_FILENAME_SUFFIX=-${{ github.ref_name }}-ubuntu-20.04-x86_64-gcc"
       - name: Release
         uses: softprops/action-gh-release@v1        
         with:
