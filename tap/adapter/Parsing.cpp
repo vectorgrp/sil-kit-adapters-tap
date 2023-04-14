@@ -57,7 +57,7 @@ void adapters::print_help(bool userRequested)
     std::cout << "\n"
                  "Example:\n"
                  "SilKitAdapterTap "<<participantNameArg<<" EthernetTapBridge "
-             <<  networkArg<<" tap_bridge ";
+             <<  networkArg<<" tap_bridge\n";
     if (!userRequested)
         std::cout << "\n"
                      "Pass "<<helpArg<<" to get this message.\n";
