@@ -7,10 +7,10 @@ This repository contains instructions to create, set up, and launch such a minim
 The main contents are working examples of necessary software to connect the running system to a SIL Kit environment,
 as well as complimentary demo application for some communication to happen.
 
-## Getting Started
 Those instructions assume you use WSL (Ubuntu) or a Linux OS for building and running the adapter, and use ``bash`` as your interactive
 shell.
 
+## a) Getting Started with self build Adapters and Demos
 This section specifies steps you should do if you have just cloned the repository.
 
 Before any of those topics, please change your current directory to the top-level in the ``sil-kit-adapters-tap``
@@ -39,7 +39,12 @@ The adapters and demos are built using ``cmake``:
 The adapters and demo executables will be available in ``build/bin`` (depending on the configured build directory).
 Additionally the ``SilKit`` shared library is copied to that directory automatically.
 
-### Run the SilKitAdapterTap
+## b) Getting Started with pre-built Adapters and Demos
+Download a preview or release of the Adapters directly from [Vector SIL Kit Adapters Releases](https://github.com/vectorgrp/sil-kit-adapters-tap/releases).
+
+If not already existent on your system you should also download a SIL Kit Release directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). You will need this for being able to start a sil-kit-registry.
+
+## Run the SilKitAdapterTap
 This application allows the user to attach a TAP device of any Linux system to the Vector SIL Kit.
 
 Before you start the adapter there always needs to be a sil-kit-registry running already. Start it e.g. like this:
