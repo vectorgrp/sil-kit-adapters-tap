@@ -30,12 +30,17 @@ Otherwise clone the standalone version of asio manually:
 ### Build the Adapters and Demos
 To build the demos, you'll need SIL Kit packages ``SilKit-x.y.z-$platform`` for your platform. You can download them directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases).
 
-The adapters and demos are built using ``cmake``:
+The adapters and demos are built using ``cmake``. If you want to build the adapter against a specific downloaded release of SIL Kit, you can follow these steps:
 
     mkdir build
     cmake -S. -Bbuild -DSILKIT_PACKAGE_DIR=/path/to/SilKit-x.y.z-$platform/ -D CMAKE_BUILD_TYPE=Release
     cmake --build build --parallel
 
+**Note 1:** If you have installed a self-built version of SIL Kit, you can build the adapter against it by setting SILKIT_PACKAGE_DIR to the installation path, where the bin, include and lib directories are.
+
+**Note 2:** If you don't provide a specific path for SILKIT_PACKAGE_DIR, a SIL Kit release package [SilKit-4.0.17-ubuntu-18.04-x86_64-gcc] will be fetched from github.com and the adapter will be built against it.
+
+  
 The adapters and demo executables will be available in ``build/bin`` (depending on the configured build directory).
 Additionally the ``SilKit`` shared library is copied to that directory automatically.
 

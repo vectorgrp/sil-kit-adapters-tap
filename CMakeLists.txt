@@ -19,7 +19,19 @@ target_include_directories(asio INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/third_part
 target_compile_definitions(asio INTERFACE ASIO_STANDALONE=1)
 target_link_libraries(asio INTERFACE Threads::Threads)
 
-if(NOT SILKIT_PACKAGE_DIR)    
+if(DEFINED SILKIT_PACKAGE_DIR)    
+# if the user forces using a specific SIL Kit package, use it
+	message(STATUS "SILKIT_PACKAGE_DIR has been set to: ${SILKIT_PACKAGE_DIR}, CMAKE will look for a SIL Kit package in that directory")
+    find_package(SilKit 4.0.7
+        REQUIRED
+        CONFIG
+        NO_CMAKE_PACKAGE_REGISTRY
+        NO_DEFAULT_PATH
+        PATHS "${SILKIT_PACKAGE_DIR}"
+    )
+	
+else()
+# otherwise, look for an installed version of SIL Kit
     message(STATUS "SILKIT_PACKAGE_DIR has not been set by user. Attempting to find an installed version of SIL Kit")
 
     find_package(SilKit 4.0.7
@@ -27,6 +39,8 @@ if(NOT SILKIT_PACKAGE_DIR)
     )
 
     if(NOT SilKit_FOUND)
+	# if installed SIL Kit is not found, fetch it from github.com
+		message(STATUS "No installed version of SIL Kit was found. Attempting to fetch [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}] from github.com")
         FetchContent_Declare(
                 silkit
                 URL https://github.com/vectorgrp/sil-kit/releases/download/sil-kit%2Fv${SILKIT_VERSION}/SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}.zip
@@ -34,7 +48,7 @@ if(NOT SILKIT_PACKAGE_DIR)
                 DOWNLOAD_EXTRACT_TIMESTAMP TRUE
             )
 
-        message(STATUS "SIL Kit: fetching: silkit")
+        message(STATUS "SIL Kit: fetching [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}]")
         FetchContent_MakeAvailable(silkit)
 
         set(SILKIT_SOURCE_DIR ${silkit_SOURCE_DIR}/SilKit-Source)
@@ -50,20 +64,12 @@ if(NOT SILKIT_PACKAGE_DIR)
             PATHS "${silkit_SOURCE_DIR}"
         )
     endif()
-
-else()
-    message(STATUS "Searching SilKit package in ${SILKIT_PACKAGE_DIR}")
-    find_package(SilKit 4.0.7
-        REQUIRED
-        CONFIG
-        NO_CMAKE_PACKAGE_REGISTRY
-        NO_DEFAULT_PATH
-        PATHS "${SILKIT_PACKAGE_DIR}"
-    )
 endif()
 
-if(NOT TARGET SilKit::SilKit)
-    message(FATAL_ERROR "Could not find SilKit package")
+if(TARGET SilKit::SilKit)
+	message(STATUS "SIL Kit package has been successfully imported as a CMake target. [version : ${SilKit_VERSION}]")
+else()
+	message(FATAL_ERROR "Something went wrong : Could not find SIL Kit package.")
 endif()
 
 add_subdirectory(tap/Utility)
