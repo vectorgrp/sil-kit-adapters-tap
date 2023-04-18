@@ -75,40 +75,21 @@ add_subdirectory(tap/demos)
 ################################################################################
 # Install sources and binaries
 # Copy all files from the source and bin directory to the proper destination
-# Filter by file types
+# Leave out git repo related data
 
 install(
     DIRECTORY            
         ${CMAKE_CURRENT_SOURCE_DIR}/tap            
-    DESTINATION Sources
+    DESTINATION .
     COMPONENT source
-    FILES_MATCHING
-        PATTERN *.cpp
-        PATTERN *.cxx
-        PATTERN *.c
-        PATTERN *.rc
-        PATTERN *.h
-        PATTERN *.hpp
-        PATTERN *.hpp.in
-        PATTERN *.json
-        PATTERN *.yaml
-        PATTERN *.cmake
-        PATTERN *.cmake.in
-        PATTERN CMakeLists.txt
-        PATTERN Readme-*.txt
-        PATTERN *.txt.in
-        PATTERN *.md
-        PATTERN *.xml
-    REGEX "/ci/.*" EXCLUDE
-    REGEX "/ci$" EXCLUDE
     REGEX "\.git$" EXCLUDE
-    REGEX "\.github$" EXCLUDE
+    REGEX "\.github$" EXCLUDE    
 )
 
 install(
     DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party
-    DESTINATION Sources
+    DESTINATION .
     COMPONENT source
     REGEX "\.git$" EXCLUDE
     REGEX "\.github$" EXCLUDE
@@ -118,13 +99,14 @@ install(
     FILES
         CMakeLists.txt
         CMakePresets.json
-    DESTINATION Sources
+    DESTINATION .
     COMPONENT source
 )
 
 install(
     FILES
-        LICENSE        
+        LICENSE
+        README.md        
     DESTINATION .
     COMPONENT source
 )
@@ -132,7 +114,7 @@ install(
 install(
     DIRECTORY
         ${SILKIT_ADAPTERS_TAP_OUTPUT_DIRECTORY}
-    DESTINATION .
+    DESTINATION build
     COMPONENT bin
 )
 
