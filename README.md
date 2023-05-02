@@ -75,3 +75,5 @@ Vector SIL Kit. Traffic being exchanged are ping (ICMP) requests, and the answer
 
 This demo is further explained in [tap/README.md](tap/README.md).
 
+## Connecting an adaptive executable to CANoe
+The Vector SIL Kit Adapters TAP allow you to connect adaptive executables to CANoe. A guide which is currently under development describes step by step how to do this can be found here [adaptive/README.md](adaptive/README.md). 
