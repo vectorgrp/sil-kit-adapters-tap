@@ -2,3 +2,5 @@
 * text eol=lf
 #ensure CANoe configs don't get their line endings converted
 *.cfg -text
+#ensure pngs are treated as binary files
+*.png binary
