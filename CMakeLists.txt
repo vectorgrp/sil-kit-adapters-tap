@@ -33,11 +33,12 @@ if(DEFINED SILKIT_PACKAGE_DIR)
 else()
 # otherwise, look for an installed version of SIL Kit
     message(STATUS "SILKIT_PACKAGE_DIR has not been set by user. Attempting to find an installed version of SIL Kit")
-
-    find_package(SilKit 4.0.7
-        CONFIG
-    )
-
+    if(WIN32)
+        # only look for installed version of SIL Kit (.msi) if environment is Windows
+        find_package(SilKit 4.0.7
+            CONFIG
+        )
+    endif()
     if(NOT SilKit_FOUND)
 	# if installed SIL Kit is not found, fetch it from github.com
 		message(STATUS "No installed version of SIL Kit was found. Attempting to fetch [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}] from github.com")
