@@ -4,3 +4,5 @@
 *.cfg -text
 #ensure pngs are treated as binary files
 *.png binary
+#configure .vtuexe files as binary files
+*.vtuexe binary
