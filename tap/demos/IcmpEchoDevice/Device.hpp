@@ -25,6 +25,7 @@
 #include <asio/ts/buffer.hpp>
 #include <asio/ts/internet.hpp>
 #include <asio/ts/socket.hpp>
+#include "silkit/services/logging/all.hpp"
 
 using namespace exceptions;
 
@@ -32,12 +33,13 @@ namespace demo {
 
 class Device
 {
+
 public:
-public:
-    Device(EthernetAddress ethernetAddress, Ip4Address ip4Address,
+    Device(EthernetAddress ethernetAddress, Ip4Address ip4Address, SilKit::Services::Logging::ILogger* logger,
            std::function<void(std::vector<std::uint8_t>)> sendFrameCallback)
         : _ethernetAddress{ethernetAddress}
         , _ip4Address{ip4Address}
+        , _logger(logger)
         , _sendFrameCallback{std::move(sendFrameCallback)}
     {
     }
@@ -52,6 +54,7 @@ private:
     EthernetAddress _ethernetAddress;
     Ip4Address _ip4Address;
     std::function<void(std::vector<std::uint8_t>)> _sendFrameCallback;
+    SilKit::Services::Logging::ILogger* _logger;
 };
 
 } // namespace demo

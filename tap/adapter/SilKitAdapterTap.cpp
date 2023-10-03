@@ -117,15 +117,6 @@ void promptForExit()
     std::cin.ignore();
 }
 
-template <class exception>
-void throwIf(bool b)
-{
-    if (b)
-        throw exception();
-}
-
-inline auto& throwInvalidCliIf = throwIf<InvalidCli>;
-
 int main(int argc, char** argv)
 {
     if (findArg(argc, argv, helpArg, argv) != NULL)

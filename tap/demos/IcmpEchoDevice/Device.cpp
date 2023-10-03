@@ -9,14 +9,19 @@ namespace demo {
 void Device::Process(asio::const_buffer incomingData)
 {
     const auto [ethernetHeader, ethernetPayload] = ParseEthernetHeader(asio::buffer(incomingData));
-    std::cout << ethernetHeader << std::endl;
+    std::ostringstream SILKitDebugMessage;
+
+    SILKitDebugMessage << ethernetHeader;
+    _logger->Debug(SILKitDebugMessage.str());
 
     switch (ethernetHeader.etherType)
     {
     case EtherType::Arp:
     {
         const auto arpPacket = ParseArpIp4Packet(ethernetPayload);
-        std::cout << arpPacket << std::endl;
+        SILKitDebugMessage.str("");
+        SILKitDebugMessage << arpPacket << std::endl;
+        _logger->Debug(SILKitDebugMessage.str());
 
         if (arpPacket.operation == ArpOperation::Request)
         {
@@ -25,7 +30,10 @@ void Device::Process(asio::const_buffer incomingData)
                 EthernetHeader replyEthernetHeader = ethernetHeader;
                 replyEthernetHeader.destination = arpPacket.senderHardwareAddress;
                 replyEthernetHeader.source = _ethernetAddress;
-                std::cout << "Reply: " << replyEthernetHeader << std::endl;
+
+                SILKitDebugMessage.str("");
+                SILKitDebugMessage << "Reply: " << replyEthernetHeader;
+                _logger->Debug(SILKitDebugMessage.str());
 
                 ArpIp4Packet replyArpPacket{
                     ArpOperation::Reply,
@@ -34,7 +42,10 @@ void Device::Process(asio::const_buffer incomingData)
                     arpPacket.senderHardwareAddress,
                     arpPacket.senderProtocolAddress,
                 };
-                std::cout << "Reply: " << replyArpPacket << std::endl;
+
+                SILKitDebugMessage.str("");
+                SILKitDebugMessage << "Reply: " << replyArpPacket;
+                _logger->Debug(SILKitDebugMessage.str());
 
                 auto reply = AllocateBuffer(incomingData.size());
                 auto dst = asio::buffer(reply);
@@ -50,14 +61,20 @@ void Device::Process(asio::const_buffer incomingData)
     case EtherType::Ip4:
     {
         const auto [ip4Header, ip4Payload] = ParseIp4Header(ethernetPayload);
-        std::cout << ip4Header << " + " << ip4Payload.size() << " bytes payload" << std::endl;
+
+        SILKitDebugMessage.str("");
+        SILKitDebugMessage << ip4Header << " + " << ip4Payload.size() << " bytes payload";
+        _logger->Debug(SILKitDebugMessage.str());
 
         switch (ip4Header.protocol)
         {
         case Ip4Protocol::ICMP:
         {
             const auto [icmp4Header, icmp4Payload] = ParseIcmp4Header(ip4Payload);
-            std::cout << icmp4Header << " + " << icmp4Payload.size() << " bytes payload" << std::endl;
+
+            SILKitDebugMessage.str("");
+            SILKitDebugMessage << icmp4Header << " + " << icmp4Payload.size() << " bytes payload";
+            _logger->Debug(SILKitDebugMessage.str());
 
             if (icmp4Header.type == Icmp4Type::EchoRequest)
             {
@@ -66,16 +83,26 @@ void Device::Process(asio::const_buffer incomingData)
                     EthernetHeader replyEthernetHeader = ethernetHeader;
                     replyEthernetHeader.destination = replyEthernetHeader.source;
                     replyEthernetHeader.source = _ethernetAddress;
-                    std::cout << "Reply: " << replyEthernetHeader << std::endl;
+
+                    SILKitDebugMessage.str("");
+                    SILKitDebugMessage << "Reply: " << replyEthernetHeader;
+                    _logger->Debug(SILKitDebugMessage.str());
 
                     Ip4Header replyIp4Header = ip4Header;
                     replyIp4Header.destinationAddress = replyIp4Header.sourceAddress;
                     replyIp4Header.sourceAddress = _ip4Address;
-                    std::cout << "Reply: " << replyIp4Header << std::endl;
+
+                    SILKitDebugMessage.str("");
+                    SILKitDebugMessage << "Reply: " << replyIp4Header;
+                    _logger->Debug(SILKitDebugMessage.str());
 
                     Icmp4Header replyIcmp4Header = icmp4Header;
                     replyIcmp4Header.type = Icmp4Type::EchoReply;
-                    std::cout << "Reply: " << replyIcmp4Header << std::endl;
+
+                    SILKitDebugMessage.str("");
+                    SILKitDebugMessage << "Reply: " << replyIcmp4Header;
+                    _logger->Debug(SILKitDebugMessage.str());
+
 
                     auto reply = AllocateBuffer(incomingData.size());
                     auto dst = asio::buffer(reply);

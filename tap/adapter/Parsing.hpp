@@ -110,8 +110,4 @@ extern const std::string participantNameArg;
 /// </summary>
 extern const std::string helpArg;
 
-class InvalidCli : public std::exception
-{
-};
-
 } // namespace adapters

@@ -33,7 +33,7 @@ Now is a good point to start the ``sil-kit-registry``, the ``SilKitDemoEthernetI
 
     ./path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
         
-    ./build/bin/SilKitDemoEthernetIcmpEchoDevice
+    ./build/bin/SilKitDemoEthernetIcmpEchoDevice --log Debug
 
     sudo ./tap/demos/start_adapter_and_ping_demo.sh
     
@@ -44,15 +44,17 @@ The ping requests should all receive responses.
     
 You should see output output similar to the following from the ``SilKitDemoEthernetIcmpEchoDevice`` application:
 
-    SIL Kit >> Demo: Ethernet frame (98 bytes)
-    EthernetHeader(destination=EthernetAddress(52:54:56:53:4b:55),source=EthernetAddress(02:d5:de:c1:7f:82),etherType=EtherType::Ip4)
-    Ip4Header(totalLength=84,identification=28274,dontFragment=1,moreFragments=0,fragmentOffset=0,timeToLive=64,protocol=Ip4Protocol::ICMP,checksum=15553,sourceAddress=192.168.7.2,destinationAddress=192.168.7.35) + 64 bytes payload
-    Icmp4Header(type=Icmp4Type::EchoRequest,code=,checksum=33586) + 60 bytes payload
-    Reply: EthernetHeader(destination=EthernetAddress(02:d5:de:c1:7f:82),source=EthernetAddress(52:54:56:53:4b:55),etherType=EtherType::Ip4)
-    Reply: Ip4Header(totalLength=84,identification=28274,dontFragment=1,moreFragments=0,fragmentOffset=0,timeToLive=64,protocol=Ip4Protocol::ICMP,checksum=15553,sourceAddress=192.168.7.35,destinationAddress=192.168.7.2)
-    Reply: Icmp4Header(type=Icmp4Type::EchoReply,code=,checksum=33586)
-    SIL Kit >> Demo: ACK for ETH Message with transmitId=718
-    Demo >> SIL Kit: Ethernet frame (98 bytes, txId=718)
+    [date time] [EthernetDevice] [debug] SIL Kit >> Demo: Ethernet frame (98 bytes)
+    [date time] [EthernetDevice] [debug] EthernetHeader(destination=EthernetAddress(52:54:56:53:4b:55),source=EthernetAddress(9a:97:c4:83:d8:d0),etherType=EtherType::Ip4)
+    [date time] [EthernetDevice] [debug] Ip4Header(totalLength=84,identification=21689,dontFragment=1,moreFragments=0,fragmentOffset=0,timeToLive=64,protocol=Ip4Protocol::ICMP,checksum=22138,sourceAddress=192.168.7.2,destinationAddress=192.168.7.35) + 64 bytes payload
+    [date time] [EthernetDevice] [debug] Icmp4Header(type=Icmp4Type::EchoRequest,code=,checksum=47730) + 60 bytes payload
+    [date time] [EthernetDevice] [debug] Reply: EthernetHeader(destination=EthernetAddress(9a:97:c4:83:d8:d0),source=EthernetAddress(52:54:56:53:4b:55),etherType=EtherType::Ip4)
+    [date time] [EthernetDevice] [debug] Reply: Ip4Header(totalLength=84,identification=21689,dontFragment=1,moreFragments=0,fragmentOffset=0,timeToLive=64,protocol=Ip4Protocol::ICMP,checksum=22138,sourceAddress=192.168.7.35,destinationAddress=192.168.7.2)
+    [date time] [EthernetDevice] [debug] Reply: Icmp4Header(type=Icmp4Type::EchoReply,code=,checksum=47730)
+    [date time] [EthernetDevice] [debug] SIL Kit >> Demo: ACK for ETH Message with transmitId=3
+    [date time] [EthernetDevice] [debug] Demo >> SIL Kit: Ethernet frame (98 bytes, txId=3)
+
+
 
 
 ## Adding CANoe (16 SP3 or newer) as a participant
