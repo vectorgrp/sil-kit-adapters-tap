@@ -23,19 +23,21 @@
 
 using namespace SilKit::Services::Ethernet;
 using namespace exceptions;
+using namespace SilKit::Services::Orchestration;
+using namespace std::chrono_literals;
 
 class TapConnection
 {
 public:
     TapConnection(asio::io_context& io_context, const std::string& tapDevName,
-                     std::function<void(std::vector<uint8_t>)> onNewFrameHandler,
+                  std::function<void(std::vector<uint8_t>)> onNewFrameHandler,
                   SilKit::Services::Logging::ILogger* logger)
         : _tapDeviceStream{io_context}
         , _onNewFrameHandler(std::move(onNewFrameHandler))
         , _logger(logger)
     {
         _tapDeviceStream.assign(GetTapDeviceFileDescriptor(tapDevName.c_str()));
-        ReceiveEthernetFrameFromTapDevice();        
+        ReceiveEthernetFrameFromTapDevice();
     }
 
     template<class container>
@@ -43,15 +45,16 @@ public:
     {
         auto sizeSent = _tapDeviceStream.write_some(asio::buffer(data.data(), data.size()));
         if (data.size() != sizeSent )
-        {                
-            throw InvalidFrameSizeError{};                                     
+        {
+            throw InvalidFrameSizeError{};
         }
     }
 
 private:
     void ReceiveEthernetFrameFromTapDevice()
     {
-        _tapDeviceStream.async_read_some(asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),                             
+        _tapDeviceStream.async_read_some(
+            asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),
             [this](const std::error_code ec, const std::size_t bytes_received) {
                 if (ec)
                 {
@@ -62,12 +65,12 @@ private:
                 asio::buffer_copy(
                     asio::buffer(frame_data),
                     asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),
-                    bytes_received);                
-                
-                _onNewFrameHandler(std::move(frame_data));                                     
+                    bytes_received);
+
+                _onNewFrameHandler(std::move(frame_data));
 
                 ReceiveEthernetFrameFromTapDevice();
-            });                                  
+            });
     }
 
 private:
@@ -76,33 +79,33 @@ private:
         struct ifreq ifr;
         int tapFileDescriptor;
         int errorCode;
-         
-        if ((tapFileDescriptor = open("/dev/net/tun", O_RDWR)) < 0) 
-        {            
+
+        if ((tapFileDescriptor = open("/dev/net/tun", O_RDWR)) < 0)
+        {
             return tapFileDescriptor;
         }
-        
+
         memset(&ifr, 0, sizeof(ifr));
         ifr.ifr_flags = (short int)IFF_TAP | IFF_NO_PI;
 
         if (*tapDeviceName)
-        {         
+        {
             strncpy(ifr.ifr_name, tapDeviceName, IFNAMSIZ);
         }
-        
+
         errorCode = ioctl(tapFileDescriptor, TUNSETIFF, reinterpret_cast<void*>(&ifr));
         if (errorCode < 0)
         {
             close(tapFileDescriptor);
             return errorCode;
         }
-        
+
         _logger->Info("TAP device successfully opened");
         return tapFileDescriptor;
     }
 
 
-private:   
+private:
     std::array<uint8_t, 1600> _ethernetFrameBuffer;
     asio::posix::stream_descriptor _tapDeviceStream;
     std::function<void(std::vector<uint8_t>)> _onNewFrameHandler;
@@ -139,14 +142,28 @@ int main(int argc, char** argv)
 
     try
     {
-        throwInvalidCliIf(thereAreUnknownArguments(argc, argv));  
+        throwInvalidCliIf(thereAreUnknownArguments(argc, argv));
 
-        auto participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);        
+        auto participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
 
         std::cout << "Creating participant '" << participantName << "' at " << registryURI << std::endl;
         auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
-        
         auto logger = participant->GetLogger();
+
+        auto* lifecycleService = participant->CreateLifecycleService({OperationMode::Autonomous});
+        auto* systemMonitor = participant->CreateSystemMonitor();
+        std::promise<void> runningStatePromise;
+
+        systemMonitor->AddParticipantStatusHandler(
+            [&runningStatePromise, participantName](const SilKit::Services::Orchestration::ParticipantStatus& status) {
+                if (participantName == status.participantName)
+                {
+                    if (status.state == SilKit::Services::Orchestration::ParticipantState::Running)
+                    {
+                        runningStatePromise.set_value();
+                    }
+                }
+            });
 
         std::ostringstream SILKitInfoMessage;
         SILKitInfoMessage << "Creating ethernet controller '" << ethernetControllerName << "'";
@@ -173,27 +190,27 @@ int main(int argc, char** argv)
         TapConnection tapConnection{ioContext, tapDevName, onReceiveEthernetFrameFromTapDevice, logger};
 
         const auto onReceiveEthernetMessageFromSilKit = [&logger, &tapConnection](IEthernetController* /*controller*/,
-                                                              const EthernetFrameEvent& msg) {
+                                                                                  const EthernetFrameEvent& msg) {
             auto rawFrame = msg.frame.raw;
             tapConnection.SendEthernetFrameToTapDevice(rawFrame);
 
             std::ostringstream SILKitDebugMessage;
-            SILKitDebugMessage << "SIL Kit >> TAP device: Ethernet frame (" << rawFrame.size() << " bytes)" << std::endl;
+            SILKitDebugMessage << "SIL Kit >> TAP device: Ethernet frame (" << rawFrame.size() << " bytes)";
             logger->Debug(SILKitDebugMessage.str());
         };
 
-        const auto onEthAckCallback = [&logger](IEthernetController* /*controller*/, 
-                                        const EthernetFrameTransmitEvent& ack) {
+        const auto onEthAckCallback = [&logger](IEthernetController* /*controller*/,
+                                                const EthernetFrameTransmitEvent& ack) {
             std::ostringstream SILKitDebugMessage;
             if (ack.status == EthernetTransmitStatus::Transmitted)
             {
-                SILKitDebugMessage << "SIL Kit >> TAP device: ACK for ETH Message with transmitId=" 
-                        << reinterpret_cast<intptr_t>(ack.userContext);
+                SILKitDebugMessage << "SIL Kit >> TAP device: ACK for ETH Message with transmitId="
+                                   << reinterpret_cast<intptr_t>(ack.userContext);
             }
             else
             {
                 SILKitDebugMessage << "SIL Kit >> TAP device: NACK for ETH Message with transmitId="
-                        << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status;
+                                   << reinterpret_cast<intptr_t>(ack.userContext) << ": " << ack.status;
             }
             logger->Debug(SILKitDebugMessage.str());
         };
@@ -202,15 +219,48 @@ int main(int argc, char** argv)
         ethController->AddFrameTransmitHandler(onEthAckCallback);
         ethController->Activate();
 
-        ioContext.run();
+        auto finalStateFuture = lifecycleService->StartLifecycle();
 
+        std::thread t([&]() -> void {
+            ioContext.run();
+        });
+        
         promptForExit();
+
+        ioContext.stop();
+
+        if (t.joinable())
+        {
+            t.join();
+        }
+            
+        auto runningStateFuture = runningStatePromise.get_future();
+        auto futureStatus = runningStateFuture.wait_for(15s);
+        if (futureStatus != std::future_status::ready)
+        {
+            std::ostringstream SILKitDebugMessage;
+            SILKitDebugMessage << "Lifecycle Service Stopping: timed out while checking if the participant is currently running.";
+            logger->Debug(SILKitDebugMessage.str());
+
+            promptForExit();
+        }
+        lifecycleService->Stop("Adapter stopped by the user.");
+
+        auto finalState = finalStateFuture.wait_for(15s);
+        if (finalState != std::future_status::ready)
+        {
+            std::ostringstream SILKitDebugMessage;
+            SILKitDebugMessage << "Lifecycle service stopping: timed out";
+            logger->Debug(SILKitDebugMessage.str());
+
+            promptForExit();
+        }
     }
     catch (const SilKit::ConfigurationError& error)
     {
         std::cerr << "Invalid configuration: " << error.what() << std::endl;
         promptForExit();
-        return CLI_ERROR;
+        return CONFIGURATION_ERROR;
     }
     catch (const InvalidCli&)
     {
