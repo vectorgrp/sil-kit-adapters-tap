@@ -64,7 +64,7 @@ The application *optionally* takes the following command line arguments (default
 
     SilKitAdapterTap [--name <participant's name{EthernetTapDevice}>]
       [--registry-uri silkit://<host{localhost}>:<port{8501}>]
-      [--log <Trace|Debug|Warn|{Info}|Error|Critical|off>]
+      [--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>]
       [--tap-name <tap device's name{silkit_tap}>]
       [--network <SIL Kit ethernet network{tap_demo}>]
       [--help]

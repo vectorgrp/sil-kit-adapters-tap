@@ -51,7 +51,7 @@ void adapters::print_help(bool userRequested)
     std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl
               << "SilKitAdapterTap ["<<participantNameArg<<" <participant's name{EthernetTapDevice}>]\n"
                  "  ["<<regUriArg<<" silkit://<host{localhost}>:<port{8501}>]\n"
-                 "  ["<<logLevelArg<<" <Trace|Debug|Warn|{Info}|Error|Critical|off>]\n"
+                 "  ["<<logLevelArg<<" <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n"
                  "  ["<<tapNameArg<<" <tap device's name{silkit_tap}>]\n"
                  "  ["<<networkArg<<" <SIL Kit ethernet network{tap_demo}>]\n";
     std::cout << "\n"
