@@ -1,6 +1,6 @@
 Description: Configuration for CANoe participant for SIL Kit Adapter TAP demo
 Middleware:
-  RegistryUri: silkit://172.20.234.25:8501
+  RegistryUri: silkit://192.168.56.102:8501
 # Logging:
   # Sinks:
   # - Type: File

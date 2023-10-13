@@ -9,12 +9,13 @@
 const std::string adapters::tapNameArg = "--tap-name";
 const std::string adapters::networkArg = "--network";
 const std::string adapters::regUriArg = "--registry-uri";
+const std::string adapters::configurationArg = "--configuration";
 const std::string adapters::logLevelArg = "--log";
 const std::string adapters::participantNameArg = "--name";
 const std::string adapters::helpArg = "--help";
 
-const std::array<std::string, 5> switchesWithArgument = {adapters::networkArg, adapters::tapNameArg, adapters::regUriArg,
-                                                         adapters::logLevelArg, adapters::participantNameArg};
+const std::array<std::string, 6> switchesWithArgument = {adapters::networkArg, adapters::tapNameArg, adapters::regUriArg, adapters::logLevelArg, 
+                                                         adapters::participantNameArg, adapters::configurationArg};
 
 const std::array<std::string, 1> switchesWithoutArguments = {adapters::helpArg};
 
@@ -50,10 +51,13 @@ void adapters::print_help(bool userRequested)
 {
     std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl
               << "SilKitAdapterTap ["<<participantNameArg<<" <participant's name{EthernetTapDevice}>]\n"
+                 "  ["<<configurationArg<<" <path to .silkit.yaml or .json configuration file>]\n"
                  "  ["<<regUriArg<<" silkit://<host{localhost}>:<port{8501}>]\n"
                  "  ["<<logLevelArg<<" <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n"
                  "  ["<<tapNameArg<<" <tap device's name{silkit_tap}>]\n"
-                 "  ["<<networkArg<<" <SIL Kit ethernet network{tap_demo}>]\n";
+                 "  ["<<networkArg<<" <SIL Kit ethernet network{tap_demo}>]\n"
+                 "\n"
+                 "SIL Kit-specific CLI arguments will be overwritten by the config file passed by " << configurationArg << ".\n";
     std::cout << "\n"
                  "Example:\n"
                  "SilKitAdapterTap "<<participantNameArg<<" EthernetTapBridge "

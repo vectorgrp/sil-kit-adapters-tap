@@ -128,9 +128,7 @@ int main(int argc, char** argv)
         return NO_ERROR;
     }
 
-    const std::string loglevel = getArgDefault(argc, argv, logLevelArg, "Info");
-    const std::string participantConfigurationString =
-        R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": ")" + loglevel + R"("} ] } })";
+    const std::string configurationFile = getArgDefault(argc, argv, configurationArg, "");
     const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
 
     const std::string tapDevName = getArgDefault(argc, argv, tapNameArg, "silkit_tap");
@@ -144,9 +142,37 @@ int main(int argc, char** argv)
     {
         throwInvalidCliIf(thereAreUnknownArguments(argc, argv));
 
-        auto participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
+        std::shared_ptr<SilKit::Config::IParticipantConfiguration> participantConfiguration;
+        if (!configurationFile.empty())
+        {
+            participantConfiguration = SilKit::Config::ParticipantConfigurationFromFile(configurationFile);
+            static const auto conflictualArguments = {
+                &logLevelArg,
+                /* &participantNameArg, &regUriArg are correctly handled by SilKit if one is overwritten.*/};
+            for (const auto* conflictualArgument : conflictualArguments)
+            {
+                if (findArg(argc, argv, *conflictualArgument, argv) != NULL)
+                {
+                    auto configFileName = configurationFile;
+                    if (configurationFile.find_last_of("/\\") != std::string::npos)
+                    {
+                        configFileName = configurationFile.substr(configurationFile.find_last_of("/\\") + 1);
+                    }
+                    std::cout << "[info] Be aware that argument given with " << *conflictualArgument 
+                              << " can be overwritten by a different value defined in the given configuration file "
+                              << configFileName << std::endl;
+                }
+            }
+        }
+        else
+        {
+            const std::string loglevel = getArgDefault(argc, argv, logLevelArg, "Info");
+            const std::string participantConfigurationString =
+                R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": ")" + loglevel + R"("} ] } })";
+            participantConfiguration =
+                SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
+        }
 
-        std::cout << "Creating participant '" << participantName << "' at " << registryURI << std::endl;
         auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
         auto logger = participant->GetLogger();
 

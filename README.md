@@ -63,11 +63,14 @@ It is also necessary that the TAP device exists before the the ``SilKitAdapterTa
 The application *optionally* takes the following command line arguments (default between curly braces):
 
     SilKitAdapterTap [--name <participant's name{EthernetTapDevice}>]
+      [--configuration <path to .silkit.yaml or .json configuration file>]
       [--registry-uri silkit://<host{localhost}>:<port{8501}>]
       [--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>]
       [--tap-name <tap device's name{silkit_tap}>]
       [--network <SIL Kit ethernet network{tap_demo}>]
       [--help]
+
+**Note:** SIL Kit-specific CLI arguments will be overwritten by the config file specified by ``--configuration``.
 
 ## TAP Demo
 The aim of this demo is to showcase a simple adapter forwarding ethernet traffic from and to a TAP device through

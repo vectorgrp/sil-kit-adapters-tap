@@ -1,0 +1,11 @@
+Description: Configuration for Adapter participant for SIL Kit Adapter TAP demo
+ParticipantName: EthernetTapDevice
+EthernetControllers: 
+- Name: EthernetTapDevice_Eth1
+  Network: tap_demo
+Middleware:
+  RegistryUri: silkit://localhost:8501
+Logging:
+  Sinks:
+  - Type: Stdout
+    Level: Debug
