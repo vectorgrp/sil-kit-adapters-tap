@@ -60,18 +60,32 @@ private:
         _tapDeviceStream.async_read_some(
             asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),
             [this](const std::error_code ec, const std::size_t bytes_received) {
-                if (ec)
+                try
                 {
-                    throw IncompleteReadError{};
+                    if (ec)
+                    {
+                        std::string SILKitErrorMessage = "Unable to receive data from TAP device.\n"
+                                                         "Error code: "+ std::to_string(ec.value()) + " (" + ec.message()+ ")\n"
+                                                         "Error category: " + ec.category().name();
+                        _logger->Error(SILKitErrorMessage);
+                    }
+                    else
+                    {
+                        auto frame_data = std::vector<std::uint8_t>(bytes_received);
+                        asio::buffer_copy(asio::buffer(frame_data),
+                                          asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),
+                                          bytes_received);
+
+                        _onNewFrameHandler(std::move(frame_data));
+                    }
                 }
-
-                auto frame_data = std::vector<std::uint8_t>(bytes_received);
-                asio::buffer_copy(
-                    asio::buffer(frame_data),
-                    asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),
-                    bytes_received);
-
-                _onNewFrameHandler(std::move(frame_data));
+                catch (const std::exception& ex)
+                {
+                    // Handle any exception that might occur
+                    std::string SILKitErrorMessage = "Exception occurred: " + std::string(ex.what());
+                    _logger->Error(SILKitErrorMessage);
+                }
+                // Continue with the next read
 
                 ReceiveEthernetFrameFromTapDevice();
             });
