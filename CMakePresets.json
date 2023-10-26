@@ -3,7 +3,7 @@
     "configurePresets": [
         {
             "name": "linux-base",            
-            "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
+            "description": "Target the Windows Subsystem for Linux (WSL2) or a remote Linux system.",
             "hidden": true,
             "generator": "Ninja",
             "binaryDir": "${sourceDir}/_build/${presetName}",

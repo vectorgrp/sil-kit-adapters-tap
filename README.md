@@ -7,7 +7,7 @@ This repository contains instructions to create, set up, and launch such a minim
 The main contents are working examples of necessary software to connect the running system to a SIL Kit environment,
 as well as complimentary demo application for some communication to happen.
 
-Those instructions assume you use WSL (Ubuntu) or a Linux OS for building and running the adapter, and use ``bash`` as your interactive
+Those instructions assume you use WSL2 (Ubuntu) or a Linux OS for building and running the adapter, and use ``bash`` as your interactive
 shell.
 
 ## a) Getting Started with self build Adapters and Demos
