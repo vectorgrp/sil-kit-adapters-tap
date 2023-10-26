@@ -6,13 +6,6 @@
 #include <array>
 #include <cstring>
 
-const std::string adapters::tapNameArg = "--tap-name";
-const std::string adapters::networkArg = "--network";
-const std::string adapters::regUriArg = "--registry-uri";
-const std::string adapters::configurationArg = "--configuration";
-const std::string adapters::logLevelArg = "--log";
-const std::string adapters::participantNameArg = "--name";
-const std::string adapters::helpArg = "--help";
 
 const std::array<std::string, 6> switchesWithArgument = {adapters::networkArg, adapters::tapNameArg, adapters::regUriArg, adapters::logLevelArg, 
                                                          adapters::participantNameArg, adapters::configurationArg};

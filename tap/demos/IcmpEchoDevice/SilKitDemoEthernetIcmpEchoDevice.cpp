@@ -40,6 +40,38 @@ void promptForExit()
             "Pass "<<helpArg<<" to get this message.\n";
 }
 
+
+const std::array<const std::string, 4> demoSwitchesWithArgument = {networkArg, regUriArg, logLevelArg, participantNameArg}; 
+
+const std::array<const std::string, 1> demoSwitchesWithoutArgument = {helpArg};
+
+bool thereAreDemoUnknownArguments(int argc, char** argv)
+{
+    //skip the executable calling:
+    argc -= 1;
+    argv += 1;
+    while (argc)
+    {
+        if (strncmp(*argv, "--", 2) != 0)
+            return true;
+        if (std::find(demoSwitchesWithArgument.begin(), demoSwitchesWithArgument.end(), *argv) != demoSwitchesWithArgument.end())
+        {
+            //switches with argument have an argument to ignore, so skip "2"
+            argc -= 2;
+            argv += 2;
+        }
+        else if (std::find(demoSwitchesWithoutArgument.begin(), demoSwitchesWithoutArgument.end(), *argv) != demoSwitchesWithoutArgument.end())
+        {
+            //switches without argument don't have an argument to ignore, so skip "1"
+            argc -= 1;
+            argv += 1;
+        }
+        else
+            return true;
+    }
+    return false;
+}
+
 /**************************************************************************************************
  * Main Function
  **************************************************************************************************/
@@ -62,7 +94,7 @@ int main(int argc, char** argv)
 
     try
     {
-        throwInvalidCliIf(thereAreUnknownArguments(argc, argv));
+        throwInvalidCliIf(thereAreDemoUnknownArguments(argc, argv));
 
         auto participantConfiguration = SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
         auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);

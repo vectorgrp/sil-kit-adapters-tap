@@ -83,36 +83,36 @@ void foreachArgDo(int argc, char** argv, const std::string& argument, const Acti
 /// <summary>
 /// string containing the argument preceding the TAP device name.
 /// </summary>
-extern const std::string tapNameArg;
+const std::string tapNameArg = "--tap-name";
 
 /// <summary>
 /// string containing the argument preceding the SIL Kit Ethernet network name.
 /// </summary>
-extern const std::string networkArg;
+const std::string networkArg = "--network";
 
 /// <summary>
 /// string containing the argument preceding the URI to the SIL Kit registry.
 /// </summary>
-extern const std::string regUriArg;
+const std::string regUriArg = "--registry-uri";
 
 /// <summary>
 /// string containing the argument preceding the path to configuration file.
 /// </summary>
-extern const std::string configurationArg;
+const std::string configurationArg = "--configuration";
 
 /// <summary>
 /// string containing the argument preceding the logging verbosity level.
 /// </summary>
-extern const std::string logLevelArg;
+const std::string logLevelArg = "--log";
 
 /// <summary>
 /// string containing the argument preceding the participant name.
 /// </summary>
-extern const std::string participantNameArg;
+const std::string participantNameArg = "--name";
 
 /// <summary>
 /// string containing the argument requesting the help message.
 /// </summary>
-extern const std::string helpArg;
+const std::string helpArg = "--help";
 
 } // namespace adapters
