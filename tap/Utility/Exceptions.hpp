@@ -58,6 +58,14 @@ class InvalidCli : public std::exception
 {
 };
 
+struct InvalidFileDescriptor : public std::runtime_error
+{
+    InvalidFileDescriptor()
+        : std::runtime_error("an invalid TAP device has been passed to the adapter.")
+    {
+    }
+};
+
 template <class exception>
 void throwIf(bool b)
 {
@@ -66,6 +74,8 @@ void throwIf(bool b)
 }
 
 inline auto& throwInvalidCliIf = throwIf<InvalidCli>;
+inline auto& throwInvalidFileDescriptorIf = throwIf<InvalidFileDescriptor>;
+
 
 } // namespace demo
 
