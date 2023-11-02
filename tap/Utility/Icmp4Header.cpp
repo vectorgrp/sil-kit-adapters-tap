@@ -18,7 +18,7 @@ std::ostream& operator<<(std::ostream& ostream, const Icmp4Type& icmp4Type)
 
 std::ostream& operator<<(std::ostream& ostream, const Icmp4Header& icmp4Header)
 {
-    return ostream << "Icmp4Header(type=" << icmp4Header.type << ",code=" << icmp4Header.code
+    return ostream << "Icmp4Header(type=" << icmp4Header.type << ",code=" << static_cast<int>(icmp4Header.code)
                    << ",checksum=" << icmp4Header.checksum << ")";
 }
 
