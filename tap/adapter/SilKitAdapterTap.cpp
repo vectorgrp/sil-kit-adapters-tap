@@ -132,7 +132,12 @@ private:
 
         strncpy(ifr.ifr_name, tapDeviceName, IFNAMSIZ);
 
-        if (ioctl(tapFileDescriptor, TUNSETIFF, reinterpret_cast<void*>(&ifr)) < 0)
+        // Path to the tap device in network interfaces
+        std::stringstream pathToTapDevice;
+        pathToTapDevice << "/sys/class/net/" << tapDeviceName;
+
+        // Check if tapDeviceName exists in the list of all network interfaces
+        if ((access(pathToTapDevice.str().c_str(), F_OK) != 0) || (ioctl(tapFileDescriptor, TUNSETIFF, reinterpret_cast<void*>(&ifr)) < 0))
         {
             int ioctlError = errno;
             _logger->Error("Failed to execute IOCTL system call with error code: " + std::to_string(ioctlError) + extractErrorMessage(ioctlError) + 
