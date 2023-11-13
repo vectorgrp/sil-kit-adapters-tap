@@ -10,14 +10,14 @@ target_link_libraries(SilKitAdapterTap
 set_target_properties(SilKitAdapterTap 
     PROPERTIES
     #ensure SilKit shared libraries can be loaded
-    INSTALL_RPATH "$ORIGIN"
+    INSTALL_RPATH "$ORIGIN/../lib:$ORIGIN"
     BUILD_RPATH "$ORIGIN"
-    RUNTIME_OUTPUT_DIRECTORY $<$<BOOL:ALWAYS>:${SILKIT_ADAPTERS_TAP_OUTPUT_DIRECTORY}>
+    RUNTIME_OUTPUT_DIRECTORY $<$<BOOL:ALWAYS>:${SILKIT_ADAPTERS_TAP_OUTPUT_DIRECTORY}>    
 )
 add_custom_command(
     TARGET SilKitAdapterTap
     POST_BUILD
     COMMAND ${CMAKE_COMMAND}
-    ARGS -E copy $<TARGET_FILE:SilKit::SilKit> ${SILKIT_ADAPTERS_TAP_OUTPUT_DIRECTORY}
+    ARGS -E copy $<TARGET_FILE:SilKit::SilKit> ${SILKIT_ADAPTERS_TAP_LIBRARY_DIRECTORY}/libSilKit.so
 )
 

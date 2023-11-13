@@ -12,7 +12,7 @@ target_link_libraries(SilKitDemoEthernetIcmpEchoDevice
 set_target_properties(SilKitDemoEthernetIcmpEchoDevice 
     PROPERTIES
     #ensure SilKit shared libraries can be loaded
-    INSTALL_RPATH "$ORIGIN"
+    INSTALL_RPATH "$ORIGIN/../lib:$ORIGIN"
     BUILD_RPATH "$ORIGIN"
     RUNTIME_OUTPUT_DIRECTORY $<$<BOOL:ALWAYS>:${SILKIT_ADAPTERS_TAP_OUTPUT_DIRECTORY}>
 )

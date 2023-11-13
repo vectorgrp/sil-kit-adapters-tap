@@ -36,18 +36,27 @@ The adapters and demos are built using ``cmake``. If you want to build the adapt
     cmake -S. -Bbuild -DSILKIT_PACKAGE_DIR=/path/to/SilKit-x.y.z-$platform/ -D CMAKE_BUILD_TYPE=Release
     cmake --build build --parallel
 
-**Note 1:** If you have installed a self-built version of SIL Kit, you can build the adapter against it by setting SILKIT_PACKAGE_DIR to the installation path, where the bin, include and lib directories are.
+**Note 1:** If you have a self-built or pre-built version of SIL Kit, you can build the adapter against it by setting SILKIT_PACKAGE_DIR to the path, where the bin, include and lib directories are.
 
-**Note 2:** If you don't provide a specific path for SILKIT_PACKAGE_DIR, a SIL Kit release package (the default version listed in CMakeLists.txt) will be fetched from github.com and the adapter will be built against it.
+**Note 2:** If you have SIL Kit installed on your system, you can build the adapter against it, even by not providing SILKIT_PACKAGE_DIR to the installation path at all. Hint: Be aware, if you are using WSL2 this may result in issue where your Windows installation of SIL Kit is found. To avoid this specify SILKIT_PACKAGE_DIR.
+
+**Note 3:** If you don't provide a specific path for SILKIT_PACKAGE_DIR and there is no SIL Kit installation on your system, a SIL Kit release package (the default version listed in CMakeLists.txt) will be fetched from github.com and the adapter will be built against it.
 
   
-The adapters and demo executables will be available in ``build/bin`` (depending on the configured build directory).
-Additionally the ``SilKit`` shared library is copied to that directory automatically.
+The adapters and demo executables will be available in the ``bin`` directory.
+Additionally the ``SilKit`` shared library is copied to the ``lib`` directory next to it automatically.
 
 ## b) Getting Started with pre-built Adapters and Demos
 Download a preview or release of the Adapters directly from [Vector SIL Kit Adapters Releases](https://github.com/vectorgrp/sil-kit-adapters-tap/releases).
 
 If not already existent on your system you should also download a SIL Kit Release directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). You will need this for being able to start a sil-kit-registry.
+
+## Install the SilKitAdapterTap (optional)
+If you call the following command (can be done for self build and pre build package after cmake configure) ``SilKitAdapterTap`` can be called from everywhere without defining a path:  
+
+    sudo cmake --build build --target install
+
+The default installation path will be ``/usr/local/bin``. Be aware that SIL Kit itself also needs to be installed to make this work.
 
 ## Run the SilKitAdapterTap
 This application allows the user to attach a TAP device of any Linux system to the Vector SIL Kit.

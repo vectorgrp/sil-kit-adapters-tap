@@ -37,7 +37,7 @@ Now is a good point to start the ``sil-kit-registry``, the ``SilKitDemoEthernetI
 
     sudo ./tap/demos/start_adapter_and_ping_demo.sh
     
-The applications will produce output when they send and receive Ethernet frames from the TAP device or the Vector SIL Kit. The console output of ``SilKitAdapterTap`` is redirected to ``/build/bin/SilKitAdapterTap.out``.
+The applications will produce output when they send and receive Ethernet frames from the TAP device or the Vector SIL Kit. The console output of ``SilKitAdapterTap`` is redirected to ``/bin/SilKitAdapterTap.out``.
 
 ## ICMP Ping and Pong
 The ping requests should all receive responses.

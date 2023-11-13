@@ -2,6 +2,8 @@
 /out/
 /.vs/
 /build/
+/bin/
+/lib/
 /*/build/
 /CMakeSettings.json
 /build_wsl
