@@ -84,9 +84,6 @@ add_subdirectory(tap/demos)
 # Copy all files from the source and bin directory to the proper destination
 # Leave out git repo related data
 
-set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
-set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
-
 install(
     DIRECTORY            
         ${CMAKE_CURRENT_SOURCE_DIR}/tap
@@ -163,5 +160,9 @@ set(CPACK_PACKAGE_NAME "SilKit-Adapters-TAP")
 set(CPACK_PACKAGE_VENDOR "Vector Informatik")
 set(CPACK_PACKAGE_CONTACT "support@vector.com")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}${PACKAGE_FILENAME_SUFFIX}")
+
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
+set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY ON)
 
 include(CPack)
