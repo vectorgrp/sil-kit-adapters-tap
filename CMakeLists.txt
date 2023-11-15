@@ -96,6 +96,18 @@ install(
 )
 
 install(
+    FILES            
+        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/start_adapter_and_ping_demo.sh
+    DESTINATION tap/demos
+    PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE
+    COMPONENT source
+    EXCLUDE_FROM_ALL
+)
+
+install(
     FILES
         CMakeLists.txt
         CMakePresets.json
@@ -123,14 +135,13 @@ install(
 )
 
 install(
-    FILES 
-        ${SILKIT_ADAPTERS_TAP_OUTPUT_DIRECTORY}/SilKitDemoEthernetIcmpEchoDevice                
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
+    TARGETS 
+        SilKitDemoEthernetIcmpEchoDevice
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
     PERMISSIONS
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE
-    COMPONENT bin
+        WORLD_READ WORLD_EXECUTE    
     EXCLUDE_FROM_ALL
 )
 
