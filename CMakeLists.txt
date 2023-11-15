@@ -46,7 +46,6 @@ else()
                 silkit
                 URL https://github.com/vectorgrp/sil-kit/releases/download/sil-kit%2Fv${SILKIT_VERSION}/SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}.zip
                 DOWNLOAD_DIR ${CMAKE_CURRENT_LIST_DIR}/Downloads
-                DOWNLOAD_EXTRACT_TIMESTAMP TRUE
             )
 
         message(STATUS "SIL Kit: fetching [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}]")
