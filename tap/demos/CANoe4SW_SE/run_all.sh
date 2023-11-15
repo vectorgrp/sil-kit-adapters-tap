@@ -29,6 +29,6 @@ sleep 1
 
 <&3 $scriptDir/../start_adapter_and_ping_demo.sh &> $scriptDir/start_adapter_and_ping_demo.out &
 
-<&3 $scriptDir/../../../build/bin/SilKitDemoEthernetIcmpEchoDevice &> $scriptDir/SilKitDemoEthernetIcmpEchoDevice.out &
+<&3 $scriptDir/../../../bin/SilKitDemoEthernetIcmpEchoDevice &> $scriptDir/SilKitDemoEthernetIcmpEchoDevice.out &
 
 $scriptDir/run.sh
