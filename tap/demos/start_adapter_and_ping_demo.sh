@@ -27,8 +27,10 @@ echo "Creating tap device silkit_tap"
 ip tuntap add dev silkit_tap mode tap
 
 echo "Starting SilKitAdapterTap..."
-<&3 $SCRIPT_DIR/../../bin/SilKitAdapterTap --configuration $SCRIPT_DIR/SilKitConfig_Adapter.silkit.yaml &> /$SCRIPT_DIR/../../bin/SilKitAdapterTap.out &
-sleep 2
+<&3 $SCRIPT_DIR/../../bin/SilKitAdapterTap --configuration $SCRIPT_DIR/SilKitConfig_Adapter.silkit.yaml &> /$SCRIPT_DIR/SilKitAdapterTap.out &
+sleep 1 # wait 1 second for the creation/existens of the .out file
+
+timeout 30s grep -q 'Press enter to stop the process...' <(tail -f /$SCRIPT_DIR/SilKitAdapterTap.out) || exit 1
 echo "SilKitAdapterTap has been started"
 
 # Hint: It is important to establish the connection to the the adapter before moving the tap device to its separate namespace
