@@ -33,7 +33,7 @@ Now is a good point to start the ``sil-kit-registry``, the ``SilKitDemoEthernetI
 
     ./path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
         
-    ./build/bin/SilKitDemoEthernetIcmpEchoDevice --log Debug
+    ./bin/SilKitDemoEthernetIcmpEchoDevice --log Debug
 
     sudo ./tap/demos/start_adapter_and_ping_demo.sh
     

@@ -65,7 +65,7 @@ Before you start the adapter there always needs to be a sil-kit-registry running
 
     ./path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
 
-It is also necessary that the TAP device exists before the the ``SilKitAdapterTap`` is started. 
+It is also necessary that the TAP device exists before the ``SilKitAdapterTap`` is started. 
 
 **Hint:** If your TAP device has been created by a third party application (you want the SIL Kit to connect to) it is possible that this TAP device resource is 'flagged' as busy/blocked. In this case you just can create another TAP device for usage with the ``SilKitAdapterTap`` by yourself and bridge (``brctl``) it with the TAP device of your third party application.
 
