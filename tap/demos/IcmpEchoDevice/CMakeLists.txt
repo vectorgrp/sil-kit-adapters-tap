@@ -3,6 +3,7 @@ add_executable(SilKitDemoEthernetIcmpEchoDevice
     Device.hpp
     Device.cpp
     ${CMAKE_SOURCE_DIR}/tap/adapter/Parsing.cpp
+    ${CMAKE_SOURCE_DIR}/tap/adapter/SignalHandler.cpp
 )
 target_link_libraries(SilKitDemoEthernetIcmpEchoDevice
     PRIVATE

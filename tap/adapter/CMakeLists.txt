@@ -1,6 +1,7 @@
 add_executable(SilKitAdapterTap
     "SilKitAdapterTap.cpp"
-    "Parsing.cpp")
+    "Parsing.cpp"
+    "SignalHandler.cpp")
 target_link_libraries(SilKitAdapterTap
     PRIVATE
         Utility

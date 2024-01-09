@@ -18,6 +18,7 @@
 
 #include "Exceptions.hpp"
 #include "Parsing.hpp"
+#include "SignalHandler.hpp"
 
 #include "SilKitAdapterTap.hpp"
 
@@ -26,6 +27,8 @@ using namespace exceptions;
 using namespace SilKit::Services::Orchestration;
 using namespace std::chrono_literals;
 using namespace adapters;
+
+std::promise<int> signalPromise;
 
 class TapConnection
 {
@@ -159,12 +162,19 @@ private:
     int _fileDescriptor;
 };
 
-using namespace adapters;
-
 void promptForExit()
-{
-    std::cout << "Press enter to stop the process..." << std::endl;
-    std::cin.ignore();
+{    
+    auto signalValue = signalPromise.get_future();
+    RegisterSignalHandler([](auto sigNum) {
+        signalPromise.set_value(sigNum);
+    });
+        
+    std::cout << "Press CTRL + C to stop the process..." << std::endl;
+
+    signalValue.wait();
+
+    std::cout << "\nSignal " << signalValue.get() << " received!" << std::endl;
+    std::cout << "Exiting..." << std::endl;
 }
 
 int main(int argc, char** argv)

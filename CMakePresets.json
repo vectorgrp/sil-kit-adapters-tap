@@ -11,7 +11,7 @@
             "cacheVariables": {                
                 "CMAKE_C_COMPILER": "gcc",
                 "CMAKE_CXX_COMPILER": "g++",
-                "SILKIT_VERSION": "4.0.39",
+                "SILKIT_VERSION": "4.0.43",
                 "SILKIT_FLAVOR": "ubuntu-18.04-x86_64-gcc"
             },
             "condition": {

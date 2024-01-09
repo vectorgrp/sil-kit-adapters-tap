@@ -12,12 +12,6 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-#Make a temporary fifo to use as std:cin which is not fd#0 (this shell's std:cin) to prevent unintended closure of the background-launched processes
-tmp_fifo=$(mktemp -u)
-mkfifo $tmp_fifo
-exec 3<>$tmp_fifo
-rm $tmp_fifo
-
 echo "Recreating tap_demo_ns network namespace"
 if test -f "/var/run/netns/tap_demo_ns"; then
     ip netns delete tap_demo_ns
@@ -27,10 +21,10 @@ echo "Creating tap device silkit_tap"
 ip tuntap add dev silkit_tap mode tap
 
 echo "Starting SilKitAdapterTap..."
-<&3 $SCRIPT_DIR/../../bin/SilKitAdapterTap --configuration $SCRIPT_DIR/SilKitConfig_Adapter.silkit.yaml &> /$SCRIPT_DIR/SilKitAdapterTap.out &
+$SCRIPT_DIR/../../bin/SilKitAdapterTap --configuration $SCRIPT_DIR/SilKitConfig_Adapter.silkit.yaml &> /$SCRIPT_DIR/SilKitAdapterTap.out &
 sleep 1 # wait 1 second for the creation/existens of the .out file
 
-timeout 30s grep -q 'Press enter to stop the process...' <(tail -f /$SCRIPT_DIR/SilKitAdapterTap.out) || exit 1
+timeout 30s grep -q 'Press CTRL + C to stop the process...' <(tail -f /$SCRIPT_DIR/SilKitAdapterTap.out) || exit 1
 echo "SilKitAdapterTap has been started"
 
 # Hint: It is important to establish the connection to the the adapter before moving the tap device to its separate namespace

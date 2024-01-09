@@ -11,17 +11,30 @@
 #include "silkit/services/ethernet/all.hpp"
 #include "silkit/services/ethernet/string_utils.hpp"
 #include "../adapter/Parsing.hpp"
+#include "../adapter/SignalHandler.hpp"
 #include "../adapter/SilKitAdapterTap.hpp"
 
 using namespace SilKit::Services::Ethernet;
 using namespace adapters; 
 using namespace exceptions;
 
+std::promise<int> signalPromise;
+const std::array<const std::string, 4> demoSwitchesWithArgument = {networkArg, regUriArg, logLevelArg, participantNameArg};
+const std::array<const std::string, 1> demoSwitchesWithoutArgument = {helpArg};
 
 void promptForExit()
 {
-    std::cout << "Press enter to stop the process..." << std::endl;
-    std::cin.ignore();
+    auto signalValue = signalPromise.get_future();
+    RegisterSignalHandler([](auto sigNum) {
+        signalPromise.set_value(sigNum);
+    });
+        
+    std::cout << "Press CTRL + C to stop the process..." << std::endl;
+
+    signalValue.wait();
+
+    std::cout << "\nSignal " << signalValue.get() << " received!" << std::endl;
+    std::cout << "Exiting..." << std::endl;
 }
 
  void print_demo_help(bool userRequested)
@@ -39,11 +52,6 @@ void promptForExit()
         std::cout << "\n"
             "Pass "<<helpArg<<" to get this message.\n";
 }
-
-
-const std::array<const std::string, 4> demoSwitchesWithArgument = {networkArg, regUriArg, logLevelArg, participantNameArg}; 
-
-const std::array<const std::string, 1> demoSwitchesWithoutArgument = {helpArg};
 
 bool thereAreDemoUnknownArguments(int argc, char** argv)
 {
