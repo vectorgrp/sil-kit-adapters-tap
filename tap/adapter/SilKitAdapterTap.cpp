@@ -19,7 +19,6 @@
 #include "Exceptions.hpp"
 #include "Parsing.hpp"
 #include "SignalHandler.hpp"
-
 #include "SilKitAdapterTap.hpp"
 
 using namespace SilKit::Services::Ethernet;
@@ -27,8 +26,6 @@ using namespace exceptions;
 using namespace SilKit::Services::Orchestration;
 using namespace std::chrono_literals;
 using namespace adapters;
-
-std::promise<int> signalPromise;
 
 class TapConnection
 {
@@ -164,8 +161,9 @@ private:
 
 void promptForExit()
 {    
+    std::promise<int> signalPromise;
     auto signalValue = signalPromise.get_future();
-    RegisterSignalHandler([](auto sigNum) {
+    RegisterSignalHandler([&signalPromise](auto sigNum) {
         signalPromise.set_value(sigNum);
     });
         
@@ -323,9 +321,7 @@ int main(int argc, char** argv)
         {
             std::ostringstream SILKitDebugMessage;
             SILKitDebugMessage << "Lifecycle Service Stopping: timed out while checking if the participant is currently running.";
-            logger->Debug(SILKitDebugMessage.str());
-
-            promptForExit();
+            logger->Debug(SILKitDebugMessage.str());            
         }
         lifecycleService->Stop("Adapter stopped by the user.");
 
@@ -334,28 +330,23 @@ int main(int argc, char** argv)
         {
             std::ostringstream SILKitDebugMessage;
             SILKitDebugMessage << "Lifecycle service stopping: timed out";
-            logger->Debug(SILKitDebugMessage.str());
-
-            promptForExit();
+            logger->Debug(SILKitDebugMessage.str());            
         }
     }
     catch (const SilKit::ConfigurationError& error)
     {
-        std::cerr << "Invalid configuration: " << error.what() << std::endl;
-        promptForExit();
+        std::cerr << "Invalid configuration: " << error.what() << std::endl;        
         return CONFIGURATION_ERROR;
     }
     catch (const InvalidCli&)
     {
         adapters::print_help();
-        std::cerr << std::endl << "Invalid command line arguments." << std::endl;
-        promptForExit();
+        std::cerr << std::endl << "Invalid command line arguments." << std::endl;        
         return CLI_ERROR;
     }
     catch (const std::exception& error)
     {
-        std::cerr << "Something went wrong: " << error.what() << std::endl;
-        promptForExit();
+        std::cerr << "Something went wrong: " << error.what() << std::endl;        
         return OTHER_ERROR;
     }
 

@@ -18,14 +18,14 @@ using namespace SilKit::Services::Ethernet;
 using namespace adapters; 
 using namespace exceptions;
 
-std::promise<int> signalPromise;
 const std::array<const std::string, 4> demoSwitchesWithArgument = {networkArg, regUriArg, logLevelArg, participantNameArg};
 const std::array<const std::string, 1> demoSwitchesWithoutArgument = {helpArg};
 
 void promptForExit()
 {
+    std::promise<int> signalPromise;
     auto signalValue = signalPromise.get_future();
-    RegisterSignalHandler([](auto sigNum) {
+    RegisterSignalHandler([&signalPromise](auto sigNum) {
         signalPromise.set_value(sigNum);
     });
         
@@ -162,21 +162,18 @@ int main(int argc, char** argv)
     }
     catch (const SilKit::ConfigurationError& error)
     {
-        std::cerr << "Invalid configuration: " << error.what() << std::endl;
-        promptForExit();
+        std::cerr << "Invalid configuration: " << error.what() << std::endl;        
         return CONFIGURATION_ERROR;
     }
     catch (const InvalidCli&)
     {
         print_demo_help(false);
-        std::cerr << std::endl << "Invalid command line arguments." << std::endl;
-        promptForExit();
+        std::cerr << std::endl << "Invalid command line arguments." << std::endl;        
         return CLI_ERROR;
     }
     catch (const std::exception& error)
     {
-        std::cerr << "Something went wrong: " << error.what() << std::endl;
-        promptForExit();
+        std::cerr << "Something went wrong: " << error.what() << std::endl;        
         return OTHER_ERROR;
     }
 
