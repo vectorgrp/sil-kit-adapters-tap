@@ -1,0 +1,16 @@
+name: trigger SIL Kit Adapters pipeline tests
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, reopened, synchronize]
+  
+jobs:
+  call-testing-workflow:
+    uses: pnd/sil-kit-adapters-ci-testing/.github/workflows/container-reusable.yml@main
+    with:
+      repository_to_test : ${{ github.repository }}
+      branch: ${{ github.event.pull_request.head.ref }}
+      adapter_name: tap
+      canoe4sw_se_scripts_dir: demos/CANoe4SW_SE
+    secrets: inherit
+

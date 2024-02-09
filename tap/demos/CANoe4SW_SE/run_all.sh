@@ -1,6 +1,8 @@
 #!/bin/bash
 scriptDir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 silKitDir=/home/vector/SilKit/SilKit-4.0.43-ubuntu-18.04-x86_64-gcc/
+# if "exported_full_path_to_silkit" environment variable is set (in pipeline script), use it. Otherwise, use default value
+silKitDir="${exported_full_path_to_silkit:-$silKitDir}"
 
 # cleanup trap for child processes 
 trap 'kill $(jobs -p); exit' EXIT SIGHUP;
@@ -26,3 +28,17 @@ $scriptDir/../start_adapter_and_ping_demo.sh &> $scriptDir/start_adapter_and_pin
 $scriptDir/../../../bin/SilKitDemoEthernetIcmpEchoDevice &> $scriptDir/SilKitDemoEthernetIcmpEchoDevice.out &
 
 $scriptDir/run.sh
+
+#capture returned value of run.sh script
+exit_status=$?
+
+echo "sil-kit-registry.out:--------------------------------------------------------------------------------------" 
+cat $scriptDir/sil-kit-registry.out
+echo "-----------------------------------------------------------------------------------------------------------" 
+
+echo "start_adapter_and_ping_demo.out:---------------------------------------------------------------------------" 
+cat $scriptDir/start_adapter_and_ping_demo.out
+echo "-----------------------------------------------------------------------------------------------------------" 
+
+#exit run_all.sh with same exit_status
+exit $exit_status
