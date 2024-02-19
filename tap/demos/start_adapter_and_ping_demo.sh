@@ -22,7 +22,7 @@ ip tuntap add dev silkit_tap mode tap
 
 echo "Starting SilKitAdapterTap..."
 $SCRIPT_DIR/../../bin/SilKitAdapterTap --configuration $SCRIPT_DIR/SilKitConfig_Adapter.silkit.yaml &> /$SCRIPT_DIR/SilKitAdapterTap.out &
-sleep 1 # wait 1 second for the creation/existens of the .out file
+sleep 1 # wait 1 second for the creation/existense of the .out file
 
 timeout 30s grep -q 'Press CTRL + C to stop the process...' <(tail -f /$SCRIPT_DIR/SilKitAdapterTap.out) || exit 1
 echo "SilKitAdapterTap has been started"
