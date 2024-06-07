@@ -20,7 +20,7 @@ fi
 
 $silKitDir/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501' -s &> $scriptDir/sil-kit-registry.out &
 sleep 1 # wait 1 second for the creation/existense of the .out file
-timeout 30s grep -q 'Registered signal handler' <(tail -f /$scriptDir/sil-kit-registry.out) || (echo "[error] Timeout reached while waiting for sil-kit-registry to start"; exit 1;)
+timeout 30s grep -q 'Registered signal handler' <(tail -f /$scriptDir/sil-kit-registry.out) || { echo "[error] Timeout reached while waiting for sil-kit-registry to start"; exit 1; }
 
 $scriptDir/../start_adapter_and_ping_demo.sh &> $scriptDir/start_adapter_and_ping_demo.out &
 
