@@ -1,5 +1,6 @@
 /out/
 /.vs/
+/.vscode/
 /build/
 /_build/
 /bin/
