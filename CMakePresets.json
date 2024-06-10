@@ -1,91 +1,165 @@
 ﻿{
-    "version": 3,
-    "configurePresets": [
-        {
-            "name": "linux-base",            
-            "description": "Target the Windows Subsystem for Linux (WSL2) or a remote Linux system.",
-            "hidden": true,
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/_build/${presetName}",
-            "installDir": "${sourceDir}/_install/${presetName}",
-            "cacheVariables": {                
-                "CMAKE_C_COMPILER": "gcc",
-                "CMAKE_CXX_COMPILER": "g++",
-                "SILKIT_VERSION": "4.0.43",
-                "SILKIT_FLAVOR": "ubuntu-18.04-x86_64-gcc"
-            },
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Linux"
-            },
-            "vendor": {
-                "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
-                    "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}",
-                    "rsyncCommandArgs": [ "--exclude", "_build" ]
-                }
-            }
-        },
-        {
-            "name": "linux-debug",
-            "displayName": "Linux Debug",            
-            "inherits": "linux-base",            
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
-            }            
-        },
-        {
-            "name": "linux-release",
-            "displayName": "Linux Release",            
-            "inherits": "linux-base",            
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
-            }            
-        }        
-    ],
-
-    "buildPresets": [
-        {
-            "name": "linux-base",
-            "hidden": true,
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Linux"
-            }
-        },
-
-        {
-            "name": "linux-debug",
-            "inherits": "linux-base",
-            "configurePreset": "linux-debug"
-        },
-        {
-            "name": "linux-release",
-            "inherits": "linux-base",
-            "configurePreset": "linux-release"
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "linux-base",
+      "description": "Target the Windows Subsystem for Linux (WSL2) or a remote Linux system.",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/_build/${presetName}",
+      "installDir": "${sourceDir}/_install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++",
+        "SILKIT_VERSION": "4.0.43",
+        "SILKIT_FLAVOR": "ubuntu-18.04-x86_64-gcc"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}",
+          "rsyncCommandArgs": [ "--exclude", "_build" ]
         }
-    ],
-    "testPresets": [
-        {
-            "name": "linux-base",
-            "hidden": true,
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Linux"
-            }
-        },
-
-        {
-            "name": "linux-debug",
-            "inherits": "linux-base",
-            "configurePreset": "linux-debug"
-        },
-        {
-            "name": "linux-release",
-            "inherits": "linux-base",
-            "configurePreset": "linux-release"
+      }
+    },
+    {
+      "name": "linux-debug",
+      "displayName": "Linux Debug",
+      "inherits": "linux-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "linux-release",
+      "displayName": "Linux Release",
+      "inherits": "linux-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "windows-base",
+      "description": "Target Windows Operating System",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/_build/${presetName}",
+      "installDir": "${sourceDir}/_install/${presetName}",
+      "cacheVariables": {
+        "SILKIT_VERSION": "4.0.43",
+        "SILKIT_FLAVOR": "Win-x86_64-VS2017"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}",
+          "rsyncCommandArgs": [ "--exclude", "_build" ]
         }
-    ]
+      }
+    },
+    {
+      "name": "windows-debug",
+      "displayName": "Windows Debug",
+      "inherits": "windows-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "windows-release",
+      "displayName": "Windows Release",
+      "inherits": "windows-base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "linux-base",
+      "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "linux-debug",
+      "inherits": "linux-base",
+      "configurePreset": "linux-debug"
+    },
+    {
+      "name": "linux-release",
+      "inherits": "linux-base",
+      "configurePreset": "linux-release"
+    },
+    {
+      "name": "windows-base",
+      "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "windows-debug",
+      "inherits": "windows-base",
+      "configurePreset": "windows-debug"
+    },
+    {
+      "name": "windows-release",
+      "inherits": "windows-base",
+      "configurePreset": "windows-release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "linux-base",
+      "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "linux-debug",
+      "inherits": "linux-base",
+      "configurePreset": "linux-debug"
+    },
+    {
+      "name": "linux-release",
+      "inherits": "linux-base",
+      "configurePreset": "linux-release"
+    },
+    {
+      "name": "windows-base",
+      "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "windows-debug",
+      "inherits": "windows-base",
+      "configurePreset": "windows-debug"
+    },
+    {
+      "name": "windows-release",
+      "inherits": "windows-base",
+      "configurePreset": "windows-release"
+    }
+  ]
 }

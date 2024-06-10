@@ -36,9 +36,16 @@ add_library(
     Icmp4Header.hpp
     Icmp4Header.cpp
 )
+
 target_include_directories(Utility PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 target_link_libraries(Utility
     PUBLIC
         asio
 )
+
+if(MINGW)
+    target_compile_definitions(Utility INTERFACE _WIN32_WINNT=0x0601)
+    target_link_libraries(Utility PUBLIC -lwsock32 -lws2_32) #windows socket/ wsa
+endif()
 

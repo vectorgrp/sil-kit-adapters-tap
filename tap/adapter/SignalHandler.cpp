@@ -31,11 +31,92 @@ class SignalMonitor;
 // global signal handler
 static std::unique_ptr<SignalMonitor> gSignalMonitor;
 
-#include <csignal>
-#include <cstring>
-#include <cerrno>
-#include <fcntl.h>
-#include <unistd.h>
+////////////////////////////////////////////
+// Inline Platform Specific Implementations
+////////////////////////////////////////////
+#if WIN32
+#    include <windows.h>
+
+namespace {
+
+using namespace adapters;
+
+//forward
+BOOL WINAPI systemHandler(DWORD ctrlType);
+
+class SignalMonitor
+{
+public:
+    SignalMonitor(SignalHandler handler)
+    {
+        _handler = std::move(handler);
+
+        auto ok = CreatePipe(&_readEnd, &_writeEnd, nullptr, 0);
+        if (!ok)
+            throw std::runtime_error("CreatePipe failed. Cannot create Signal Handler!");
+        DWORD nowait = PIPE_NOWAIT;
+        ok = SetNamedPipeHandleState(_writeEnd, &nowait, nullptr, nullptr);
+        if (!ok)
+            throw std::runtime_error("Set pipe read end to nonblocking failed. Cannot create Signal Handler!");
+        SetConsoleCtrlHandler(systemHandler, true);
+        _worker = std::thread{std::bind(&SignalMonitor::workerMain, this)};
+    }
+    ~SignalMonitor()
+    {
+        SetConsoleCtrlHandler(systemHandler, false);
+        Notify(-1);
+        _worker.join();
+        CloseHandle(_writeEnd);
+        CloseHandle(_readEnd);
+    }
+    void Notify(int signalNumber)
+    {
+        // no allocs, no error handling
+        _signalNumber = signalNumber;
+        uint8_t buf{};
+        auto ok = WriteFile(_writeEnd, &buf, sizeof(buf), nullptr, nullptr);
+        (void)ok;
+    }
+
+private:
+    void workerMain()
+    {
+        std::vector<uint8_t> buf(1);
+        //blocking read until Notify() was called
+        auto ok = ReadFile(_readEnd, buf.data(), static_cast<DWORD>(buf.size()), nullptr, nullptr);
+        if (!ok)
+            throw std::runtime_error("SignalMonitor::workerMain: cannot read from pipe.");
+
+        if (_handler)
+        {
+            _handler(_signalNumber);
+        }
+    }
+    HANDLE _readEnd{INVALID_HANDLE_VALUE}, _writeEnd{INVALID_HANDLE_VALUE};
+    SignalHandler _handler;
+    std::thread _worker;
+    int _signalNumber{-1};
+};
+
+BOOL WINAPI systemHandler(DWORD ctrlType)
+{
+    if (gSignalMonitor)
+    {
+        gSignalMonitor->Notify(static_cast<int>(ctrlType));
+        return TRUE;
+    }
+    return FALSE;
+}
+
+} // end anonymous namespace
+
+#else //UNIX
+
+#    include <csignal>
+#    include <cstring>
+#    include <cerrno>
+#    include <fcntl.h>
+#    include <unistd.h>
 
 namespace {
 
@@ -117,6 +198,7 @@ void systemHandler(int sigNum)
 }
 
 } // namespace
+#endif
 
 namespace adapters {
 

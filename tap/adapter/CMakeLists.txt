@@ -1,7 +1,9 @@
 add_executable(SilKitAdapterTap
     "SilKitAdapterTap.cpp"
+    "TapConnection.cpp"
     "Parsing.cpp"
-    "SignalHandler.cpp")
+    "SignalHandler.cpp"
+)
 target_link_libraries(SilKitAdapterTap
     PRIVATE
         Utility
@@ -21,4 +23,3 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND}
     ARGS -E copy $<TARGET_FILE:SilKit::SilKit> ${SILKIT_ADAPTERS_TAP_LIBRARY_DIRECTORY}/libSilKit.so
 )
-

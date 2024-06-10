@@ -1,4 +1,4 @@
-# Vector SIL Kit Adapters for TAP devices (Linux only)
+# Vector SIL Kit Adapters for TAP devices
 This collection of software is provided to illustrate how the [Vector SIL Kit](https://github.com/vectorgrp/sil-kit/)
 can be attached to a TAP device.
 
@@ -7,8 +7,7 @@ This repository contains instructions to create, set up, and launch such a minim
 The main contents are working examples of necessary software to connect the running system to a SIL Kit environment,
 as well as complimentary demo application for some communication to happen.
 
-Those instructions assume you use WSL2 (Ubuntu) or a Linux OS for building and running the adapter, and use ``bash`` as your interactive
-shell.
+Those instructions assume you use WSL2 (Ubuntu) or a Linux OS for building and running the Linux version of the adapter together with ``bash`` as your interactive shell. In case of the Windows version of the adapter ``PowerShell`` is assumed.
 
 ## a) Getting Started with self build Adapters and Demos
 This section specifies steps you should do if you have just cloned the repository.
@@ -34,7 +33,7 @@ The adapters and demos are built using ``cmake``. If you want to build the adapt
 
     mkdir build
     cmake -S. -Bbuild -DSILKIT_PACKAGE_DIR=/path/to/SilKit-x.y.z-$platform/ -D CMAKE_BUILD_TYPE=Release
-    cmake --build build --parallel
+    cmake --build build --parallel --config Release
 
 **Note 1:** If you have a self-built or pre-built version of SIL Kit, you can build the adapter against it by setting SILKIT_PACKAGE_DIR to the path, where the bin, include and lib directories are.
 
@@ -42,7 +41,6 @@ The adapters and demos are built using ``cmake``. If you want to build the adapt
 
 **Note 3:** If you don't provide a specific path for SILKIT_PACKAGE_DIR and there is no SIL Kit installation on your system, a SIL Kit release package (the default version listed in CMakeLists.txt) will be fetched from github.com and the adapter will be built against it.
 
-  
 The adapters and demo executables will be available in the ``bin`` directory.
 Additionally the ``SilKit`` shared library is copied to the ``lib`` directory next to it automatically.
 
@@ -52,22 +50,36 @@ Download a preview or release of the Adapters directly from [Vector SIL Kit Adap
 If not already existent on your system you should also download a SIL Kit Release directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). You will need this for being able to start a sil-kit-registry.
 
 ## Install the SilKitAdapterTap (optional)
-If you call the following command (can be done for self build and pre build package after cmake configure) ``SilKitAdapterTap`` can be called from everywhere without defining a path:  
+Be aware that SIL Kit itself also needs to be installed to run the adapter.
+
+Run the following command to install the SilKitAdapterTap (can be done for self build and pre build package after cmake configure):
+
+
+### Linux installation
 
     sudo cmake --build build --target install
 
-The default installation path will be ``/usr/local/bin``. Be aware that SIL Kit itself also needs to be installed to make this work.
+**Note:** After installing the adapter on Linux, the following command  ``SilKitAdapterTap`` can be called from everywhere without defining a path. The default installation path will be ``/usr/local/bin``.
+
+### Windows installation
+
+    cmake --build build --target install --config Release
+
+**Note 1:** Elevated rights are needed to install the adapter under its default location. This can be achieved by running the command in a PowerShell opened as administrator.
+
+**Note 2:** The default installation path will be ``C:\Program Files\Vector SIL Kit Adapters TAP <TAP_ADAPTER_VERSION>``, with <TAP_ADAPTER_VERSION> as the version of the TAP adapter you install. 
+Depending on your system this default path can be ``Program Files (x86)``.
 
 ## Run the SilKitAdapterTap
-This application allows the user to attach a TAP device of any Linux system to the Vector SIL Kit.
+This application allows the user to attach a TAP device of a Linux or Windows system to the Vector SIL Kit.
 
 Before you start the adapter there always needs to be a sil-kit-registry running already. Start it e.g. like this:
 
-    ./path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
+    /path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
 
 It is also necessary that the TAP device exists before the ``SilKitAdapterTap`` is started. 
 
-**Hint:** If your TAP device has been created by a third party application (you want the SIL Kit to connect to) it is possible that this TAP device resource is 'flagged' as busy/blocked. In this case you just can create another TAP device for usage with the ``SilKitAdapterTap`` by yourself and bridge (``brctl``) it with the TAP device of your third party application.
+**Hint:** If your TAP device has been created by a third party application (you want the SIL Kit to connect to) it is possible that this TAP device resource is 'flagged' as busy/blocked. In this case you just can create another TAP device for usage with the ``SilKitAdapterTap`` by yourself and bridge (``brctl`` on Linux, ``netsh bridge`` on Windows) it with the TAP device of your third party application.
 
 The application *optionally* takes the following command line arguments (default between curly braces):
 
@@ -81,11 +93,17 @@ The application *optionally* takes the following command line arguments (default
 
 **Note:** SIL Kit-specific CLI arguments will be overwritten by the config file specified by ``--configuration``.
 
-## TAP Demo
-The aim of this demo is to showcase a simple adapter forwarding ethernet traffic from and to a TAP device through
+## Linux TAP Demo
+The aim of this demo is to showcase a simple adapter forwarding ethernet traffic from and to a Linux TAP device through
 Vector SIL Kit. Traffic being exchanged are ping (ICMP) requests, and the answering device replies to them.
 
-This demo is further explained in [tap/README.md](tap/README.md).
+This demo is further explained in [tap/demos/DemoLinux/README.md](tap/demos/DemoLinux/README.md).
+
+## Windows TAP Demo
+The aim of this demo is to showcase a simple adapter forwarding ethernet traffic from and to a Windows TAP device through
+Vector SIL Kit. Traffic being exchanged are ping (ICMP) requests, and the answering device replies to them.
+
+This demo is further explained in [tap/demos/DemoWindows/README.md](tap/demos/DemoWindows/README.md).
 
 ## Connecting an adaptive executable to CANoe
 The Vector SIL Kit Adapters TAP allow you to connect adaptive executables to CANoe. A guide describes step by step how to do this can be found here [adaptive/README.md](adaptive/README.md). 

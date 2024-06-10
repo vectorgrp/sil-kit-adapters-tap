@@ -11,6 +11,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(SILKIT_ADAPTERS_TAP_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 set(SILKIT_ADAPTERS_TAP_LIBRARY_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
+set(SILKIT_ADAPTERS_TAP_VERSION "1.0.2")
+
 set(SILKIT_VERSION "4.0.43" CACHE STRING "If no SIL Kit package is specified, this version will be downloaded")
 set(SILKIT_FLAVOR "ubuntu-18.04-x86_64-gcc" CACHE STRING "If no SIL Kit package is specified, this package flavor will be downloaded")
 
@@ -20,9 +22,21 @@ target_include_directories(asio INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/third_part
 target_compile_definitions(asio INTERFACE ASIO_STANDALONE=1)
 target_link_libraries(asio INTERFACE Threads::Threads)
 
-if(DEFINED SILKIT_PACKAGE_DIR)    
-# if the user forces using a specific SIL Kit package, use it
-	message(STATUS "SILKIT_PACKAGE_DIR has been set to: ${SILKIT_PACKAGE_DIR}, CMAKE will look for a SIL Kit package in that directory")
+if (WIN32)
+    # set the default install paths for Windows 32 and 64 bits
+    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+        set(CMAKE_INSTALL_PREFIX "C:/Program Files/Vector SIL Kit Adapters TAP ${SILKIT_ADAPTERS_TAP_VERSION}" CACHE PATH "Default install path" FORCE)
+    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+        set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Vector SIL Kit Adapters TAP ${SILKIT_ADAPTERS_TAP_VERSION}" CACHE PATH "Default install path" FORCE)
+    endif()
+    
+    target_compile_definitions(asio INTERFACE _SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1)
+    target_compile_definitions(asio INTERFACE WINVER=0x0601 _WIN32_WINNT=0x0601) # Windows 7
+endif()
+
+if(DEFINED SILKIT_PACKAGE_DIR)
+    # if the user forces using a specific SIL Kit package, use it
+	message(STATUS "SILKIT_PACKAGE_DIR has been set to: ${SILKIT_PACKAGE_DIR}, CMake will look for a SIL Kit package in that directory")
     find_package(SilKit 4.0.40
         REQUIRED
         CONFIG
@@ -30,11 +44,9 @@ if(DEFINED SILKIT_PACKAGE_DIR)
         NO_DEFAULT_PATH
         PATHS "${SILKIT_PACKAGE_DIR}"
     )
-	
 else()
 # otherwise, look for an installed version of SIL Kit
     message(STATUS "SILKIT_PACKAGE_DIR has not been set by user. Attempting to find an installed version of SIL Kit")
-    
     find_package(SilKit 4.0.40
         CONFIG
     )
@@ -43,10 +55,10 @@ else()
 	# if installed SIL Kit is not found, fetch it from github.com
 		message(STATUS "No installed version of SIL Kit was found. Attempting to fetch [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}] from github.com")
         FetchContent_Declare(
-                silkit
-                URL https://github.com/vectorgrp/sil-kit/releases/download/sil-kit%2Fv${SILKIT_VERSION}/SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}.zip
-                DOWNLOAD_DIR ${CMAKE_CURRENT_LIST_DIR}/Downloads
-            )
+            silkit
+            URL https://github.com/vectorgrp/sil-kit/releases/download/sil-kit%2Fv${SILKIT_VERSION}/SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}.zip
+            DOWNLOAD_DIR ${CMAKE_CURRENT_LIST_DIR}/Downloads
+        )
 
         message(STATUS "SIL Kit: fetching [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}]")
         FetchContent_MakeAvailable(silkit)
@@ -97,8 +109,8 @@ install(
 
 install(
     FILES            
-        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/start_adapter_and_ping_demo.sh
-    DESTINATION tap/demos
+        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/start_adapter_and_ping_demo.sh
+    DESTINATION tap/demos/DemoLinux
     PERMISSIONS
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE

@@ -6,8 +6,10 @@ namespace adapters {
 
 enum ReturnCode
 {
+#ifndef WIN32 // already defined in winerror.h
     NO_ERROR = 0,
-    CLI_ERROR,
+#endif
+    CLI_ERROR = 1,
     CONFIGURATION_ERROR,
     OTHER_ERROR,
     FILE_DESCRIPTOR_ERROR = -1

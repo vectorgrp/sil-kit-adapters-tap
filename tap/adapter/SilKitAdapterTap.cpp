@@ -1,14 +1,19 @@
 // Copyright (c) Vector Informatik GmbH. All rights reserved.
 
+#include "SilKitAdapterTap.hpp"
+
 #include <iostream>
 #include <string>
 #include <thread>
 #include <vector>
-#include <linux/if_tun.h>
 
-#include <asio/ts/buffer.hpp>
-#include <asio/ts/io_context.hpp>
-#include <asio/posix/stream_descriptor.hpp>
+#include "Exceptions.hpp"
+#include "Parsing.hpp"
+#include "SignalHandler.hpp"
+#include "TapConnection.hpp"
+
+#include "asio/ts/buffer.hpp"
+#include "asio/ts/io_context.hpp"
 
 #include "silkit/SilKit.hpp"
 #include "silkit/config/all.hpp"
@@ -16,148 +21,11 @@
 #include "silkit/services/ethernet/string_utils.hpp"
 #include "silkit/services/logging/all.hpp"
 
-#include "Exceptions.hpp"
-#include "Parsing.hpp"
-#include "SignalHandler.hpp"
-#include "SilKitAdapterTap.hpp"
-
 using namespace SilKit::Services::Ethernet;
 using namespace exceptions;
 using namespace SilKit::Services::Orchestration;
 using namespace std::chrono_literals;
 using namespace adapters;
-
-class TapConnection
-{
-public:
-    TapConnection(asio::io_context& io_context, const std::string& tapDevName,
-                  std::function<void(std::vector<uint8_t>)> onNewFrameHandler,
-                  SilKit::Services::Logging::ILogger* logger)
-        : _tapDeviceStream{io_context}
-        , _onNewFrameHandler(std::move(onNewFrameHandler))
-        , _logger(logger)
-    {
-        _fileDescriptor = GetTapDeviceFileDescriptor(tapDevName.c_str());
-        throwInvalidFileDescriptorIf(_fileDescriptor < 0);
-
-        _tapDeviceStream.assign(_fileDescriptor);
-        ReceiveEthernetFrameFromTapDevice();
-    }
-
-    template<class container>
-    void SendEthernetFrameToTapDevice(const container& data)
-    {
-        auto sizeSent = _tapDeviceStream.write_some(asio::buffer(data.data(), data.size()));
-        if (data.size() != sizeSent )
-        {
-            throw InvalidFrameSizeError{};
-        }
-    }
-
-private:
-    void ReceiveEthernetFrameFromTapDevice()
-    {
-        _tapDeviceStream.async_read_some(
-            asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),
-            [this](const std::error_code ec, const std::size_t bytes_received) {
-                try
-                {
-                    if (ec)
-                    {
-                        std::string SILKitErrorMessage = "Unable to receive data from TAP device.\n"
-                                                         "Error code: "+ std::to_string(ec.value()) + " (" + ec.message()+ ")\n"
-                                                         "Error category: " + ec.category().name();
-                        _logger->Error(SILKitErrorMessage);
-                    }
-                    else
-                    {
-                        auto frame_data = std::vector<std::uint8_t>(bytes_received);
-                        asio::buffer_copy(asio::buffer(frame_data),
-                                          asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),
-                                          bytes_received);
-
-                        _onNewFrameHandler(std::move(frame_data));
-                    }
-                }
-                catch (const std::exception& ex)
-                {
-                    // Handle any exception that might occur
-                    std::string SILKitErrorMessage = "Exception occurred: " + std::string(ex.what());
-                    _logger->Error(SILKitErrorMessage);
-                }
-                // Continue with the next read
-
-                ReceiveEthernetFrameFromTapDevice();
-            });
-    }
-
-private:
-
-    std::string extractErrorMessage(int errorCode)
-    {
-        const char* errorMessage = strerror(errorCode);
-
-        if (errorMessage != nullptr)
-        {
-            return ("\t(" + std::string(errorMessage) + ")");
-        }
-        else
-        {
-            return "";
-        }
-    }
-
-    int GetTapDeviceFileDescriptor(const char *tapDeviceName)
-    {
-        struct ifreq ifr;
-        int tapFileDescriptor;
-        
-        if ((tapFileDescriptor = open("/dev/net/tun", O_RDWR)) < 0)
-        {
-            int fdError = errno;
-            _logger->Error("File descriptor openning failed with error code: " + std::to_string(fdError) + extractErrorMessage(fdError));
-            return FILE_DESCRIPTOR_ERROR;
-        }
-
-        // Check if tapDeviceName is null, empty, or too long, IFNAMSIZ is a constant that defines the maximum possible buffer size for an interface name (including its terminating zero byte)
-        if (tapDeviceName == nullptr || strlen(tapDeviceName) >= IFNAMSIZ)
-        {
-            _logger->Error("Invalid TAP device name used for [--tap-name] arg.\n"
-            "(Hint): Ensure that the name provided is within a valid length between (1 and " + std::to_string(IFNAMSIZ - 1) + ") characters.");
-            return FILE_DESCRIPTOR_ERROR;
-        }
-
-        memset(&ifr, 0, sizeof(ifr));
-        ifr.ifr_flags = (short int)IFF_TAP | IFF_NO_PI;
-
-        strncpy(ifr.ifr_name, tapDeviceName, IFNAMSIZ);
-
-        // Path to the tap device in network interfaces
-        std::stringstream pathToTapDevice;
-        pathToTapDevice << "/sys/class/net/" << tapDeviceName;
-
-        // Check if tapDeviceName exists in the list of all network interfaces
-        if ((access(pathToTapDevice.str().c_str(), F_OK) != 0) || (ioctl(tapFileDescriptor, TUNSETIFF, reinterpret_cast<void*>(&ifr)) < 0))
-        {
-            int ioctlError = errno;
-            _logger->Error("Failed to execute IOCTL system call with error code: " + std::to_string(ioctlError) + extractErrorMessage(ioctlError) + 
-                "\n(Hint): Ensure that the network interface \"" + std::string(tapDeviceName) + "\" specified in [--tap-name] exists and is operational.");
-            close(tapFileDescriptor);
-            return FILE_DESCRIPTOR_ERROR;
-        }
-
-        _logger->Info("TAP device successfully opened");
-        return tapFileDescriptor;
-    }
-
-
-private:
-    std::array<uint8_t, 1600> _ethernetFrameBuffer;
-    asio::posix::stream_descriptor _tapDeviceStream;
-    std::function<void(std::vector<uint8_t>)> _onNewFrameHandler;
-    SilKit::Services::Logging::ILogger* _logger;
-    int _fileDescriptor;
-};
 
 void promptForExit()
 {    

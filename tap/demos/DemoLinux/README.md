@@ -31,18 +31,18 @@ The application will reply to an ARP request and respond to ICMPv4 Echo Requests
 
 Now is a good point to start the ``sil-kit-registry``, the ``SilKitDemoEthernetIcmpEchoDevice`` and the demo helper script ``start_adapter_and_ping_demo`` - which creates the TAP device, connects it to the adapter and afterwards adds it to the network namespace and starts pinging the echos device from there - in separate terminals:
 
-    ./path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
+    /path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
         
     ./bin/SilKitDemoEthernetIcmpEchoDevice --log Debug
 
-    sudo ./tap/demos/start_adapter_and_ping_demo.sh
+    sudo ./tap/demos/DemoLinux/start_adapter_and_ping_demo.sh
     
-The applications will produce output when they send and receive Ethernet frames from the TAP device or the Vector SIL Kit. The console output of ``SilKitAdapterTap`` is redirected to ``/bin/SilKitAdapterTap.out``.
+The applications will produce output when they send and receive Ethernet frames from the TAP device or the Vector SIL Kit. The console output of ``SilKitAdapterTap`` is redirected to ``./bin/SilKitAdapterTap.out``.
 
 ## ICMP Ping and Pong
 The ping requests should all receive responses.
     
-You should see output output similar to the following from the ``SilKitDemoEthernetIcmpEchoDevice`` application:
+You should see output similar to the following from the ``SilKitDemoEthernetIcmpEchoDevice`` application:
 
     [date time] [EthernetDevice] [debug] SIL Kit >> Demo: Ethernet frame (98 bytes)
     [date time] [EthernetDevice] [debug] EthernetHeader(destination=EthernetAddress(52:54:56:53:4b:55),source=EthernetAddress(9a:97:c4:83:d8:d0),etherType=EtherType::Ip4)
@@ -54,21 +54,16 @@ You should see output output similar to the following from the ``SilKitDemoEther
     [date time] [EthernetDevice] [debug] SIL Kit >> Demo: ACK for ETH Message with transmitId=3
     [date time] [EthernetDevice] [debug] Demo >> SIL Kit: Ethernet frame (98 bytes, txId=3)
 
-
-
-
 ## Adding CANoe (16 SP3 or newer) as a participant
 If CANoe is connected to the SIL Kit, all ethernet traffic is visible there as well. You can also execute a test unit which checks if the ICMP Ping and Pong is happening as expected.
 
-Before you can connect CANoe to the SIL Kit network you should adapt the ``RegistryUri`` in ``/tap/demos/SilKitConfig_CANoe.silkit.yaml`` to the IP address of your system where your sil-kit-registry is running (in case of a WSL2 Ubuntu image e.g. the IP address of Eth0). The configuration file is referenced by both following CANoe use cases (Desktop Edition and Server Edition).
+Before you can connect CANoe to the SIL Kit network you should adapt the ``RegistryUri`` in ``tap/demos/SilKitConfig_CANoe.silkit.yaml`` to the IP address of your system where your sil-kit-registry is running (in case of a WSL2 Ubuntu image e.g. the IP address of Eth0). The configuration file is referenced by both following CANoe use cases (Desktop Edition and Server Edition).
 
 ### CANoe Desktop Edition
-Load the ``Tap_adapter_CANoe.cfg`` from the ``demos/CANoe`` directory and start the measurement. Optionally you can also start the test unit execution of included test configuration. While the demo is running these tests should be successful.
+Load the ``Tap_adapter_CANoe.cfg`` from the ``tap/demos/CANoe`` directory and start the measurement. Optionally you can also start the test unit execution of included test configuration. While the demo is running these tests should be successful.
 
 ### CANoe4SW Server Edition (Windows)
-You can also run the same test set with ``CANoe4SW SE`` by executing the following powershell script ``demos/CANoe4SW_SE/run.ps1``. The test cases are executed automatically and you should see a short test report in powershell after execution.
+You can also run the same test set with ``CANoe4SW SE`` by executing the following PowerShell script ``tap/demos/CANoe4SW_SE/run.ps1``. The test cases are executed automatically and you should see a short test report in PowerShell after execution.
 
 ### CANoe4SW Server Edition (Linux)
-You can also run the same test set with ``CANoe4SW SE (Linux)``. At first you have to execute the powershell script ``demos/CANoe4SW_SE/createEnvForLinux.ps1`` on your windows system by using tools of ``CANoe4SW SE (Windows)`` to prepare your test environment for Linux. In ``demos/CANoe4SW_SE/run.sh`` you should adapt ``canoe4sw_se_install_dir`` to the path of your ``CANoe4SW SE`` installation in your WSL2. Afterwards you can execute ``demos/CANoe4SW_SE/run.sh`` in your WSL2. The test cases are executed automatically and you should see a short test report in your terminal after execution.
-
-
+You can also run the same test set with ``CANoe4SW SE (Linux)``. At first you have to execute the PowerShell script ``tap/demos/CANoe4SW_SE/createEnvForLinux.ps1`` on your windows system by using tools of ``CANoe4SW SE (Windows)`` to prepare your test environment for Linux. In ``tap/demos/CANoe4SW_SE/run.sh`` you should adapt ``canoe4sw_se_install_dir`` to the path of your ``CANoe4SW SE`` installation in your WSL2. Afterwards you can execute ``tap/demos/CANoe4SW_SE/run.sh`` in your WSL2. The test cases are executed automatically and you should see a short test report in your terminal after execution.
