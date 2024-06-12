@@ -134,7 +134,7 @@ int main(int argc, char** argv)
         };
 
         SILKitInfoMessage.str("");
-        SILKitInfoMessage << "Creating TAP device ethernet connector for '" << tapDevName << "'";
+        SILKitInfoMessage << "Creating TAP device ethernet connector for [" << tapDevName << "] on network [" << ethernetNetworkName << "]";
         logger->Info(SILKitInfoMessage.str());
         TapConnection tapConnection{ioContext, tapDevName, onReceiveEthernetFrameFromTapDevice, logger};
 

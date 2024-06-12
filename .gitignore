@@ -8,4 +8,5 @@
 /*/build/
 /*/_build/
 /CMakeSettings.json
+*.out
 
