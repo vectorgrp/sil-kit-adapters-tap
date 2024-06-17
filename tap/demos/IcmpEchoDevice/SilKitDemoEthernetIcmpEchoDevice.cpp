@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include "silkit/SilKit.hpp"
 #include "silkit/config/all.hpp"

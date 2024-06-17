@@ -2,9 +2,9 @@
 
 #include "EthernetAddress.hpp"
 
-#include "FormattedBuffer.hpp"
-
 #include <ostream>
+
+#include "FormattedBuffer.hpp"
 
 namespace demo {
 

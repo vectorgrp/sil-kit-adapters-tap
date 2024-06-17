@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include "Exceptions.hpp"
 
@@ -26,7 +27,7 @@ class TapConnection
 {
 public:
     TapConnection(asio::io_context& io_context, const std::string& tapDevName,
-                  std::function<void(std::vector<uint8_t>)> onNewFrameHandler,
+                  std::function<void(std::vector<std::uint8_t>)> onNewFrameHandler,
                   SilKit::Services::Logging::ILogger* logger);
 
     template<class container>
@@ -40,8 +41,8 @@ public:
     }
 
 private:
-    std::array<uint8_t, 1600> _ethernetFrameBuffer;
-    std::function<void(std::vector<uint8_t>)> _onNewFrameHandler;
+    std::array<std::uint8_t, 1600> _ethernetFrameBuffer;
+    std::function<void(std::vector<std::uint8_t>)> _onNewFrameHandler;
     SilKit::Services::Logging::ILogger* _logger;
 
     void ReceiveEthernetFrameFromTapDevice();

@@ -2,17 +2,17 @@
 
 #pragma once
 
+#include <iosfwd>
+#include <cstdint>
+
 #include "BufferWriter.hpp"
 #include "BufferReader.hpp"
 #include "ReadUintBe.hpp"
 #include "WriteUintBe.hpp"
 #include "ParseResult.hpp"
-
 #include "EthernetAddress.hpp"
 #include "EthernetHeader.hpp"
 #include "Ip4Address.hpp"
-
-#include <iosfwd>
 
 namespace demo {
 

@@ -2,15 +2,15 @@
 
 #pragma once
 
+#include <array>
+#include <type_traits>
+#include <cstdint>
+#include <cstddef>
+
 #include "Exceptions.hpp"
 #include "InternetChecksum.hpp"
 
-#include <array>
-#include <type_traits>
-
-#include <cstddef>
-
-#include <asio/ts/buffer.hpp>
+#include "asio/ts/buffer.hpp"
 
 using namespace exceptions;
 

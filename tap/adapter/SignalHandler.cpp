@@ -22,6 +22,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 #include <thread>
 #include <stdexcept>
 #include <vector>
+#include <cstdint>
 
 //forward
 namespace {
@@ -73,7 +74,7 @@ public:
     {
         // no allocs, no error handling
         _signalNumber = signalNumber;
-        uint8_t buf{};
+        std::uint8_t buf{};
         auto ok = WriteFile(_writeEnd, &buf, sizeof(buf), nullptr, nullptr);
         (void)ok;
     }
@@ -81,7 +82,7 @@ public:
 private:
     void workerMain()
     {
-        std::vector<uint8_t> buf(1);
+        std::vector<std::uint8_t> buf(1);
         //blocking read until Notify() was called
         auto ok = ReadFile(_readEnd, buf.data(), static_cast<DWORD>(buf.size()), nullptr, nullptr);
         if (!ok)
@@ -163,7 +164,7 @@ public:
     {
         //in signal handler context: no allocs, no error handling
         _signalNumber = signalNumber;
-        uint8_t buf{};
+        std::uint8_t buf{};
         auto ok = ::write(_pipe[1], &buf, sizeof(buf));
         (void)ok;
     }
@@ -171,7 +172,7 @@ public:
 private:
     void workerMain()
     {
-        std::vector<uint8_t> buf(1);
+        std::vector<std::uint8_t> buf(1);
         //blocking read until Notify() was called
         auto ok = ::read(_pipe[0], buf.data(), buf.size());
         if (ok == -1)

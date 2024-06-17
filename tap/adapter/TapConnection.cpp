@@ -10,7 +10,7 @@ using namespace exceptions;
 using namespace adapters;
 
 TapConnection::TapConnection(asio::io_context& io_context, const std::string& tapDevName,
-                  std::function<void(std::vector<uint8_t>)> onNewFrameHandler,
+                  std::function<void(std::vector<std::uint8_t>)> onNewFrameHandler,
                   SilKit::Services::Logging::ILogger* logger)
     : _tapDeviceStream{io_context}
     , _onNewFrameHandler(std::move(onNewFrameHandler))

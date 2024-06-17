@@ -21,6 +21,7 @@
 #include <iostream>
 #include <vector>
 #include <functional>
+#include <cstdint>
 
 #include <asio/ts/buffer.hpp>
 #include <asio/ts/internet.hpp>

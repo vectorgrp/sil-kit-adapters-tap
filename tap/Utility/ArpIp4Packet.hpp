@@ -2,14 +2,14 @@
 
 #pragma once
 
+#include <iosfwd>
+#include <cstdint>
+
 #include "ReadUintBe.hpp"
 #include "WriteUintBe.hpp"
-
 #include "EthernetAddress.hpp"
 #include "EthernetHeader.hpp"
 #include "Ip4Address.hpp"
-
-#include <iosfwd>
 
 namespace demo {
 

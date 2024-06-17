@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "Exceptions.hpp"
-
 #include <array>
 #include <iosfwd>
-
+#include <cstdint>
 #include <asio/ts/buffer.hpp>
+
+#include "Exceptions.hpp"
 
 using namespace exceptions;
 

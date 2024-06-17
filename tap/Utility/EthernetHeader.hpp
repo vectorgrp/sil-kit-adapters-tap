@@ -2,19 +2,17 @@
 
 #pragma once
 
+#include <optional>
+#include <iosfwd>
+#include <cstdint>
+
 #include "Enums.hpp"
 #include "ReadUintBe.hpp"
 #include "WriteUintBe.hpp"
-
 #include "ParseResult.hpp"
 #include "EthernetAddress.hpp"
 
-#include <optional>
-#include <iosfwd>
-
-#include <cstdint>
-
-#include <asio/ts/buffer.hpp>
+#include "asio/ts/buffer.hpp"
 
 namespace demo {
 

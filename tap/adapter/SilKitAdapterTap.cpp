@@ -6,6 +6,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <cstdint>
 
 #include "Exceptions.hpp"
 #include "Parsing.hpp"
