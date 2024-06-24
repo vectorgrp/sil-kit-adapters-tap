@@ -58,7 +58,7 @@ int main(int argc, char** argv)
     const std::string tapDevName = getArgDefault(argc, argv, tapNameArg, "silkit_tap");
     const std::string participantName = getArgDefault(argc, argv, participantNameArg, "EthernetTapDevice");
     const std::string ethernetNetworkName = getArgDefault(argc, argv, networkArg, "tap_demo");
-    const std::string ethernetControllerName = participantName + "_Eth1";
+    const std::string ethernetControllerName = "SilKit_ETH_CTRL_1";
 
     asio::io_context ioContext;
 
@@ -135,7 +135,7 @@ int main(int argc, char** argv)
         };
 
         SILKitInfoMessage.str("");
-        SILKitInfoMessage << "Creating TAP device ethernet connector for [" << tapDevName << "] on network [" << ethernetNetworkName << "]";
+        SILKitInfoMessage << "Creating TAP device ethernet connector for [" << tapDevName << "]";
         logger->Info(SILKitInfoMessage.str());
         TapConnection tapConnection{ioContext, tapDevName, onReceiveEthernetFrameFromTapDevice, logger};
 

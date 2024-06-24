@@ -1,7 +1,7 @@
 Description: Configuration for Adapter participant for SIL Kit Adapter TAP demo
 ParticipantName: EthernetTapDevice
 EthernetControllers: 
-- Name: EthernetTapDevice_Eth1
+- Name: SilKit_ETH_CTRL_1
   Network: tap_demo
 Middleware:
   RegistryUri: silkit://localhost:8501
