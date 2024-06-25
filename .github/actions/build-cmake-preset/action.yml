@@ -19,6 +19,20 @@ runs:
       id: setup-host-linux
       shell: bash
 
+    - name: Setup host
+      if: runner.os == 'Windows'
+      run: choco install -y ninja
+      id: setup-host-windows
+      shell: powershell
+
+    - name: Prepare build env on Windows
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1.12.0
+      with:
+        arch: x64
+        toolset: '14.1'
+      id: setup-env-windows
+
     - name: Configure ${{ inputs.preset-name }}
       run: cmake --preset ${{ inputs.preset-name }} ${{ inputs.cmake-args }}
       id: cmake-configure
