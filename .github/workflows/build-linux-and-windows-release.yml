@@ -41,7 +41,7 @@ jobs:
         uses: ./.github/actions/build-cmake-preset
         with:
           preset-name: windows-release
-          cmake-args: "-D PACKAGE_FILENAME_SUFFIX=-${{ github.ref_name }}-Win-x86_64-VS2017 -D SILKIT_FLAVOR=Win-x86_64-VS2017"
+          cmake-args: "-D PACKAGE_FILENAME_SUFFIX=-${{ github.ref_name }}-Win-x86_64-VS -D SILKIT_FLAVOR=Win-x86_64-VS2017"
       - name: Release
         uses: softprops/action-gh-release@v1        
         with:
