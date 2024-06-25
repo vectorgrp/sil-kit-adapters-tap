@@ -223,7 +223,7 @@ The user manual of the start application suggests to create a network adapter wi
     a) If no special SIL Kit configuration was added in the global CANoe options, this is just the name of the used network, e.g. ``Ethernet1``.
 
     ```bash
-    ./bin/SilKitAdapterTap --network 'Ethernet1'
+    ./bin/sil-kit-adapter-tap --network 'Ethernet1'
     ```
 
     b) If the Vector SIL Kit was configured with an additional configuration.yaml, make sure to use the network name from that file.
@@ -235,7 +235,7 @@ The user manual of the start application suggests to create a network adapter wi
     ```
 
     ```bash
-    ./bin/SilKitAdapterTap --network 'silkit_network'
+    ./bin/sil-kit-adapter-tap --network 'silkit_network'
     ```
 
 3. Move the TAP device "silkit_tap" to the network namespace "tap_demo_ns"

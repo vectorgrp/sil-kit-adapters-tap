@@ -17,12 +17,12 @@ $execRegistry = {
 
 $execAdapter = {
     param ($ScriptDir)
-    & $ScriptDir\..\..\..\bin\SilKitAdapterTap.exe --log Debug | Out-File -FilePath $ScriptDir\SilKitAdapterTap.out
+    & $ScriptDir\..\..\..\bin\sil-kit-adapter-tap.exe --log Debug | Out-File -FilePath $ScriptDir\sil-kit-adapter-tap.out
 }
 
 $execDemo = {
     param ($ScriptDir)
-    & $ScriptDir\..\..\..\bin\SilKitDemoEthernetIcmpEchoDevice.exe --log Debug | Out-File -FilePath $ScriptDir\SilKitDemoEthernetIcmpEchoDevice.out
+    & $ScriptDir\..\..\..\bin\sil-kit-demo-ethernet-icmp-echo-device.exe --log Debug | Out-File -FilePath $ScriptDir\sil-kit-demo-ethernet-icmp-echo-device.out
 }
 
 $execPing = {

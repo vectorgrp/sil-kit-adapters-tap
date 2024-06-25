@@ -49,17 +49,17 @@ Download a preview or release of the Adapters directly from [Vector SIL Kit Adap
 
 If not already existent on your system you should also download a SIL Kit Release directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). You will need this for being able to start a sil-kit-registry.
 
-## Install the SilKitAdapterTap (optional)
+## Install the sil-kit-adapter-tap (optional)
 Be aware that SIL Kit itself also needs to be installed to run the adapter.
 
-Run the following command to install the SilKitAdapterTap (can be done for self build and pre build package after cmake configure):
+Run the following command to install the sil-kit-adapter-tap (can be done for self build and pre build package after cmake configure):
 
 
 ### Linux installation
 
     sudo cmake --build build --target install
 
-**Note:** After installing the adapter on Linux, the following command  ``SilKitAdapterTap`` can be called from everywhere without defining a path. The default installation path will be ``/usr/local/bin``.
+**Note:** After installing the adapter on Linux, the following command  ``sil-kit-adapter-tap`` can be called from everywhere without defining a path. The default installation path will be ``/usr/local/bin``.
 
 ### Windows installation
 
@@ -70,20 +70,20 @@ Run the following command to install the SilKitAdapterTap (can be done for self 
 **Note 2:** The default installation path will be ``C:\Program Files\Vector SIL Kit Adapters TAP <TAP_ADAPTER_VERSION>``, with <TAP_ADAPTER_VERSION> as the version of the TAP adapter you install. 
 Depending on your system this default path can be ``Program Files (x86)``.
 
-## Run the SilKitAdapterTap
+## Run the sil-kit-adapter-tap
 This application allows the user to attach a TAP device of a Linux or Windows system to the Vector SIL Kit.
 
 Before you start the adapter there always needs to be a sil-kit-registry running already. Start it e.g. like this:
 
     /path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
 
-It is also necessary that the TAP device exists before the ``SilKitAdapterTap`` is started. 
+It is also necessary that the TAP device exists before the ``sil-kit-adapter-tap`` is started. 
 
-**Hint:** If your TAP device has been created by a third party application (you want the SIL Kit to connect to) it is possible that this TAP device resource is 'flagged' as busy/blocked. In this case you just can create another TAP device for usage with the ``SilKitAdapterTap`` by yourself and bridge (``brctl`` on Linux, ``netsh bridge`` on Windows) it with the TAP device of your third party application.
+**Hint:** If your TAP device has been created by a third party application (you want the SIL Kit to connect to) it is possible that this TAP device resource is 'flagged' as busy/blocked. In this case you just can create another TAP device for usage with the ``sil-kit-adapter-tap`` by yourself and bridge (``brctl`` on Linux, ``netsh bridge`` on Windows) it with the TAP device of your third party application.
 
 The application *optionally* takes the following command line arguments (default between curly braces):
 
-    SilKitAdapterTap [--name <participant's name{EthernetTapDevice}>]
+    sil-kit-adapter-tap [--name <participant's name{EthernetTapDevice}>]
       [--configuration <path to .silkit.yaml or .json configuration file>]
       [--registry-uri silkit://<host{localhost}>:<port{8501}>]
       [--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>]

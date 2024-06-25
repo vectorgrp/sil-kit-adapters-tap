@@ -1,5 +1,5 @@
 # Ethernet Demo and Adapter Setup
-This demo consists of a TAP device "silkit_tap" which is connected to the SIL Kit via ``SilKitAdapterTap`` as a SIL Kit participant. In a second step this TAP device is moved to a Linux network name space and gets a IP configured which is in the same range as the one of the ``SilKitDemoEthernetIcmpEchoDevice``. The Linux ping application is used within this created network name space to ping ``SilKitDemoEthernetIcmpEchoDevice`` through the TAP device via SIL Kit. The application ``SilKitDemoEthernetIcmpEchoDevice``, which is a SIL Kit participant as well, will reply to an ARP request and respond to ICMPv4 echo requests. 
+This demo consists of a TAP device "silkit_tap" which is connected to the SIL Kit via ``sil-kit-adapter-tap`` as a SIL Kit participant. In a second step this TAP device is moved to a Linux network name space and gets a IP configured which is in the same range as the one of the ``sil-kit-demo-ethernet-icmp-echo-device``. The Linux ping application is used within this created network name space to ping ``sil-kit-demo-ethernet-icmp-echo-device`` through the TAP device via SIL Kit. The application ``sil-kit-demo-ethernet-icmp-echo-device``, which is a SIL Kit participant as well, will reply to an ARP request and respond to ICMPv4 echo requests. 
 
 The following sketch shows the general setup: 
 
@@ -19,7 +19,7 @@ The following sketch shows the general setup:
     +----------------------------------------+                                +-----------------------------------+
   
 
-## SilKitDemoEthernetIcmpEchoDevice
+## sil-kit-demo-ethernet-icmp-echo-device
 This demo application implements a very simple SIL Kit participant with a single simulated ethernet controller.
 The application will reply to an ARP request and respond to ICMPv4 Echo Requests directed to it's hardcoded MAC address
 (``52:54:56:53:4B:55``) and IPv4 address (``192.168.7.35``).
@@ -29,20 +29,20 @@ The application will reply to an ARP request and respond to ICMPv4 Echo Requests
 
 ## Running the Demo Applications
 
-Now is a good point to start the ``sil-kit-registry``, the ``SilKitDemoEthernetIcmpEchoDevice`` and the demo helper script ``start_adapter_and_ping_demo`` - which creates the TAP device, connects it to the adapter and afterwards adds it to the network namespace and starts pinging the echos device from there - in separate terminals:
+Now is a good point to start the ``sil-kit-registry``, the ``sil-kit-demo-ethernet-icmp-echo-device`` and the demo helper script ``start_adapter_and_ping_demo`` - which creates the TAP device, connects it to the adapter and afterwards adds it to the network namespace and starts pinging the echos device from there - in separate terminals:
 
     /path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501'
         
-    ./bin/SilKitDemoEthernetIcmpEchoDevice --log Debug
+    ./bin/sil-kit-demo-ethernet-icmp-echo-device --log Debug
 
     sudo ./tap/demos/DemoLinux/start_adapter_and_ping_demo.sh
     
-The applications will produce output when they send and receive Ethernet frames from the TAP device or the Vector SIL Kit. The console output of ``SilKitAdapterTap`` is redirected to ``./bin/SilKitAdapterTap.out``.
+The applications will produce output when they send and receive Ethernet frames from the TAP device or the Vector SIL Kit. The console output of ``sil-kit-adapter-tap`` is redirected to ``./bin/sil-kit-adapter-tap.out``.
 
 ## ICMP Ping and Pong
 The ping requests should all receive responses.
     
-You should see output similar to the following from the ``SilKitDemoEthernetIcmpEchoDevice`` application:
+You should see output similar to the following from the ``sil-kit-demo-ethernet-icmp-echo-device`` application:
 
     [date time] [EthernetDevice] [debug] SIL Kit >> Demo: Ethernet frame (98 bytes)
     [date time] [EthernetDevice] [debug] EthernetHeader(destination=EthernetAddress(52:54:56:53:4b:55),source=EthernetAddress(9a:97:c4:83:d8:d0),etherType=EtherType::Ip4)

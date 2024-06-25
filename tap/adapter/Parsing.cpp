@@ -43,7 +43,7 @@ bool adapters::thereAreUnknownArguments(int argc, char** argv)
 void adapters::print_help(bool userRequested)
 {
     std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl
-              << "SilKitAdapterTap ["<<participantNameArg<<" <participant's name{EthernetTapDevice}>]\n"
+              << "sil-kit-adapter-tap ["<<participantNameArg<<" <participant's name{EthernetTapDevice}>]\n"
                  "  ["<<configurationArg<<" <path to .silkit.yaml or .json configuration file>]\n"
                  "  ["<<regUriArg<<" silkit://<host{localhost}>:<port{8501}>]\n"
                  "  ["<<logLevelArg<<" <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n"
@@ -53,7 +53,7 @@ void adapters::print_help(bool userRequested)
                  "SIL Kit-specific CLI arguments will be overwritten by the config file passed by " << configurationArg << ".\n";
     std::cout << "\n"
                  "Example:\n"
-                 "SilKitAdapterTap "<<participantNameArg<<" EthernetTapBridge "
+                 "sil-kit-adapter-tap "<<participantNameArg<<" EthernetTapBridge "
              <<  networkArg<<" tap_bridge\n";
     if (!userRequested)
         std::cout << "\n"

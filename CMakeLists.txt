@@ -160,8 +160,8 @@ install(
 )
 
 install(
-    TARGETS 
-        SilKitDemoEthernetIcmpEchoDevice
+    TARGETS
+        sil-kit-demo-ethernet-icmp-echo-device
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
     PERMISSIONS
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
@@ -170,13 +170,13 @@ install(
     EXCLUDE_FROM_ALL
 )
 
-# only SilKitAdapterTap should be installed to /usr/local/bin by calling --target install (therefore it is not excluded)
+# only sil-kit-adapter-tap should be installed to /usr/local/bin by calling --target install (therefore it is not excluded)
 install(
-    TARGETS 
-        SilKitAdapterTap        
+    TARGETS
+        sil-kit-adapter-tap
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/SilKitAdapterTap COMPONENT Development   
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/sil-kit-adapter-tap COMPONENT Development   
     PERMISSIONS
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
         GROUP_READ GROUP_EXECUTE

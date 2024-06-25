@@ -41,13 +41,13 @@ void promptForExit()
  void print_demo_help(bool userRequested)
 {
     std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl;
-    std::cout << "SilKitDemoEthernetIcmpEchoDevice [" << participantNameArg << " <participant's name{EthernetDevice}>]\n"
+    std::cout << "sil-kit-demo-ethernet-icmp-echo-device [" << participantNameArg << " <participant's name{EthernetDevice}>]\n"
         "  [" << regUriArg << " silkit://<host{localhost}>:<port{8501}>]\n"
         "  [" << networkArg << " <SIL Kit Ethernet network name{tap_demo}>]\n"
         "  [" << logLevelArg << " <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n";
         std::cout << "\n"
         "Example:\n"
-        "SilKitDemoEthernetIcmpEchoDevice " << participantNameArg << " EchoDevice " << networkArg << " tap_network " << logLevelArg << " Off\n ";
+        "sil-kit-demo-ethernet-icmp-echo-device " << participantNameArg << " EchoDevice " << networkArg << " tap_network " << logLevelArg << " Off\n ";
 
     if (!userRequested)
         std::cout << "\n"

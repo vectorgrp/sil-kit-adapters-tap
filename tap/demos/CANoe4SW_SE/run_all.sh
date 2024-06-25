@@ -24,7 +24,7 @@ timeout 30s grep -q 'Registered signal handler' <(tail -f /$scriptDir/sil-kit-re
 
 $scriptDir/../DemoLinux/start_adapter_and_ping_demo.sh &> $scriptDir/start_adapter_and_ping_demo.out &
 
-$scriptDir/../../../bin/SilKitDemoEthernetIcmpEchoDevice &> $scriptDir/SilKitDemoEthernetIcmpEchoDevice.out &
+$scriptDir/../../../bin/sil-kit-demo-ethernet-icmp-echo-device &> $scriptDir/sil-kit-demo-ethernet-icmp-echo-device.out &
 
 $scriptDir/run.sh
 
