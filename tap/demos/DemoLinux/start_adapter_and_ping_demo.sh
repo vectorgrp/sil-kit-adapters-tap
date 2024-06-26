@@ -20,12 +20,14 @@ fi
 echo "Creating tap device silkit_tap"
 ip tuntap add dev silkit_tap mode tap
 
+
 echo "Starting sil-kit-adapter-tap..."
 $SCRIPT_DIR/../../../bin/sil-kit-adapter-tap --configuration $SCRIPT_DIR/../SilKitConfig_Adapter.silkit.yaml &> /$SCRIPT_DIR/../CANoe4SW_SE/sil-kit-adapter-tap.out &
 sleep 1 # wait 1 second for the creation/existense of the .out file
 
-timeout 30s grep -q 'Press CTRL + C to stop the process...' <(tail -f /$SCRIPT_DIR/../CANoe4SW_SE/sil-kit-adapter-tap.out) || (echo "[error] Timeout reached while waiting for sil-kit-adapter-tap to start"; exit 1;)
+timeout 30s grep -q 'Press CTRL + C to stop the process...' <(tail -f /$SCRIPT_DIR/../CANoe4SW_SE/sil-kit-adapter-tap.out -n +1) || { echo "[error] Timeout reached while waiting for sil-kit-adapter-tap to start"; exit 1; }
 echo "sil-kit-adapter-tap has been started"
+
 
 # Hint: It is important to establish the connection to the the adapter before moving the tap device to its separate namespace
 echo "Moving tap device 'silkit_tap' to network namespace 'tap_demo_ns'"
@@ -36,7 +38,6 @@ echo "Configuring tap device 'silkit_tap'"
 # Hint: The IP address can be set to anything as long as it is in the same network as the echo device which is pinged
 ip -netns tap_demo_ns addr add 192.168.7.2/16 dev silkit_tap
 ip -netns tap_demo_ns link set silkit_tap up
-
 
 echo "Starting to ping the echo device..."
 # Hint: The command 'ping -c4 192.168.7.35' can be replaced by any other command or application which should send/receive data to/from SIL Kit via silkit_tap
