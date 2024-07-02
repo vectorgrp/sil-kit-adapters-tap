@@ -38,3 +38,13 @@ export testcase Ethernet_WaitForEchoMessage()
   CheckTestResult("Ethernet_WaitForEchoMessage", result);
 }
 
+on ethernetPacket *
+{
+  if (this.HasProtocolError())
+  {
+    char text[100];
+    this.GetProtocolErrorText( text );
+    write( "Protocol error on Eth %d: %s", this.msgChannel, text );
+    testStepFail("FAILED: protocol error");
+  }
+}
