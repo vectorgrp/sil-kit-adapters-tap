@@ -1,5 +1,8 @@
 #!/bin/bash
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+scriptDir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+logDir=$scriptDir/../CANoe4SW_SE/logs # define a directory for .out files
+mkdir -p $logDir # if it does not exist, create it
 
 echo "Setting up network and ping the echo demo device via SIL Kit Adapter TAP..."
 
@@ -22,10 +25,10 @@ ip tuntap add dev silkit_tap mode tap
 
 
 echo "Starting sil-kit-adapter-tap..."
-$SCRIPT_DIR/../../../bin/sil-kit-adapter-tap --configuration $SCRIPT_DIR/../SilKitConfig_Adapter.silkit.yaml &> /$SCRIPT_DIR/../CANoe4SW_SE/sil-kit-adapter-tap.out &
+$scriptDir/../../../bin/sil-kit-adapter-tap --configuration $scriptDir/../SilKitConfig_Adapter.silkit.yaml &> $logDir/sil-kit-adapter-tap.out &
 sleep 1 # wait 1 second for the creation/existense of the .out file
 
-timeout 30s grep -q 'Press CTRL + C to stop the process...' <(tail -f /$SCRIPT_DIR/../CANoe4SW_SE/sil-kit-adapter-tap.out -n +1) || { echo "[error] Timeout reached while waiting for sil-kit-adapter-tap to start"; exit 1; }
+timeout 30s grep -q 'Press CTRL + C to stop the process...' <(tail -f $logDir/sil-kit-adapter-tap.out -n +1) || { echo "[error] Timeout reached while waiting for sil-kit-adapter-tap to start"; exit 1; }
 echo "sil-kit-adapter-tap has been started"
 
 
