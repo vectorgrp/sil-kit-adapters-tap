@@ -20,7 +20,7 @@ void Device::Process(asio::const_buffer incomingData)
     {
         const auto arpPacket = ParseArpIp4Packet(ethernetPayload);
         SILKitDebugMessage.str("");
-        SILKitDebugMessage << arpPacket << std::endl;
+        SILKitDebugMessage << arpPacket;
         _logger->Debug(SILKitDebugMessage.str());
 
         if (arpPacket.operation == ArpOperation::Request)
