@@ -74,7 +74,7 @@ You should see output similar to the following from the ``sil-kit-demo-ethernet-
     [date time] [EthernetDevice] [debug] SIL Kit >> Demo: ACK for ETH Message with transmitId=3
     [date time] [EthernetDevice] [debug] Demo >> SIL Kit: Ethernet frame (98 bytes, txId=3)
 
-## Adding CANoe (16 SP3 or newer) as a participant
+## Adding CANoe (17 SP3 or newer) as a participant
 If CANoe is connected to the SIL Kit, all ethernet traffic is visible there as well. You can also execute a test unit which checks if the ICMP Ping and Pong is happening as expected.
 
 If you encounter connection issues by connecting CANoe to the SIL Kit network you may have to adapt the ``RegistryUri`` in ``tap/demos/SilKitConfig_CANoe.silkit.yaml`` to the IP address of your system where your sil-kit-registry is running. However if you run it on the same system in most cases ``localhost`` should be sufficient. The configuration file is referenced by both following CANoe use cases (Desktop Edition and Server Edition).

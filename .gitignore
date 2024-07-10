@@ -9,4 +9,13 @@
 /*/_build/
 /CMakeSettings.json
 *.out
-
+/.vector
+*.xpa
+*.vtestreport
+*.stcfg
+*.ini
+*.vsysvar
+/**/.run
+/**/Default.venvironment
+/**/working-dir
+/**/*.vtestunit/

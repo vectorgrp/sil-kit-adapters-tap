@@ -15,7 +15,7 @@ fi
 if [[ -n "$canoe4sw_se_install_dir" ]]; then
 	echo "canoe4sw-se found at location : $canoe4sw_se_install_dir"
 	#run tests
-	$canoe4sw_se_install_dir/canoe4sw-se "$script_root/Default.venvironment" -d "$script_root/working-dir" --verbosity-level "2" --test-unit "$script_root/TestUnit.vtestunit"  --show-progress "tree-element"
+	$canoe4sw_se_install_dir/canoe4sw-se "$script_root/Default.venvironment" -d "$script_root/working-dir" --verbosity-level "2" --test-unit "$script_root/Testing_TAP_ping_demo.vtestunit"  --show-progress "tree-element"
 	exit_status=$?
 else
     echo "canoe4sw-se executable not found"

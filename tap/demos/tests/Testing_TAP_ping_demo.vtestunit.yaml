@@ -1,0 +1,7 @@
+version: 2.0.0
+
+test-unit-information:
+  description: Test unit tests
+test-unit-implementation:
+  - source-file-path: Testing_TAP_ping_demo.can
+  - source-file-path: Testing_TAP_ping_demo.vtesttree.yaml

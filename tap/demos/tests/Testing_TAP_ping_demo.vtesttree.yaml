@@ -1,0 +1,6 @@
+version: 2.0.0
+test-tree:
+  - test-fixture: Testing_TAP_ping_demo    
+    elements:
+      - capl-test-case: Ethernet_WaitForTapMessage
+      - capl-test-case: Ethernet_WaitForEchoMessage
