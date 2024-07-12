@@ -4,9 +4,13 @@ param (
 
 # Check if exactly one argument is passed
 if (-not $SILKitDir) {
-    Write-Host "Error: Exactly one argument is required."
-    Write-Host "Usage: .\run_all.ps1 <path_to_sil_kit_dir>"
-    exit 1
+    # If no argument is passed, check if SIL Kit dir has its own environment variable (for the ci-pipeline)
+    $SILKitDir = $env:SILKit_InstallDir
+    if (-not $SILKitDir) {
+        Write-Host "Error: Either provide the path to the SIL Kit directory as an argument or set the `$env:SILKit_InstallDir` environment variable"
+        Write-Host "Usage: .\run_all.ps1 <path_to_sil_kit_dir>"
+        exit 1
+    }
 }
 
 # Scripts to run the executables and commands in background
