@@ -1,5 +1,5 @@
 name: build CMake preset
-description: Build the given SIL Kit Adapters CMake preset
+description: Build the given SIL Kit Adapter CMake preset
 
 inputs:
   preset-name:

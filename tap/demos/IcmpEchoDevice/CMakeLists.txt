@@ -15,5 +15,5 @@ set_target_properties(sil-kit-demo-ethernet-icmp-echo-device
     #ensure SilKit shared libraries can be loaded
     INSTALL_RPATH "$ORIGIN/../lib:$ORIGIN"
     BUILD_RPATH "$ORIGIN"
-    RUNTIME_OUTPUT_DIRECTORY $<$<BOOL:ALWAYS>:${SILKIT_ADAPTERS_TAP_OUTPUT_DIRECTORY}>
+    RUNTIME_OUTPUT_DIRECTORY $<$<BOOL:ALWAYS>:${SILKIT_ADAPTER_TAP_OUTPUT_DIRECTORY}>
 )

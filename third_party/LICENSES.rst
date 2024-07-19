@@ -1,14 +1,12 @@
-SIL Kit Adapters TAP Third Party Libraries
+Vector SIL Kit Adapter for TAP devices Third Party Libraries
 ======================================
 
-The SIL Kit Adapters TAP uses the following third party software components which are governed by their respective licenses:
+The Vector SIL Kit Adapter for TAP devices uses the following third party software components which are governed by their respective licenses:
 
  1. Asio C++ Library
  2. softprops/action-gh-release
 
 The full and unmodified license of each component is printed below.
-
-
 
 1. Asio C++ Library
 ===================

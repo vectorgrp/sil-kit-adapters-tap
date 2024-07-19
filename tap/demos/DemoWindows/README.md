@@ -1,6 +1,6 @@
 # Ethernet Demo and Adapter Setup
 This demo consists of a TAP device "silkit_tap" which is connected to the SIL Kit via ``sil-kit-adapter-tap`` as a SIL Kit participant. This TAP device gets 
-a IP configured which is in the same range as the one of the ``sil-kit-demo-ethernet-icmp-echo-device``.
+an IP configured which is in the same range as the one of the ``sil-kit-demo-ethernet-icmp-echo-device``.
 The Windows ping application is used to ping ``sil-kit-demo-ethernet-icmp-echo-device`` through the TAP device via SIL Kit. 
 The application ``sil-kit-demo-ethernet-icmp-echo-device``, which is a SIL Kit participant as well, will reply to an ARP request and respond to ICMPv4 echo requests. 
 
@@ -46,7 +46,7 @@ netsh interface ip set address silkit_tap static 192.168.7.2 255.255.255.0
 
 ## Running the Demo Applications
 
-Now is a good point to start the ``sil-kit-registry``, the ``sil-kit-demo-ethernet-icmp-echo-device`` in separate terminals:
+Now is a good point to start the ``sil-kit-registry``, the ``sil-kit-adapter-tap`` and the ``sil-kit-demo-ethernet-icmp-echo-device`` in separate terminals:
 
     /path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry.exe --listen-uri 'silkit://0.0.0.0:8501'
     

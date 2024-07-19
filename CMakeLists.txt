@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(VectorSilKitAdaptersTap)
+project(VectorSilKitAdapterTap)
 include(FetchContent)
 
 set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
@@ -8,10 +8,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SILKIT_ADAPTERS_TAP_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
-set(SILKIT_ADAPTERS_TAP_LIBRARY_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
+set(SILKIT_ADAPTER_TAP_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
+set(SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
-set(SILKIT_ADAPTERS_TAP_VERSION "1.0.2")
+set(SILKIT_ADAPTER_TAP_VERSION "1.0.2")
 
 set(SILKIT_VERSION "4.0.50" CACHE STRING "If no SIL Kit package is specified, this version will be downloaded")
 set(SILKIT_FLAVOR "ubuntu-18.04-x86_64-gcc" CACHE STRING "If no SIL Kit package is specified, this package flavor will be downloaded")
@@ -25,9 +25,9 @@ target_link_libraries(asio INTERFACE Threads::Threads)
 if (WIN32)
     # set the default install paths for Windows 32 and 64 bits
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(CMAKE_INSTALL_PREFIX "C:/Program Files/Vector SIL Kit Adapters TAP ${SILKIT_ADAPTERS_TAP_VERSION}" CACHE PATH "Default install path" FORCE)
+        set(CMAKE_INSTALL_PREFIX "C:/Program Files/Vector SIL Kit Adapter TAP ${SILKIT_ADAPTER_TAP_VERSION}" CACHE PATH "Default install path" FORCE)
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-        set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Vector SIL Kit Adapters TAP ${SILKIT_ADAPTERS_TAP_VERSION}" CACHE PATH "Default install path" FORCE)
+        set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Vector SIL Kit Adapter TAP ${SILKIT_ADAPTER_TAP_VERSION}" CACHE PATH "Default install path" FORCE)
     endif()
     
     target_compile_definitions(asio INTERFACE _SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1)
@@ -149,7 +149,7 @@ include(GNUInstallDirs)
 
 install(
     FILES 
-        ${SILKIT_ADAPTERS_TAP_LIBRARY_DIRECTORY}/libSilKit.so                
+        ${SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY}/libSilKit.so                
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
     PERMISSIONS
         OWNER_READ OWNER_WRITE
@@ -190,8 +190,8 @@ install(
 
 set(CPACK_GENERATOR "ZIP")
 
-set(CPACK_PACKAGE_DESCRIPTION "binary release of SIL Kit Adapters TAP")
-set(CPACK_PACKAGE_NAME "SilKit-Adapters-TAP")
+set(CPACK_PACKAGE_DESCRIPTION "binary release of SIL Kit Adapter TAP")
+set(CPACK_PACKAGE_NAME "SilKit-Adapter-TAP")
 set(CPACK_PACKAGE_VENDOR "Vector Informatik")
 set(CPACK_PACKAGE_CONTACT "support@vector.com")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}${PACKAGE_FILENAME_SUFFIX}")

@@ -1,5 +1,5 @@
 # Ethernet Demo and Adapter Setup
-This demo consists of a TAP device "silkit_tap" which is connected to the SIL Kit via ``sil-kit-adapter-tap`` as a SIL Kit participant. In a second step this TAP device is moved to a Linux network name space and gets a IP configured which is in the same range as the one of the ``sil-kit-demo-ethernet-icmp-echo-device``. The Linux ping application is used within this created network name space to ping ``sil-kit-demo-ethernet-icmp-echo-device`` through the TAP device via SIL Kit. The application ``sil-kit-demo-ethernet-icmp-echo-device``, which is a SIL Kit participant as well, will reply to an ARP request and respond to ICMPv4 echo requests. 
+This demo consists of a TAP device "silkit_tap" which is connected to the SIL Kit via ``sil-kit-adapter-tap`` as a SIL Kit participant. In a second step this TAP device is moved to a Linux network name space and gets a IP configured which is in the same range as the one of the ``sil-kit-demo-ethernet-icmp-echo-device``. The Linux ping application is used within this created network namespace to ping ``sil-kit-demo-ethernet-icmp-echo-device`` through the TAP device via SIL Kit. The application ``sil-kit-demo-ethernet-icmp-echo-device``, which is a SIL Kit participant as well, will reply to an ARP request and respond to ICMPv4 echo requests. 
 
 The following sketch shows the general setup: 
 
@@ -23,7 +23,6 @@ The following sketch shows the general setup:
 This demo application implements a very simple SIL Kit participant with a single simulated ethernet controller.
 The application will reply to an ARP request and respond to ICMPv4 Echo Requests directed to it's hardcoded MAC address
 (``52:54:56:53:4B:55``) and IPv4 address (``192.168.7.35``).
-
 
 # Running the Demos
 
@@ -66,4 +65,4 @@ Load the ``Tap_adapter_CANoe.cfg`` from the ``tap/demos/CANoe`` directory and st
 You can also run the same test set with ``CANoe4SW SE`` by executing the following PowerShell script ``tap/demos/CANoe4SW_SE/run.ps1``. The test cases are executed automatically and you should see a short test report in PowerShell after execution.
 
 ### CANoe4SW Server Edition (Linux)
-You can also run the same test set with ``CANoe4SW SE (Linux)``. At first you have to execute the PowerShell script ``tap/demos/CANoe4SW_SE/createEnvForLinux.ps1`` on your windows system by using tools of ``CANoe4SW SE (Windows)`` to prepare your test environment for Linux. In ``tap/demos/CANoe4SW_SE/run.sh`` you should adapt ``canoe4sw_se_install_dir`` to the path of your ``CANoe4SW SE`` installation in your WSL2. Afterwards you can execute ``tap/demos/CANoe4SW_SE/run.sh`` in your WSL2. The test cases are executed automatically and you should see a short test report in your terminal after execution.
+You can also run the same test set with ``CANoe4SW SE (Linux)``. At first you have to execute the PowerShell script ``tap/demos/CANoe4SW_SE/createEnvForLinux.ps1`` on your Windows system by using tools of ``CANoe4SW SE (Windows)`` to prepare your test environment for Linux. In ``tap/demos/CANoe4SW_SE/run.sh`` you should adapt ``canoe4sw_se_install_dir`` to the path of your ``CANoe4SW SE`` installation in your WSL2. Afterwards you can execute ``tap/demos/CANoe4SW_SE/run.sh`` in your WSL2. The test cases are executed automatically and you should see a short test report in your terminal after execution.

@@ -1,4 +1,4 @@
-# Vector SIL Kit Adapters for TAP devices
+# Vector SIL Kit Adapter for TAP devices
 This collection of software is provided to illustrate how the [Vector SIL Kit](https://github.com/vectorgrp/sil-kit/)
 can be attached to a TAP device.
 
@@ -9,7 +9,7 @@ as well as complimentary demo application for some communication to happen.
 
 Those instructions assume you use WSL2 (Ubuntu) or a Linux OS for building and running the Linux version of the adapter together with ``bash`` as your interactive shell. In case of the Windows version of the adapter ``PowerShell`` is assumed.
 
-## a) Getting Started with self build Adapters and Demos
+## a) Getting Started with self-built Adapter and Demos
 This section specifies steps you should do if you have just cloned the repository.
 
 Before any of those topics, please change your current directory to the top-level in the ``sil-kit-adapters-tap``
@@ -26,10 +26,10 @@ Otherwise clone the standalone version of asio manually:
 
     git clone --branch asio-1-24-0 https://github.com/chriskohlhoff/asio.git third_party/asio
 
-### Build the Adapters and Demos
+### Build the Adapter and Demos
 To build the demos, you'll need SIL Kit packages ``SilKit-x.y.z-$platform`` for your platform. You can download them directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases).
 
-The adapters and demos are built using ``cmake``. If you want to build the adapter against a specific downloaded release of SIL Kit, you can follow these steps:
+The adapter and demos are built using ``cmake``. If you want to build the adapter against a specific downloaded release of SIL Kit, you can follow these steps:
 
     mkdir build
     cmake -S. -Bbuild -DSILKIT_PACKAGE_DIR=/path/to/SilKit-x.y.z-$platform/ -D CMAKE_BUILD_TYPE=Release
@@ -41,19 +41,18 @@ The adapters and demos are built using ``cmake``. If you want to build the adapt
 
 **Note 3:** If you don't provide a specific path for SILKIT_PACKAGE_DIR and there is no SIL Kit installation on your system, a SIL Kit release package (the default version listed in CMakeLists.txt) will be fetched from github.com and the adapter will be built against it.
 
-The adapters and demo executables will be available in the ``bin`` directory.
+The adapter and demo executables will be available in the ``bin`` directory.
 Additionally the ``SilKit`` shared library is copied to the ``lib`` directory next to it automatically.
 
-## b) Getting Started with pre-built Adapters and Demos
-Download a preview or release of the Adapters directly from [Vector SIL Kit Adapters Releases](https://github.com/vectorgrp/sil-kit-adapters-tap/releases).
+## b) Getting Started with pre-built Adapter and Demos
+Download a preview or release of the Adapter directly from [Vector SIL Kit Adapter for TAP devices Releases](https://github.com/vectorgrp/sil-kit-adapters-tap/releases).
 
 If not already existent on your system you should also download a SIL Kit Release directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). You will need this for being able to start a sil-kit-registry.
 
 ## Install the sil-kit-adapter-tap (optional)
 Be aware that SIL Kit itself also needs to be installed to run the adapter.
 
-Run the following command to install the sil-kit-adapter-tap (can be done for self build and pre build package after cmake configure):
-
+Run the following command to install the sil-kit-adapter-tap (can be done for self-built and pre-built package after cmake configure):
 
 ### Linux installation
 
@@ -67,7 +66,7 @@ Run the following command to install the sil-kit-adapter-tap (can be done for se
 
 **Note 1:** Elevated rights are needed to install the adapter under its default location. This can be achieved by running the command in a PowerShell opened as administrator.
 
-**Note 2:** The default installation path will be ``C:\Program Files\Vector SIL Kit Adapters TAP <TAP_ADAPTER_VERSION>``, with <TAP_ADAPTER_VERSION> as the version of the TAP adapter you install. 
+**Note 2:** The default installation path will be ``C:\Program Files\Vector SIL Kit Adapter TAP <TAP_ADAPTER_VERSION>``, with <TAP_ADAPTER_VERSION> as the version of the TAP adapter you install. 
 Depending on your system this default path can be ``Program Files (x86)``.
 
 ## Run the sil-kit-adapter-tap
@@ -106,4 +105,4 @@ Vector SIL Kit. Traffic being exchanged are ping (ICMP) requests, and the answer
 This demo is further explained in [tap/demos/DemoWindows/README.md](tap/demos/DemoWindows/README.md).
 
 ## Connecting an adaptive executable to CANoe
-The Vector SIL Kit Adapters TAP allow you to connect adaptive executables to CANoe. A guide describes step by step how to do this can be found here [adaptive/README.md](adaptive/README.md). 
+The SIL Kit Adapter TAP allows you to connect adaptive executables to CANoe. A guide describes step by step how to do this can be found here [adaptive/README.md](adaptive/README.md). 

@@ -26,7 +26,7 @@ jobs:
           prerelease: true
           draft: true
           files: |
-            _build/linux-release/SilKit-Adapters*.zip
+            _build/linux-release/SilKit-Adapter*.zip
 
   windows-release:
     name: Build SIL Kit TAP for Windows Release configuration
@@ -48,4 +48,4 @@ jobs:
           prerelease: true
           draft: true
           files: |
-            _build/windows-release/SilKit-Adapters*.zip
+            _build/windows-release/SilKit-Adapter*.zip

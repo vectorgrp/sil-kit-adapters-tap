@@ -1,4 +1,4 @@
-name: trigger SIL Kit Adapters pipeline tests
+name: trigger SIL Kit Adapter pipeline tests
 on:
   workflow_dispatch:
   pull_request:
