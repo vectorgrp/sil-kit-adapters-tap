@@ -1,5 +1,5 @@
 Description: Configuration for Adapter participant for SIL Kit Adapter TAP demo
-ParticipantName: EthernetTapDevice
+ParticipantName: SilKitAdapterTap
 EthernetControllers: 
 - Name: SilKit_ETH_CTRL_1
   Network: tap_demo

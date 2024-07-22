@@ -56,7 +56,7 @@ int main(int argc, char** argv)
     const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
 
     const std::string tapDevName = getArgDefault(argc, argv, tapNameArg, "silkit_tap");
-    const std::string participantName = getArgDefault(argc, argv, participantNameArg, "EthernetTapDevice");
+    const std::string participantName = getArgDefault(argc, argv, participantNameArg, "SilKitAdapterTap");
     const std::string ethernetNetworkName = getArgDefault(argc, argv, networkArg, "tap_demo");
     const std::string ethernetControllerName = "SilKit_ETH_CTRL_1";
 

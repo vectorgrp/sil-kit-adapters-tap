@@ -43,7 +43,7 @@ bool adapters::thereAreUnknownArguments(int argc, char** argv)
 void adapters::print_help(bool userRequested)
 {
     std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl
-              << "sil-kit-adapter-tap ["<<participantNameArg<<" <participant's name{EthernetTapDevice}>]\n"
+              << "sil-kit-adapter-tap ["<<participantNameArg<<" <participant's name{SilKitAdapterTap}>]\n"
                  "  ["<<configurationArg<<" <path to .silkit.yaml or .json configuration file>]\n"
                  "  ["<<regUriArg<<" silkit://<host{localhost}>:<port{8501}>]\n"
                  "  ["<<logLevelArg<<" <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n"

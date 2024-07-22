@@ -45,7 +45,7 @@ The adapter and demo executables will be available in the ``bin`` directory.
 Additionally the ``SilKit`` shared library is copied to the ``lib`` directory next to it automatically.
 
 ## b) Getting Started with pre-built Adapter and Demos
-Download a preview or release of the Adapter directly from [Vector SIL Kit Adapter for TAP devices Releases](https://github.com/vectorgrp/sil-kit-adapters-tap/releases).
+Download a preview or release of the adapter directly from [Vector SIL Kit Adapter for TAP devices Releases](https://github.com/vectorgrp/sil-kit-adapters-tap/releases).
 
 If not already existent on your system you should also download a SIL Kit Release directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). You will need this for being able to start a sil-kit-registry.
 
@@ -82,7 +82,7 @@ It is also necessary that the TAP device exists before the ``sil-kit-adapter-tap
 
 The application *optionally* takes the following command line arguments (default between curly braces):
 
-    sil-kit-adapter-tap [--name <participant's name{EthernetTapDevice}>]
+    sil-kit-adapter-tap [--name <participant's name{SilKitAdapterTap}>]
       [--configuration <path to .silkit.yaml or .json configuration file>]
       [--registry-uri silkit://<host{localhost}>:<port{8501}>]
       [--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>]
