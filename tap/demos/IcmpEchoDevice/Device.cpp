@@ -109,7 +109,7 @@ void Device::Process(asio::const_buffer incomingData)
 
                     dst += WriteEthernetHeader(dst, replyEthernetHeader);
                     dst += WriteIp4Header(dst, replyIp4Header);
-                    auto icmp4Dst = dst;
+                    asio::mutable_buffer icmp4Dst(dst);
                     dst += WriteIcmp4Header(dst, replyIcmp4Header);
                     asio::buffer_copy(dst, icmp4Payload);
 
