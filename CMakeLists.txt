@@ -133,6 +133,18 @@ install(
 )
 
 install(
+    FILES            
+        ${CMAKE_CURRENT_SOURCE_DIR}/adaptive/helper-scripts/start_app_sil_kit_adapters_setup.sh
+    DESTINATION adaptive/helper-scripts
+    PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE
+    COMPONENT source
+    EXCLUDE_FROM_ALL
+)
+
+install(
     FILES
         CMakeLists.txt
         CMakePresets.json
