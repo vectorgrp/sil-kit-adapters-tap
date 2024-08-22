@@ -2,7 +2,7 @@
 script_root=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Set a default path for canoe4sw-se installation directory
-default_canoe4sw_se_install_dir="/home/vector/canoe4sw-se"
+default_canoe4sw_se_install_dir="/opt/vector/canoe4sw-se"
 
 # Check if the executable exists at the default path
 if [[ -x "$default_canoe4sw_se_install_dir/canoe4sw-se" ]]; then
