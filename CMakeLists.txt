@@ -159,17 +159,34 @@ install(
 
 include(GNUInstallDirs)
 
-install(
-    FILES 
-        ${SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY}/libSilKit.so                
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PERMISSIONS
-        OWNER_READ OWNER_WRITE
-        GROUP_READ
-        WORLD_READ
-    COMPONENT lib
-    EXCLUDE_FROM_ALL
-)
+if(WIN32)
+    install(
+        FILES
+            ${SILKIT_ADAPTER_TAP_OUTPUT_DIRECTORY}/SilKit.dll
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+        COMPONENT lib
+        EXCLUDE_FROM_ALL
+    )
+    install(
+        FILES
+            ${SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY}/SilKit.lib
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        COMPONENT lib
+        EXCLUDE_FROM_ALL
+    )
+else()
+    install(
+        FILES
+            ${SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY}/libSilKit.so
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PERMISSIONS
+            OWNER_READ OWNER_WRITE
+            GROUP_READ
+            WORLD_READ
+        COMPONENT lib
+        EXCLUDE_FROM_ALL
+    )
+endif()
 
 install(
     TARGETS

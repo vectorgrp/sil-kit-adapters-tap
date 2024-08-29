@@ -41,8 +41,7 @@ The adapter and demos are built using ``cmake``. If you want to build the adapte
 
 **Note 3:** If you don't provide a specific path for SILKIT_PACKAGE_DIR and there is no SIL Kit installation on your system, a SIL Kit release package (the default version listed in CMakeLists.txt) will be fetched from github.com and the adapter will be built against it.
 
-The adapter and demo executables will be available in the ``bin`` directory.
-Additionally the ``SilKit`` shared library is copied to the ``lib`` directory next to it automatically.
+The adapter and demo executables will be available in the ``bin`` directory as well as the ``SilKit.dll`` if you are on Windows. Additionally the ``SilKit.lib`` on Windows and the ``libSilKit.so`` on Linux are automatically copied to the ``lib`` directory.
 
 ## b) Getting Started with pre-built Adapter and Demos
 Download a preview or release of the adapter directly from [Vector SIL Kit Adapter for TAP devices Releases](https://github.com/vectorgrp/sil-kit-adapters-tap/releases).
