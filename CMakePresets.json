@@ -1,4 +1,4 @@
-﻿{
+{
   "version": 3,
   "configurePresets": [
     {
@@ -80,6 +80,34 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
+    },
+    {
+      "name": "cross-qnx-x86_64",
+      "displayName": "QNX cross-build x86_64",
+      "generator": "Unix Makefiles",
+      "environment": {
+        "SILKIT_CMAKE_PRESET_BUILD_PLATFORM": "qnx"
+      },
+      "toolchainFile": "${sourceDir}/cmake/toolchain-qnx-x86_64.cmake",
+      "binaryDir": "${sourceDir}/_build/${presetName}",
+      "vendor": {
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
+          "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}",
+          "rsyncCommandArgs": [ "--exclude", "_build" ]
+        }
+      }
+    },
+    {
+      "inherits": "cross-qnx-x86_64",
+      "name": "cross-qnx-armv7",
+      "displayName": "QNX cross-build armv7",
+      "toolchainFile": "${sourceDir}/cmake/toolchain-qnx-armv7.cmake"
+    },
+    {
+      "inherits": "cross-qnx-x86_64",
+      "name": "cross-qnx-aarch64",
+      "displayName": "QNX cross-build aarch64",
+      "toolchainFile": "${sourceDir}/cmake/toolchain-qnx-aarch64.cmake"
     }
   ],
   "buildPresets": [
@@ -120,6 +148,18 @@
       "name": "windows-release",
       "inherits": "windows-base",
       "configurePreset": "windows-release"
+    },
+    {
+      "name": "cross-qnx-x86_64",
+      "configurePreset": "cross-qnx-x86_64"
+    },
+    {
+      "name": "cross-qnx-armv7",
+      "configurePreset": "cross-qnx-armv7"
+    },
+    {
+      "name": "cross-qnx-aarch64",
+      "configurePreset": "cross-qnx-aarch64"
     }
   ],
   "testPresets": [
@@ -160,6 +200,18 @@
       "name": "windows-release",
       "inherits": "windows-base",
       "configurePreset": "windows-release"
+    },
+    {
+      "name": "cross-qnx-x86_64",
+      "configurePreset": "cross-qnx-x86_64"
+    },
+    {
+      "name": "cross-qnx-armv7",
+      "configurePreset": "cross-qnx-armv7"
+    },
+    {
+      "name": "cross-qnx-aarch64",
+      "configurePreset": "cross-qnx-aarch64"
     }
   ]
 }

@@ -18,6 +18,10 @@
 #include <windows.h>
 #include <winioctl.h>
 #include "asio/windows/stream_handle.hpp"
+#elif defined(__QNX__)
+#include <net/if.h>
+#include <net/if_tap.h>
+#include "asio/posix/stream_descriptor.hpp"
 #else // UNIX
 #include <linux/if_tun.h>
 #include "asio/posix/stream_descriptor.hpp"
@@ -80,14 +84,13 @@ private:
 
     auto GetTapDeviceFileDescriptor(const char* tapDeviceName) -> HANDLE;
 
-#else // UNIX
+#else // QNX OR UNIX
 private:
     asio::posix::stream_descriptor _tapDeviceStream;
     int _fileDescriptor;
 
     auto GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int;
 #endif
-
 };
 
 ////////////////////////////
@@ -112,7 +115,7 @@ auto TapConnection::extractErrorMessage(const int errorCode) -> std::string
         return strError;
     }
     return "";
-#else // UNIX
+#else // QNX OR UNIX
     const char* errorMessage = strerror(errorCode);
 
     if (errorMessage != nullptr)

@@ -41,6 +41,8 @@ The adapter and demos are built using ``cmake``. If you want to build the adapte
 
 **Note 3:** If you don't provide a specific path for SILKIT_PACKAGE_DIR and there is no SIL Kit installation on your system, a SIL Kit release package (the default version listed in CMakeLists.txt) will be fetched from github.com and the adapter will be built against it.
 
+**Note 4:** The Adapter can be used to connect to TAP devices in QNX environments. In order to acheive that, you can cross-build the adapter for QNX systems using the provided CMake toolchain files inside the `cmake` folder.  
+
 The adapter and demo executables will be available in the ``bin`` directory as well as the ``SilKit.dll`` if you are on Windows. Additionally the ``SilKit.lib`` on Windows and the ``libSilKit.so`` on Linux are automatically copied to the ``lib`` directory.
 
 ## b) Getting Started with pre-built Adapter and Demos

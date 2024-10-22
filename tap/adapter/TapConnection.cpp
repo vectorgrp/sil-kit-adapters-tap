@@ -300,12 +300,50 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> HAN
     return tapFileHandle;
 }
 
+#elif defined(__QNX__)
+auto TapConnection::GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int
+{
+    int tapFileDescriptor{-1};
+    std::stringstream pathToTapDevice;
+    pathToTapDevice << "/dev/" << tapDeviceName;
+
+    // Check if tapDeviceName is null, empty, or too long, IFNAMSIZ is a constant that defines the maximum possible buffer size for an interface name (including its terminating zero byte)
+    if (tapDeviceName == nullptr || strlen(tapDeviceName) >= IFNAMSIZ)
+    {
+        _logger->Error("Invalid TAP device name used for [--tap-name] arg.\n"
+                       "(Hint): Ensure that the name provided is within a valid length between (1 and " + std::to_string(IFNAMSIZ - 1) + ") characters.");
+        return FILE_DESCRIPTOR_ERROR;
+    }
+
+    // Check if tapDeviceName exists in the list of available network devices
+    if (access(pathToTapDevice.str().c_str(), F_OK) != 0)
+    {
+        _logger->Error(std::string(tapDeviceName) + " not found in network devices."
+               + "\n(Hint): Ensure that the network interface \"" + std::string(tapDeviceName)
+               + "\" specified in [--tap-name] exists and is operational.");
+        return FILE_DESCRIPTOR_ERROR;
+    }
+
+    // open the file descriptor
+    if ((tapFileDescriptor = open(pathToTapDevice.str().c_str(), O_RDWR)) < 0)
+    {
+        int fdError = errno;
+        _logger->Error("File descriptor openning failed with error code: " + std::to_string(fdError) + extractErrorMessage(fdError));
+        return FILE_DESCRIPTOR_ERROR;
+    }
+   
+    _logger->Info("[" + pathToTapDevice.str() + "] TAP device successfully opened");
+    
+
+    return tapFileDescriptor;
+}
+
 #else // UNIX
 auto TapConnection::GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int
 {
     struct ifreq ifr;
     int tapFileDescriptor;
-    
+
     if ((tapFileDescriptor = open("/dev/net/tun", O_RDWR)) < 0)
     {
         int fdError = errno;
@@ -317,7 +355,7 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int
     if (tapDeviceName == nullptr || strlen(tapDeviceName) >= IFNAMSIZ)
     {
         _logger->Error("Invalid TAP device name used for [--tap-name] arg.\n"
-        "(Hint): Ensure that the name provided is within a valid length between (1 and " + std::to_string(IFNAMSIZ - 1) + ") characters.");
+                       "(Hint): Ensure that the name provided is within a valid length between (1 and " + std::to_string(IFNAMSIZ - 1) + ") characters.");
         return FILE_DESCRIPTOR_ERROR;
     }
 
@@ -334,8 +372,8 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int
     if ((access(pathToTapDevice.str().c_str(), F_OK) != 0) || (ioctl(tapFileDescriptor, TUNSETIFF, reinterpret_cast<void*>(&ifr)) < 0))
     {
         int ioctlError = errno;
-        _logger->Error("Failed to execute IOCTL system call with error code: " + std::to_string(ioctlError) + extractErrorMessage(ioctlError) + 
-            "\n(Hint): Ensure that the network interface \"" + std::string(tapDeviceName) + "\" specified in [--tap-name] exists and is operational.");
+        _logger->Error("Failed to execute IOCTL system call with error code: " + std::to_string(ioctlError) + extractErrorMessage(ioctlError) +
+                       "\n(Hint): Ensure that the network interface \"" + std::string(tapDeviceName) + "\" specified in [--tap-name] exists and is operational.");
         close(tapFileDescriptor);
         return FILE_DESCRIPTOR_ERROR;
     }

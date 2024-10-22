@@ -157,6 +157,13 @@ install(
     EXCLUDE_FROM_ALL
 )
 
+install(
+        DIRECTORY cmake
+        DESTINATION cmake
+        COMPONENT source
+        EXCLUDE_FROM_ALL
+)
+
 include(GNUInstallDirs)
 
 if(WIN32)
