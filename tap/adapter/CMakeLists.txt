@@ -24,7 +24,7 @@ if(WIN32)
         TARGET sil-kit-adapter-tap
         POST_BUILD
         COMMAND ${CMAKE_COMMAND}
-        ARGS -E copy $<TARGET_FILE:SilKit::SilKit> ${SILKIT_ADAPTER_TAP_OUTPUT_DIRECTORY}/SilKit.dll
+        ARGS -E copy $<TARGET_FILE:SilKit::SilKit> ${SILKIT_ADAPTER_TAP_OUTPUT_DIRECTORY}/${SILKIT_DLL_NAME}
     )
     # Copy the SilKit.lib in the lib folder
     get_target_property(SILKIT_DIR_LIB SilKit::SilKit LOCATION) # Get the SilKit.dll full path
@@ -33,7 +33,7 @@ if(WIN32)
         TARGET sil-kit-adapter-tap
         POST_BUILD
         COMMAND ${CMAKE_COMMAND}
-        ARGS -E copy ${SILKIT_DIR_LIB}/../lib/SilKit.lib ${SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY}/SilKit.lib
+        ARGS -E copy ${SILKIT_DIR_LIB}/../lib/${SILKIT_LIB_NAME} ${SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY}/${SILKIT_LIB_NAME}
     )
 else()
     # Copy the libSilKit.so in the lib folder
@@ -41,6 +41,6 @@ else()
         TARGET sil-kit-adapter-tap
         POST_BUILD
         COMMAND ${CMAKE_COMMAND}
-        ARGS -E copy $<TARGET_FILE:SilKit::SilKit> ${SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY}/libSilKit.so
+        ARGS -E copy $<TARGET_FILE:SilKit::SilKit> ${SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY}/${SILKIT_SO_NAME}
     )
 endif()
