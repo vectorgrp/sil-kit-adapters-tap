@@ -1,3 +1,4 @@
+
 # ignore cmake-generated path directories
 build*/
 _build*/
@@ -11,7 +12,6 @@ lib/
 # ignore IDE directories
 .idea/
 .vs/
-.vscode/
 
 # ignore log files
 *.out
@@ -24,6 +24,7 @@ lib/
 *.vtestreport
 *.stcfg
 *.ini
+
 **/.run/
 **/Default.venvironment/
 **/working-dir/

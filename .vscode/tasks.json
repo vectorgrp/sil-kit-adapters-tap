@@ -1,0 +1,61 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+        {
+            "label": "1-Build SIL Kit Adapter TAP",
+            "command": "/bin/bash",
+            "args": [
+                "tap/demos/DemoLinux/tasks_scripts/build_adapter.sh"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "2-Run sil-kit-registry",
+            "command": "/bin/bash",
+            "args": [
+                "tap/demos/DemoLinux/tasks_scripts/prepare_run_silkit.sh"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+            ]
+        },
+        {
+            "label": "3-Run sil-kit-demo-ethernet-icmp-echo-device",
+            "command": "/bin/bash",
+            "args": [
+                "tap/demos/DemoLinux/tasks_scripts/run_IcmpEchoDevice.sh"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+            ]
+        },
+        {
+            "label": "4-Start Adapter and ping demo",
+            "command": "/bin/bash",
+            "args": [
+                "tap/demos/DemoLinux/start_adapter_and_ping_demo.sh"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+            ]
+        },
+        {
+            "label": "5-Stop processes",
+            "command": "/bin/bash",
+            "args": [
+                "tap/demos/DemoLinux/tasks_scripts/stop_processes.sh"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        }
+    ]
+}

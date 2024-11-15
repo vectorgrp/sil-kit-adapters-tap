@@ -6,3 +6,5 @@
 *.png binary
 #configure .vtuexe files as binary files
 *.vtuexe binary
+#ensure pngs are treated as binary files
+*.png binary

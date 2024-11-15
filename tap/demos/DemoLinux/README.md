@@ -66,3 +66,25 @@ You can also run the same test set with ``CANoe4SW SE`` by executing the followi
 
 ### CANoe4SW Server Edition (Linux)
 You can also run the same test set with ``CANoe4SW SE (Linux)``. At first you have to execute the PowerShell script ``tap/demos/CANoe4SW_SE/createEnvForLinux.ps1`` on your Windows system by using tools of ``CANoe4SW SE (Windows)`` to prepare your test environment for Linux. In ``tap/demos/CANoe4SW_SE/run.sh`` you should adapt ``canoe4sw_se_install_dir`` to the path of your ``CANoe4SW SE`` installation in your WSL2. Afterwards you can execute ``tap/demos/CANoe4SW_SE/run.sh`` in your WSL2. The test cases are executed automatically and you should see a short test report in your terminal after execution.
+
+## Running the demo applications inside a Docker container (Optional)
+*Note: This section provides an alternative method for running the demo applications - apart from CANoe Desktop Edition and CANoe4SW Server Edition - inside a Docker container and using the `devcontainers` Visual Studio Code extension. The steps outlined here are optional and not required if you prefer to run the applications directly and manually on your host machine.*
+
+The following tools are needed:
+* Visual Studio Code in Windows
+* WSL2 with Docker running as a daemon. You will need the *ms-vscode-remote.remote-wsl* Visual Studio Code Extension to connect your Visual Studio Code instance to WSL2.  
+    >Alternatively, if you prefer to use a Linux Virtual Machine as a remote host, you can use the *ms-vscode-remote.remote-ssh* Visual Studio Code extension to connect your Visual Studio Code instance to it.    
+* *ms-vscode-remote.remote-containers* Visual Studio Code extension
+
+>In WSL2, it is advisable to use the native filesystem (such as `/home/`) rather than the mounted `/mnt/` filesystem to prevent any performance issues.
+
+### Steps:
+Clone the repo and open it with Visual Studio Code. A pop-up will appear and propose to open the project in a container.
+
+![Dev Containers popup](images/dev-container-popup.png)
+
+Alternatively, you can click on the Dev Containers button at the bottom-left corner of Visual Studio Code, then click on `Reopen in Container`. 
+
+Wait for the Docker image to be built and for the container to start. After that, you can launch the available pre-defined tasks to acheive the demo setup. 
+
+> The Docker container exposes the TCP/IP port 8501 to the host, which means that adding CANoe as a participant in the following steps shall work out-of-the box if you set SIL Kit's registry-uri to `silkit://localhost:8501`.  

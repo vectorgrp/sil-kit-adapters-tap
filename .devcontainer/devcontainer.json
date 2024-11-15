@@ -1,0 +1,20 @@
+{
+	"name": "SIL_Kit_Adapters_Container",
+	"dockerFile": "Dockerfile",
+	"privileged":true,
+	"forwardPorts": [8501],
+	"mounts": [
+		"type=bind,source=${localWorkspaceFolder},target=/adapter-demo"
+    ],
+	"remoteUser": "root",
+	"customizations": {
+		"vscode": {
+			"settings": {
+    			"http.proxyStrictSSL": false
+			},
+			"extensions": [
+				"SanaAjani.taskrunnercode"
+			]
+		}
+	}
+}

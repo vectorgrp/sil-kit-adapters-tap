@@ -137,6 +137,22 @@ install(
 
 install(
     FILES            
+        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/0_clean.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/1_build_adapter.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/2_prepare_run_silkit.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/3_run_IcmpEchoDevice.sh
+    DESTINATION tap/demos/DemoLinux/tasks_scripts
+    PERMISSIONS
+        OWNER_READ OWNER_WRITE OWNER_EXECUTE
+        GROUP_READ GROUP_EXECUTE
+        WORLD_READ WORLD_EXECUTE
+    COMPONENT source
+    EXCLUDE_FROM_ALL
+)
+
+
+install(
+    FILES            
         ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/CANoe4SW_SE/run.sh
         ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/CANoe4SW_SE/run_all.sh
     DESTINATION tap/demos/CANoe4SW_SE
