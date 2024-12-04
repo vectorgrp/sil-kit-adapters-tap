@@ -126,11 +126,11 @@ The user manual of the *start application* suggests to create a network adapter 
 
 ### Start the server application
 
-At this point, the server executable can be started in the Linux system. For the example, it is not necessary to use the Execution Manager and it is enough to start the startapplication_cm_server1. The executable provides the StartApplicationService1 service and the SOME/IP Daemon will dispatch it. The `StartApplicationMethod1` method will increment the received value by 1, set the `StartApplicationEvent1` and update the `StartApplicationField1`.
+At this point, the server executable can be started in the Linux system. For the example, it is not necessary to use the Execution Manager and it is enough to start the `startapp_cm_server1`. The executable provides the StartApplicationService1 service and the SOME/IP Daemon will dispatch it. The `StartApplicationMethod1` method will increment the received value by 1, set the `StartApplicationEvent1` and update the `StartApplicationField1`.
 
   ```bash
-  cd ${AMSR_SRC_DIR}/Examples/startapplication/build/gcc7_linux_x86_64/install/opt/startapplication_cm_server1/
-  ./bin/startapplication_cm_server1
+  cd ${AMSR_SRC_DIR}/Examples/startapplication/build/gcc7_linux_x86_64/install/opt/startapp_cm_server1/
+  ./bin/startapp_cm_server1
   ```
 
 **Hint:** It is totally fine to see error messages like shown below, as long as you got the feedback that the actual application you just started is running. The error message are shown due to the fact that we don't use the execution manager for this demo.
