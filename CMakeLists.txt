@@ -116,6 +116,9 @@ install(
         ${CMAKE_CURRENT_SOURCE_DIR}/tap
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party
         ${CMAKE_CURRENT_SOURCE_DIR}/adaptive
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+        ${CMAKE_CURRENT_SOURCE_DIR}/.devcontainer
+        ${CMAKE_CURRENT_SOURCE_DIR}/.vscode
     DESTINATION .
     COMPONENT source
     EXCLUDE_FROM_ALL   
@@ -137,10 +140,10 @@ install(
 
 install(
     FILES            
-        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/0_clean.sh
-        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/1_build_adapter.sh
-        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/2_prepare_run_silkit.sh
-        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/3_run_IcmpEchoDevice.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/build_adapter.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/prepare_run_silkit.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/run_IcmpEchoDevice.sh
+        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/stop_processes.sh
     DESTINATION tap/demos/DemoLinux/tasks_scripts
     PERMISSIONS
         OWNER_READ OWNER_WRITE OWNER_EXECUTE
@@ -187,13 +190,6 @@ install(
     DESTINATION .
     COMPONENT source
     EXCLUDE_FROM_ALL
-)
-
-install(
-        DIRECTORY cmake
-        DESTINATION cmake
-        COMPONENT source
-        EXCLUDE_FROM_ALL
 )
 
 include(GNUInstallDirs)

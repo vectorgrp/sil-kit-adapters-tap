@@ -12,6 +12,6 @@ for process in "${processes[@]}"; do
         pkill -f "$process"
         echo "[Info] $process has been stopped"
     else
-        echo "$process is not running"
+        echo "[Info] $process is not running"
     fi
 done
