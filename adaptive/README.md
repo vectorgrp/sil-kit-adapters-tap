@@ -18,7 +18,7 @@ The *start application* is part of the delivery at ``Examples/startapplication``
 
 ## Obtain the Vector SIL Kit components
 
-Download a preview or release of the adapter directly from [Vector SIL Kit Adapter TAP Releases](https://github.com/vectorgrp/sil-kit-adapters-tap/releases) or build the Vector SIL Kit Adapter TAP [on your own](https://github1.vg.vector.int/pnd/sil-kit-adapters-tap#a-getting-started-with-self-built-adapter-and-demos).
+Download a preview or release of the adapter directly from [Vector SIL Kit Adapter TAP Releases](https://github.com/vectorgrp/sil-kit-adapters-tap/releases) or build the Vector SIL Kit Adapter TAP [on your own](https://github.com/vectorgrp/sil-kit-adapters-tap#a-getting-started-with-self-built-adapter-and-demos).
 
 For both options you need a sil-kit-registry contained in the SIL Kit Release, which you can download directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases).
 
