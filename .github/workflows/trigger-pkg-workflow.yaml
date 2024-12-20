@@ -7,9 +7,7 @@ on:
 jobs:
   get-tag-name:
     name: Get the release tag name
-    runs-on: 
-      group: shared-runners
-      labels: Linux
+    runs-on: ubuntu-20.04
     outputs:
       tag_name: ${{ steps.get_tag_name.outputs.tag_name }}
     steps:
@@ -27,9 +25,8 @@ jobs:
   handle-artifacts:
     name: Download the package archive and upload it to the release
     needs: call-packaging-workflow
-    runs-on: 
-      group: shared-runners
-      labels: Linux
+    environment: public-github-runners
+    runs-on: ubuntu-20.04
     steps:
       - name: Download the package
         id: download-pkg
