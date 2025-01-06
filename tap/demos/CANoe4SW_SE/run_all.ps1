@@ -21,7 +21,7 @@ $execRegistry = {
 
 $execAdapter = {
     param ($ScriptDir)
-    & $ScriptDir\..\..\..\bin\sil-kit-adapter-tap.exe --log Debug | Out-File -FilePath $ScriptDir\sil-kit-adapter-tap.out
+    & $ScriptDir\..\..\..\bin\sil-kit-adapter-tap.exe --log Debug --configuration $scriptDir/../SilKitConfig_Adapter.silkit.yaml | Out-File -FilePath $ScriptDir\sil-kit-adapter-tap.out
 }
 
 $execDemo = {

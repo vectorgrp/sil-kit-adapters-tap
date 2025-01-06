@@ -48,11 +48,11 @@ netsh interface ip set address silkit_tap static 192.168.7.2 255.255.255.0
 
 Now is a good point to start the ``sil-kit-registry``, the ``sil-kit-adapter-tap`` and the ``sil-kit-demo-ethernet-icmp-echo-device`` in separate terminals:
 
-    /path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry.exe --listen-uri 'silkit://0.0.0.0:8501'
+    \path\to\SilKit-x.y.z-$platform\SilKit\bin\sil-kit-registry.exe --listen-uri 'silkit://0.0.0.0:8501'
     
-    ./bin/sil-kit-adapter-tap.exe --log Debug
+    .\bin\sil-kit-adapter-tap.exe --configuration .\tap\demos\SilKitConfig_Adapter.silkit.yaml
 
-    ./bin/sil-kit-demo-ethernet-icmp-echo-device.exe --log Debug
+    .\bin\sil-kit-demo-ethernet-icmp-echo-device.exe --log Debug
     
 The applications will produce output when they send and receive Ethernet frames from the TAP device or the Vector SIL Kit.
 

@@ -48,7 +48,7 @@ void adapters::print_help(bool userRequested)
                  "  ["<<regUriArg<<" silkit://<host{localhost}>:<port{8501}>]\n"
                  "  ["<<logLevelArg<<" <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n"
                  "  ["<<tapNameArg<<" <tap device's name{silkit_tap}>]\n"
-                 "  ["<<networkArg<<" <SIL Kit ethernet network{tap_demo}>]\n"
+                 "  ["<<networkArg<<" <SIL Kit ethernet network{Ethernet1}>]\n"
                  "\n"
                  "SIL Kit-specific CLI arguments will be overwritten by the config file passed by " << configurationArg << ".\n";
     std::cout << "\n"

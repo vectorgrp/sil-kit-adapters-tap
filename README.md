@@ -88,7 +88,7 @@ The application *optionally* takes the following command line arguments (default
       [--registry-uri silkit://<host{localhost}>:<port{8501}>]
       [--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>]
       [--tap-name <tap device's name{silkit_tap}>]
-      [--network <SIL Kit ethernet network{tap_demo}>]
+      [--network <SIL Kit ethernet network{Ethernet1}>]
       [--help]
 
 **Note:** SIL Kit-specific CLI arguments will be overwritten by the config file specified by ``--configuration``.

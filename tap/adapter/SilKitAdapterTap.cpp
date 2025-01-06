@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 
     const std::string tapDevName = getArgDefault(argc, argv, tapNameArg, "silkit_tap");
     const std::string participantName = getArgDefault(argc, argv, participantNameArg, "SilKitAdapterTap");
-    const std::string ethernetNetworkName = getArgDefault(argc, argv, networkArg, "tap_demo");
+    const std::string ethernetNetworkName = getArgDefault(argc, argv, networkArg, "Ethernet1");
     const std::string ethernetControllerName = "SilKit_ETH_CTRL_1";
 
     asio::io_context ioContext;
