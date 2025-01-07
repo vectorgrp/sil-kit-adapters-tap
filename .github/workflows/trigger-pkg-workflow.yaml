@@ -31,12 +31,6 @@ jobs:
       - name: Download the package
         id: download-pkg
         uses: actions/download-artifact@v3
-      - name: Zip the artifact
-        run: |
-          rm -f sil-kit-adapter-tap_*.zip
-          dir_path=$(find . -maxdepth 1 -name "sil-kit-adapter-tap_*")
-          dir_name=$(basename $dir_path)
-          zip "${dir_name}.zip" $dir_path/*
       - name: Release the package
         uses: softprops/action-gh-release@v1
         with:
@@ -44,4 +38,4 @@ jobs:
           draft: true
           fail_on_unmatched_files: true
           files: |
-            ${{ steps.download-pkg.outputs.download-path }}/sil-kit-adapter-tap_*.zip
+            ${{ steps.download-pkg.outputs.download-path }}/sil-kit-adapter-tap_*.deb
