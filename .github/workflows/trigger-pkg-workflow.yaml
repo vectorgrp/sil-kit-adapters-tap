@@ -31,6 +31,10 @@ jobs:
       - name: Download the package
         id: download-pkg
         uses: actions/download-artifact@v3
+      - name: Get the .deb file path
+        run: |
+          dir_path=$(find . -maxdepth 2 -name "sil-kit-adapter-tap_*.deb")
+          echo "file-path=$dir_path" >> $GITHUB_ENV
       - name: Release the package
         uses: softprops/action-gh-release@v1
         with:
@@ -38,4 +42,4 @@ jobs:
           draft: true
           fail_on_unmatched_files: true
           files: |
-            ${{ steps.download-pkg.outputs.download-path }}/sil-kit-adapter-tap_*.deb
+            ${{ env.file-path }}
