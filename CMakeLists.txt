@@ -247,6 +247,17 @@ install(
         WORLD_READ WORLD_EXECUTE
 )
 
+if (DEFINED CMAKE_INSTALL_MANDIR)
+    if (UNIX)
+        install(
+            FILES
+                ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/sil-kit-adapter-tap.1
+            DESTINATION ${CMAKE_INSTALL_MANDIR}/man1/
+            COMPONENT docs
+        )
+    endif()
+endif()
+
 
 ###############################################################################
 # Packaging

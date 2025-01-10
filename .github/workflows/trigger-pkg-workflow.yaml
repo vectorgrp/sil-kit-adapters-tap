@@ -1,0 +1,45 @@
+name: trigger SIL Kit Adapters Pkg Workflow
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  get-tag-name:
+    name: Get the release tag name
+    runs-on: ubuntu-20.04
+    outputs:
+      tag_name: ${{ steps.get_tag_name.outputs.tag_name }}
+    steps:
+      - name: Get the tag name
+        id: get_tag_name
+        run: echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+  call-packaging-workflow:
+    name: Trigger the Debian package workflow
+    needs: get-tag-name
+    uses: vectorgrp/sil-kit-adapters-pkg/.github/workflows/package-debian.yml@main
+    with:
+      adapter_name: tap
+      tag_name: ${{ needs.get-tag-name.outputs.tag_name }}
+    secrets: inherit
+  handle-artifacts:
+    name: Download the package archive and upload it to the release
+    needs: call-packaging-workflow
+    environment: public-github-runners
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Download the package
+        id: download-pkg
+        uses: actions/download-artifact@v3
+      - name: Get the .deb file path
+        run: |
+          dir_path=$(find . -maxdepth 2 -name "sil-kit-adapter-tap_*.deb")
+          echo "file-path=$dir_path" >> $GITHUB_ENV
+      - name: Release the package
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          draft: true
+          fail_on_unmatched_files: true
+          files: |
+            ${{ env.file-path }}
