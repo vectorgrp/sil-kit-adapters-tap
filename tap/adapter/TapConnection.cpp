@@ -2,6 +2,13 @@
 
 #include "TapConnection.hpp"
 
+#if defined(__QNX__)
+#include <net/if.h>
+#include <net/if_tap.h>
+#elif defined(__linux__)
+#include <linux/if_tun.h>
+#endif
+
 #include "Parsing.hpp"
 #include "SignalHandler.hpp"
 #include "SilKitAdapterTap.hpp"
@@ -300,57 +307,9 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> HAN
     return tapFileHandle;
 }
 
-#elif defined(__QNX__)
-auto TapConnection::GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int
-{
-    int tapFileDescriptor{-1};
-    std::stringstream pathToTapDevice;
-    pathToTapDevice << "/dev/" << tapDeviceName;
-
-    // Check if tapDeviceName is null, empty, or too long, IFNAMSIZ is a constant that defines the maximum possible buffer size for an interface name (including its terminating zero byte)
-    if (tapDeviceName == nullptr || strlen(tapDeviceName) >= IFNAMSIZ)
-    {
-        _logger->Error("Invalid TAP device name used for [--tap-name] arg.\n"
-                       "(Hint): Ensure that the name provided is within a valid length between (1 and " + std::to_string(IFNAMSIZ - 1) + ") characters.");
-        return FILE_DESCRIPTOR_ERROR;
-    }
-
-    // Check if tapDeviceName exists in the list of available network devices
-    if (access(pathToTapDevice.str().c_str(), F_OK) != 0)
-    {
-        _logger->Error(std::string(tapDeviceName) + " not found in network devices."
-               + "\n(Hint): Ensure that the network interface \"" + std::string(tapDeviceName)
-               + "\" specified in [--tap-name] exists and is operational.");
-        return FILE_DESCRIPTOR_ERROR;
-    }
-
-    // open the file descriptor
-    if ((tapFileDescriptor = open(pathToTapDevice.str().c_str(), O_RDWR)) < 0)
-    {
-        int fdError = errno;
-        _logger->Error("File descriptor openning failed with error code: " + std::to_string(fdError) + extractErrorMessage(fdError));
-        return FILE_DESCRIPTOR_ERROR;
-    }
-   
-    _logger->Info("[" + pathToTapDevice.str() + "] TAP device successfully opened");
-    
-
-    return tapFileDescriptor;
-}
-
 #else // UNIX
 auto TapConnection::GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int
 {
-    struct ifreq ifr;
-    int tapFileDescriptor;
-
-    if ((tapFileDescriptor = open("/dev/net/tun", O_RDWR)) < 0)
-    {
-        int fdError = errno;
-        _logger->Error("File descriptor openning failed with error code: " + std::to_string(fdError) + extractErrorMessage(fdError));
-        return FILE_DESCRIPTOR_ERROR;
-    }
-
     // Check if tapDeviceName is null, empty, or too long, IFNAMSIZ is a constant that defines the maximum possible buffer size for an interface name (including its terminating zero byte)
     if (tapDeviceName == nullptr || strlen(tapDeviceName) >= IFNAMSIZ)
     {
@@ -359,26 +318,83 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int
         return FILE_DESCRIPTOR_ERROR;
     }
 
-    memset(&ifr, 0, sizeof(ifr));
-    ifr.ifr_flags = (short int)IFF_TAP | IFF_NO_PI;
-
-    strncpy(ifr.ifr_name, tapDeviceName, IFNAMSIZ);
-
     // Path to the tap device in network interfaces
     std::stringstream pathToTapDevice;
+#if defined(__QNX__)
+    pathToTapDevice << "/dev/" << tapDeviceName;
+#else // Linux
     pathToTapDevice << "/sys/class/net/" << tapDeviceName;
+#endif
 
     // Check if tapDeviceName exists in the list of all network interfaces
-    if ((access(pathToTapDevice.str().c_str(), F_OK) != 0) || (ioctl(tapFileDescriptor, TUNSETIFF, reinterpret_cast<void*>(&ifr)) < 0))
+    if ((access(pathToTapDevice.str().c_str(), F_OK) != 0) )
+    {
+        int ioctlError = errno;
+        _logger->Error("Failed to execute IOCTL system call with error code: " + std::to_string(ioctlError) + extractErrorMessage(ioctlError) +
+                       "\n(Hint): Ensure that the network interface \"" + std::string(tapDeviceName) + "\" specified in [--tap-name] exists and is operational.");
+        return FILE_DESCRIPTOR_ERROR;
+    }
+
+    int tapFileDescriptor{-1};
+#if defined(__QNX__)
+    if ((tapFileDescriptor = open(pathToTapDevice.str().c_str(), O_RDWR)) < 0)
+#else // Linux
+    if ((tapFileDescriptor = open("/dev/net/tun", O_RDWR)) < 0)
+#endif
+    {
+        int fdError = errno;
+        _logger->Error("File descriptor openning failed with error code: " + std::to_string(fdError) + extractErrorMessage(fdError));
+        return FILE_DESCRIPTOR_ERROR;
+    }
+
+    struct ifreq ifr;
+    memset(&ifr, 0, sizeof(ifr));
+    strncpy(ifr.ifr_name, tapDeviceName, IFNAMSIZ-1);
+    ifr.ifr_name[IFNAMSIZ-1] = '\0';
+
+#if defined(__linux__)
+    // Linux only
+    ifr.ifr_flags = (short int)IFF_TAP | IFF_NO_PI;
+    if (ioctl(tapFileDescriptor, TUNSETIFF, reinterpret_cast<void*>(&ifr)) < 0)
+    {
+        int fdError = errno;
+        _logger->Error("Failed to set TUNSETIFF flag to the TAP device: " + std::to_string(fdError) + extractErrorMessage(fdError));
+        close(tapFileDescriptor);
+        return FILE_DESCRIPTOR_ERROR;
+    }
+#endif
+
+    _logger->Info("TAP device successfully opened");
+
+    // Check if tapDeviceName is up or down when starting the adapter
+    int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd < 0) 
+    {
+        int ioctlError = errno;
+        _logger->Error("Failed to create a socket to perform IOCTL call on TAP device with error code: " + std::to_string(ioctlError) + extractErrorMessage(ioctlError));
+        close(tapFileDescriptor);
+        return OTHER_ERROR;
+    }
+
+    ifr.ifr_flags = 0;
+    if (ioctl(sockfd, SIOCGIFFLAGS, &ifr) < 0)
     {
         int ioctlError = errno;
         _logger->Error("Failed to execute IOCTL system call with error code: " + std::to_string(ioctlError) + extractErrorMessage(ioctlError) +
                        "\n(Hint): Ensure that the network interface \"" + std::string(tapDeviceName) + "\" specified in [--tap-name] exists and is operational.");
         close(tapFileDescriptor);
-        return FILE_DESCRIPTOR_ERROR;
+        return OTHER_ERROR;
     }
 
-    _logger->Info("TAP device successfully opened");
+    if ((ifr.ifr_flags & IFF_UP) == 0)
+    {
+        _logger->Info("TAP device is currently down");
+    }
+    else
+    {
+        _logger->Info("TAP device is currently up");
+    }
+
     return tapFileDescriptor;
 }
 #endif
