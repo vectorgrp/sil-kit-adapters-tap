@@ -1,6 +1,6 @@
 # Vector SIL Kit Adapter for TAP devices
 [![Vector Informatik](https://img.shields.io/badge/Vector%20Informatik-rgb(180,0,50))](https://www.vector.com/int/en/)
-[![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/vectorgrp)](https://x.com/vectorgrp?lang=en)\
+[![SocialNetwork](https://img.shields.io/badge/vectorgrp-rgb(0,113,176))](https://www.linkedin.com/company/vectorgrp/)\
 [![ReleaseBadge](https://img.shields.io/github/v/release/vectorgrp/sil-kit-adapters-tap.svg)](https://github.com/vectorgrp/sil-kit-adapters-tap/releases)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/vectorgrp/sil-kit-adapters-tap/blob/main/LICENSE)
 [![Win & Linux Builds](https://github.com/vectorgrp/sil-kit-adapters-tap/actions/workflows/build-linux-and-windows-release.yml/badge.svg)](https://github.com/vectorgrp/sil-kit-adapters-tap/actions/workflows/build-linux-and-windows-release.yml)
