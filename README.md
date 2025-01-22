@@ -58,23 +58,38 @@ Download a preview or release of the adapter directly from [Vector SIL Kit Adapt
 If not already existent on your system you should also download a SIL Kit Release directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases). You will need this for being able to start a sil-kit-registry.
 
 ## Install the sil-kit-adapter-tap (optional)
-Be aware that SIL Kit itself also needs to be installed to run the adapter.
 
-Run the following command to install the sil-kit-adapter-tap (can be done for self-built and pre-built package after cmake configure):
+### Linux installation with Debian package
+On Debian systems, the most straightforward way to install the sil-kit-adapter-tap is to use the Debian package `sil-kit-adapter-tap_*.deb` which is provided with each release (version v1.0.3 and above).
+After downloading it, you can install it using the following command:
+```
+sudo apt install ./sil-kit-adapter-tap_*.deb
+```
+To get more information about this Debian package you can refer to the SIL Kit Adapter Packaging [README](https://github.com/vectorgrp/sil-kit-adapters-pkg).
 
-### Linux installation
+**Note 1:** To be able to run the installed adapter you will also have to install the SIL Kit library. This can be done installing the `libsilkit4_*.deb` and `libsilkit-dev_*.deb` provided in the SIL Kit releases.
+
+**Note 2:** After installing the adapter on Linux, you can run the ``sil-kit-adapter-tap`` from any location without specifying a path. The default installation path is ``/usr/bin``.
+
+### Linux installation with CMake
+To install the sil-kit-adapter-tap using CMake on Linux, run the following command (can be done for self-built and pre-built package after cmake configure):
 
     sudo cmake --build build --target install
 
-**Note:** After installing the adapter on Linux, the following command  ``sil-kit-adapter-tap`` can be called from everywhere without defining a path. The default installation path will be ``/usr/local/bin``.
+**Note 1:** Be aware that SIL Kit itself also needs to be installed to run the adapter.
+
+**Note 2:** After installing the adapter on Linux, you can run the ``sil-kit-adapter-tap`` from any location without specifying a path. The default installation path is ``/usr/local/bin``.
 
 ### Windows installation
+To install the sil-kit-adapter-tap on Windows, run the following command (can be done for self-built and pre-built package after cmake configure):
 
     cmake --build build --target install --config Release
 
-**Note 1:** Elevated rights are needed to install the adapter under its default location. This can be achieved by running the command in a PowerShell opened as administrator.
+**Note 1:** Be aware that SIL Kit itself also needs to be installed to run the adapter.
 
-**Note 2:** The default installation path will be ``C:\Program Files\Vector SIL Kit Adapter TAP <TAP_ADAPTER_VERSION>``, with <TAP_ADAPTER_VERSION> as the version of the TAP adapter you install. 
+**Note 2:** Elevated rights are needed to install the adapter under its default location. This can be achieved by running the command in a PowerShell opened as administrator.
+
+**Note 3:** The default installation path will be ``C:\Program Files\Vector SIL Kit Adapter TAP <TAP_ADAPTER_VERSION>``, with <TAP_ADAPTER_VERSION> as the version of the TAP adapter you install. 
 Depending on your system this default path can be ``Program Files (x86)``.
 
 ## Run the sil-kit-adapter-tap
