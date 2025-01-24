@@ -34,13 +34,8 @@ if (WIN32)
     target_compile_definitions(asio INTERFACE WINVER=0x0601 _WIN32_WINNT=0x0601) # Windows 7
 
     # Set SIL Kit lib name
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        set(SILKIT_DLL_NAME "SilKit.dll")
-        set(SILKIT_LIB_NAME "SilKit.lib")
-    else() # Debug or RelWithDebInfo
-        set(SILKIT_DLL_NAME "SilKitd.dll")
-        set(SILKIT_LIB_NAME "SilKitd.lib")
-    endif()
+    set(SILKIT_DLL_NAME $<IF:$<CONFIG:Release>,SilKit.dll,SilKitd.dll>)
+    set(SILKIT_LIB_NAME $<IF:$<CONFIG:Release>,SilKit.lib,SilKitd.lib>)
 else()
     # Set SIL Kit lib name
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
