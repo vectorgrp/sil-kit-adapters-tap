@@ -10,7 +10,7 @@
 const std::array<std::string, 6> switchesWithArgument = {adapters::networkArg, adapters::tapNameArg, adapters::regUriArg, adapters::logLevelArg, 
                                                          adapters::participantNameArg, adapters::configurationArg};
 
-const std::array<std::string, 1> switchesWithoutArguments = {adapters::helpArg};
+const std::array<std::string, 2> switchesWithoutArguments = {adapters::helpArg, adapters::versionArg};
 
 bool adapters::thereAreUnknownArguments(int argc, char** argv)
 {
@@ -42,8 +42,10 @@ bool adapters::thereAreUnknownArguments(int argc, char** argv)
 
 void adapters::print_help(bool userRequested)
 {
+    print_version(); // print version first
     std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl
-              << "sil-kit-adapter-tap ["<<participantNameArg<<" <participant's name{SilKitAdapterTap}>]\n"
+              << "sil-kit-adapter-tap\n"
+                 "  ["<<participantNameArg<<" <participant's name{SilKitAdapterTap}>]\n"
                  "  ["<<configurationArg<<" <path to .silkit.yaml or .json configuration file>]\n"
                  "  ["<<regUriArg<<" silkit://<host{localhost}>:<port{8501}>]\n"
                  "  ["<<logLevelArg<<" <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n"
@@ -55,10 +57,19 @@ void adapters::print_help(bool userRequested)
                  "Example:\n"
                  "sil-kit-adapter-tap "<<participantNameArg<<" EthernetTapBridge "
              <<  networkArg<<" tap_bridge\n";
+
+    std::cout << "\n"
+                     "Pass "<<versionArg<<" to get the version of the Adapter.\n";
+
     if (!userRequested)
         std::cout << "\n"
                      "Pass "<<helpArg<<" to get this message.\n";
 };
+
+void adapters::print_version()
+{
+    std::cout << "Vector SIL Kit Adapter for TAP devices - version: " << SILKIT_ADAPTER_TAP_VERSION << std::endl;
+}
 
 char** adapters::findArg(int argc, char** argv, const std::string& argument, char** args)
 {

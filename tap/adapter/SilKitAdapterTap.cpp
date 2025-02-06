@@ -52,6 +52,12 @@ int main(int argc, char** argv)
         return NO_ERROR;
     }
 
+    if(findArg(argc, argv, versionArg, argv) != NULL)
+    {
+        print_version();
+        return NO_ERROR;
+    }
+    
     const std::string configurationFile = getArgDefault(argc, argv, configurationArg, "");
     const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
 

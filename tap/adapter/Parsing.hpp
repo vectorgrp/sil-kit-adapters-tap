@@ -22,6 +22,12 @@ bool thereAreUnknownArguments(int argc, char** argv);
 void print_help(bool userRequested = false);
 
 /// <summary>
+/// Prints the version of the adapter.
+/// </summary>
+/// <param name="userRequested">Set this to true to signify the user requested the printing.</param>
+void print_version();
+
+/// <summary>
 /// Searches [argv,argv+argc[ for a string matching argument, starting at args.
 /// </summary>
 /// <param name="argc">length of the available char**.</param>
@@ -109,6 +115,11 @@ const std::string logLevelArg = "--log";
 /// string containing the argument preceding the participant name.
 /// </summary>
 const std::string participantNameArg = "--name";
+
+/// <summary>
+/// string containing the argument requesting the version of the adapter.
+/// </summary>
+const std::string versionArg = "--version";
 
 /// <summary>
 /// string containing the argument requesting the help message.
