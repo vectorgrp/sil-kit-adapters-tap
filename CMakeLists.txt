@@ -110,16 +110,41 @@ add_subdirectory(tap/demos)
 install(
     DIRECTORY            
         ${CMAKE_CURRENT_SOURCE_DIR}/tap
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party
         ${CMAKE_CURRENT_SOURCE_DIR}/adaptive
         ${CMAKE_CURRENT_SOURCE_DIR}/cmake
         ${CMAKE_CURRENT_SOURCE_DIR}/.devcontainer
         ${CMAKE_CURRENT_SOURCE_DIR}/.vscode
     DESTINATION .
     COMPONENT source
+    EXCLUDE_FROM_ALL
+
+    FILES_MATCHING
+        PATTERN *.cpp
+        PATTERN *.hpp
+        PATTERN *.cmake
+        PATTERN *.ps1
+        PATTERN *.sh
+        PATTERN *.json
+        PATTERN *.yaml
+        PATTERN *.can
+        PATTERN *.cfg
+        PATTERN *.md
+        PATTERN *.png
+        PATTERN Dockerfile
+        PATTERN CMakeLists.txt
+
+    REGEX "\.git$" EXCLUDE
+    REGEX "\.github$" EXCLUDE
+)
+
+install(
+    DIRECTORY            
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+    DESTINATION .
+    COMPONENT source
     EXCLUDE_FROM_ALL   
     REGEX "\.git$" EXCLUDE
-    REGEX "\.github$" EXCLUDE    
+    REGEX "\.github$" EXCLUDE
 )
 
 install(
