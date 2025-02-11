@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.5)
 project(VectorSilKitAdapterTap)
 include(FetchContent)
 
+option(BUILD_LINUX_PACKAGE "Creates a SIL Kit Adapter TAP build suitable for package managers in Linux Distributions (.deb)" OFF)
+
+if(BUILD_LINUX_PACKAGE)
+    add_subdirectory(docs/man)
+endif()
+
 set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -120,6 +126,7 @@ install(
         ${CMAKE_CURRENT_SOURCE_DIR}/tap
         ${CMAKE_CURRENT_SOURCE_DIR}/adaptive
         ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+        ${CMAKE_CURRENT_SOURCE_DIR}/docs
         ${CMAKE_CURRENT_SOURCE_DIR}/.devcontainer
         ${CMAKE_CURRENT_SOURCE_DIR}/.vscode
     DESTINATION .
@@ -275,18 +282,6 @@ install(
         GROUP_READ GROUP_EXECUTE
         WORLD_READ WORLD_EXECUTE
 )
-
-if (DEFINED CMAKE_INSTALL_MANDIR)
-    if (UNIX)
-        install(
-            FILES
-                ${CMAKE_CURRENT_SOURCE_DIR}/docs/man/sil-kit-adapter-tap.1
-            DESTINATION ${CMAKE_INSTALL_MANDIR}/man1/
-            COMPONENT docs
-        )
-    endif()
-endif()
-
 
 ###############################################################################
 # Packaging
