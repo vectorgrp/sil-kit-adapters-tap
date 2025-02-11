@@ -68,7 +68,7 @@ void adapters::print_help(bool userRequested)
 
 void adapters::print_version()
 {
-    std::cout << "Vector SIL Kit Adapter for TAP devices - version: " << SILKIT_ADAPTER_TAP_VERSION << std::endl;
+    std::cout << "Vector SIL Kit Adapter for TAP devices - version: " << SILKIT_ADAPTER_VERSION << std::endl;
 }
 
 char** adapters::findArg(int argc, char** argv, const std::string& argument, char** args)

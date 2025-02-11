@@ -1,6 +1,6 @@
 
 # ignore cmake-generated path directories
-^build*/
+build*/
 _build*/
 install*/
 _install*/

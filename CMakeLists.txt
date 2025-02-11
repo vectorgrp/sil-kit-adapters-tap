@@ -11,8 +11,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(SILKIT_ADAPTER_TAP_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 set(SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
-set(SILKIT_ADAPTER_TAP_VERSION "1.0.3")
-add_definitions(-DSILKIT_ADAPTER_TAP_VERSION="${SILKIT_ADAPTER_TAP_VERSION}")
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
+include(SilKitAdapterVersion)
+configure_silkit_adapter_version(${PROJECT_NAME})
+
+add_definitions(-DSILKIT_ADAPTER_VERSION="${PROJECT_VERSION}")
 
 set(SILKIT_VERSION "4.0.50" CACHE STRING "If no SIL Kit package is specified, this version will be downloaded")
 set(SILKIT_FLAVOR "ubuntu-18.04-x86_64-gcc" CACHE STRING "If no SIL Kit package is specified, this package flavor will be downloaded")
@@ -26,9 +30,9 @@ target_link_libraries(asio INTERFACE Threads::Threads)
 if (WIN32)
     # set the default install paths for Windows 32 and 64 bits
     if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(CMAKE_INSTALL_PREFIX "C:/Program Files/Vector SIL Kit Adapter TAP ${SILKIT_ADAPTER_TAP_VERSION}" CACHE PATH "Default install path" FORCE)
+        set(CMAKE_INSTALL_PREFIX "C:/Program Files/Vector SIL Kit Adapter TAP ${PROJECT_VERSION}" CACHE PATH "Default install path" FORCE)
     elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-        set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Vector SIL Kit Adapter TAP ${SILKIT_ADAPTER_TAP_VERSION}" CACHE PATH "Default install path" FORCE)
+        set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Vector SIL Kit Adapter TAP ${PROJECT_VERSION}" CACHE PATH "Default install path" FORCE)
     endif()
     
     target_compile_definitions(asio INTERFACE _SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1)
@@ -94,6 +98,10 @@ if(TARGET SilKit::SilKit)
 	message(STATUS "SIL Kit package has been successfully imported as a CMake target. [version : ${SilKit_VERSION}]")
 else()
 	message(FATAL_ERROR "Something went wrong : Could not find SIL Kit package.")
+endif()
+
+if(NOT DEFINED PACKAGE_FILENAME_SUFFIX)
+    set(PACKAGE_FILENAME_SUFFIX "-${PROJECT_VERSION}")
 endif()
 
 add_subdirectory(tap/Utility)
@@ -291,6 +299,9 @@ set(CPACK_PACKAGE_NAME "SilKit-Adapter-TAP")
 set(CPACK_PACKAGE_VENDOR "Vector Informatik")
 set(CPACK_PACKAGE_CONTACT "support@vector.com")
 set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}${PACKAGE_FILENAME_SUFFIX}")
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 
 set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
 set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
