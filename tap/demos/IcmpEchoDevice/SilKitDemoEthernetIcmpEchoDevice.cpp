@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <future>
 
 #include "silkit/SilKit.hpp"
 #include "silkit/config/all.hpp"
@@ -16,8 +17,10 @@
 #include "../adapter/SilKitAdapterTap.hpp"
 
 using namespace SilKit::Services::Ethernet;
+using namespace SilKit::Services::Orchestration;
 using namespace adapters; 
 using namespace exceptions;
+using namespace std::chrono_literals;
 
 const std::array<const std::string, 4> demoSwitchesWithArgument = {networkArg, regUriArg, logLevelArg, participantNameArg};
 const std::array<const std::string, 1> demoSwitchesWithoutArgument = {helpArg};
@@ -109,16 +112,9 @@ int main(int argc, char** argv)
         auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
 
         auto logger = participant->GetLogger();
-        
-        std::ostringstream SILKitInfoMessage;
-        SILKitInfoMessage << "Creating participant '" << participantName << "' at " << registryURI;
-        logger->Info(SILKitInfoMessage.str());
 
+        logger->Info("Creating ethernet controller '" + ethernetControllerName + "'");
         auto* ethController = participant->CreateEthernetController(ethernetControllerName, ethernetNetworkName);
-        
-        SILKitInfoMessage.str("");
-        SILKitInfoMessage << "Created ethernet controller '" << ethernetControllerName << "'";
-        logger->Info(SILKitInfoMessage.str());
 
         static constexpr auto ethernetAddress = demo::EthernetAddress{0x52, 0x54, 0x56, 0x53, 0x4B, 0x55};
         static constexpr auto ip4Address = demo::Ip4Address{192, 168, 7, 35};
@@ -157,9 +153,49 @@ int main(int argc, char** argv)
 
         ethController->AddFrameHandler(onReceivedEthernetMessageFromSILKit);
         ethController->AddFrameTransmitHandler(onEthernetAckCallback);
-        ethController->Activate();
+
+        // Setup lifecycle
+        auto* lifecycleService = participant->CreateLifecycleService({OperationMode::Autonomous});
+        auto* systemMonitor = participant->CreateSystemMonitor();
+        std::promise<void> runningStatePromise;
+
+        systemMonitor->AddParticipantStatusHandler(
+            [&runningStatePromise, participantName](const ParticipantStatus& status) {
+                if (participantName == status.participantName)
+                {
+                    if (status.state == ParticipantState::Running)
+                    {
+                        runningStatePromise.set_value();
+                    }
+                }
+            });
+
+        // Called during startup
+        lifecycleService->SetCommunicationReadyHandler([&ethController]() {
+            ethController->Activate();
+        });
+        
+        auto finalStateFuture = lifecycleService->StartLifecycle();
         
         promptForExit();
+            
+        auto runningStateFuture = runningStatePromise.get_future();
+        auto futureStatus = runningStateFuture.wait_for(15s);
+        if (futureStatus != std::future_status::ready)
+        {
+            std::ostringstream SILKitDebugMessage;
+            SILKitDebugMessage << "Lifecycle Service Stopping: timed out while checking if the participant is currently running.";
+            logger->Debug(SILKitDebugMessage.str());            
+        }
+        lifecycleService->Stop("Adapter stopped by the user.");
+
+        auto finalState = finalStateFuture.wait_for(15s);
+        if (finalState != std::future_status::ready)
+        {
+            std::ostringstream SILKitDebugMessage;
+            SILKitDebugMessage << "Lifecycle service stopping: timed out";
+            logger->Debug(SILKitDebugMessage.str());            
+        }
     }
     catch (const SilKit::ConfigurationError& error)
     {

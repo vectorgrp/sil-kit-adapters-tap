@@ -106,24 +106,7 @@ int main(int argc, char** argv)
         auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
         auto logger = participant->GetLogger();
 
-        auto* lifecycleService = participant->CreateLifecycleService({OperationMode::Autonomous});
-        auto* systemMonitor = participant->CreateSystemMonitor();
-        std::promise<void> runningStatePromise;
-
-        systemMonitor->AddParticipantStatusHandler(
-            [&runningStatePromise, participantName](const SilKit::Services::Orchestration::ParticipantStatus& status) {
-                if (participantName == status.participantName)
-                {
-                    if (status.state == SilKit::Services::Orchestration::ParticipantState::Running)
-                    {
-                        runningStatePromise.set_value();
-                    }
-                }
-            });
-
-        std::ostringstream SILKitInfoMessage;
-        SILKitInfoMessage << "Creating ethernet controller '" << ethernetControllerName << "'";
-        logger->Info(SILKitInfoMessage.str());
+        logger->Info("Creating ethernet controller '" + ethernetControllerName + "'");
         auto* ethController = participant->CreateEthernetController(ethernetControllerName,ethernetNetworkName);
 
         const auto onReceiveEthernetFrameFromTapDevice = [&logger, ethController](std::vector<std::uint8_t> data) {
@@ -140,9 +123,7 @@ int main(int argc, char** argv)
             logger->Debug(SILKitDebugMessage.str());
         };
 
-        SILKitInfoMessage.str("");
-        SILKitInfoMessage << "Creating TAP device ethernet connector for [" << tapDevName << "]";
-        logger->Info(SILKitInfoMessage.str());
+        logger->Info("Creating TAP device ethernet connector for [" + tapDevName + "]");
         TapConnection tapConnection{ioContext, tapDevName, onReceiveEthernetFrameFromTapDevice, logger};
 
         const auto onReceiveEthernetMessageFromSilKit = [&logger, &tapConnection](IEthernetController* /*controller*/,
@@ -173,8 +154,28 @@ int main(int argc, char** argv)
 
         ethController->AddFrameHandler(onReceiveEthernetMessageFromSilKit);
         ethController->AddFrameTransmitHandler(onEthAckCallback);
-        ethController->Activate();
 
+        // Setup lifecycle
+        auto* lifecycleService = participant->CreateLifecycleService({OperationMode::Autonomous});
+        auto* systemMonitor = participant->CreateSystemMonitor();
+        std::promise<void> runningStatePromise;
+
+        systemMonitor->AddParticipantStatusHandler(
+            [&runningStatePromise, participantName](const ParticipantStatus& status) {
+                if (participantName == status.participantName)
+                {
+                    if (status.state == ParticipantState::Running)
+                    {
+                        runningStatePromise.set_value();
+                    }
+                }
+            });
+
+        // Called during startup
+        lifecycleService->SetCommunicationReadyHandler([&ethController]() {
+            ethController->Activate();
+        });
+        
         auto finalStateFuture = lifecycleService->StartLifecycle();
 
         std::thread t([&]() -> void {
