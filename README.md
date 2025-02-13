@@ -52,6 +52,23 @@ The adapter and demos are built using ``cmake``. If you want to build the adapte
 
 The adapter and demo executables will be available in the ``bin`` directory as well as the ``SilKit.dll`` if you are on Windows. Additionally the ``SilKit.lib`` on Windows and the ``libSilKit.so`` on Linux are automatically copied to the ``lib`` directory.
 
+### Build the adapter for Android environments 
+You can use the [Android NDK](https://developer.android.com/ndk) to cross-build the adapter for Android environments. 
+
+Begin by cloning the SIL Kit repo and building it using the cmake toolchain file provided by Android NDK and generating a package as follows: 
+
+    cmake -S. -Bbuild -DCMAKE_TOOLCHAIN_FILE=/path/to/android-ndk/build/cmake/android.toolchain.cmake -DANDROID_ABI=x86_64 -DSILKIT_HOST_PLATFORM=android -DANDROID_PLATFORM=android-33 -DSILKIT_BUILD_TESTS=OFF -DSILKIT_BUILD_DEMOS=OFF
+
+    cmake --build build --parallel --target package
+
+Unzip the package that was generated and use the same toolchain file to cross-build the adapter, ensuring it is built against the unzipped package. 
+
+    cmake -S.  -Bbuild -DCMAKE_TOOLCHAIN_FILE=/path/to/android-ndk/build/cmake/android.toolchain.cmake  -DANDROID_ABI=x86_64 -DCMAKE_BUILD_TYPE=Release -DSILKIT_HOST_PLATFORM=android  -DSILKIT_PACKAGE_DIR=/path/to/SilKit-*-Linux-x86_64-clang-Release/  -DSilKit_DIR=/path/to/SilKit-*-Linux-x86_64-clang-Release/lib/cmake/SilKit -DANDROID_PLATFORM=android-33
+
+    cmake --build build --parallel
+
+Lastly, update the LD_LIBRARY_PATH in your Android environment to point to the location of the SIL Kit shared library, which can be found in the generated lib folder.
+
 ## b) Getting Started with pre-built Adapter and Demos
 Download a preview or release of the adapter directly from [Vector SIL Kit Adapter for TAP devices Releases](https://github.com/vectorgrp/sil-kit-adapters-tap/releases).
 

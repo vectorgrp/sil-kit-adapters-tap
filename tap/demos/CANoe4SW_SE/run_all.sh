@@ -1,6 +1,6 @@
 #!/bin/bash
 scriptDir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-silKitDir=/home/vector/SILKit/SilKit-4.0.50-ubuntu-18.04-x86_64-gcc/
+silKitDir=/home/dev/SilKit-4.0.50-ubuntu-18.04-x86_64-gcc/
 
 logDir=$scriptDir/logs # define a directory for .out files
 mkdir -p $logDir # if it does not exist, create it
