@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+# SPDX-License-Identifier: MIT
+
 add_executable(sil-kit-demo-ethernet-icmp-echo-device
     "SilKitDemoEthernetIcmpEchoDevice.cpp"
     Device.hpp

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+# SPDX-License-Identifier: MIT
+
 add_executable(sil-kit-adapter-tap
     "SilKitAdapterTap.cpp"
     "TapConnection.cpp"

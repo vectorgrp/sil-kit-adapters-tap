@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+# SPDX-License-Identifier: MIT
+
 param (
     [string]$remote_ip
 )

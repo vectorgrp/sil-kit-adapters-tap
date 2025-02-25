@@ -1,4 +1,5 @@
-// Copyright (c) Vector Informatik GmbH. All rights reserved.
+// SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+// SPDX-License-Identifier: MIT
 
 #pragma once
 

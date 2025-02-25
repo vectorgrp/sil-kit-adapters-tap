@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+# SPDX-License-Identifier: MIT
+
 #!/bin/bash
 scriptDir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 silKitDir=/home/dev/SilKit-4.0.50-ubuntu-18.04-x86_64-gcc/
@@ -37,14 +40,6 @@ $scriptDir/run.sh
 
 #capture returned value of run.sh script
 exit_status=$?
-
-echo "sil-kit-registry.out:--------------------------------------------------------------------------------------" 
-cat $logDir/sil-kit-registry.out
-echo "-----------------------------------------------------------------------------------------------------------" 
-
-echo "start_adapter_and_ping_demo.out:---------------------------------------------------------------------------" 
-cat $logDir/start_adapter_and_ping_demo.out
-echo "-----------------------------------------------------------------------------------------------------------" 
 
 #exit run_all.sh with same exit_status
 exit $exit_status

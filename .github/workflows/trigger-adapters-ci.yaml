@@ -1,0 +1,12 @@
+name: trigger sil-kit-adapters-ci
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+jobs:
+  call-check-licenses-workflow:
+    uses: pnd/sil-kit-adapters-ci-testing/.github/workflows/sil-kit-adapters-ci.yaml@main
+    with:
+      repository_under_test : ${{ github.repository }}
+      branch_under_test: ${{ github.event.pull_request.head.ref }}
+    secrets: inherit

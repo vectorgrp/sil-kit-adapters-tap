@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
+# SPDX-License-Identifier: MIT
+
 param (
     [string]$SILKitDir
 )
@@ -48,10 +51,6 @@ Start-Job -ScriptBlock $execPing -ArgumentList $PSScriptRoot -Name PingCmd
 $scriptResult = & $PSScriptRoot\run.ps1 | Select-Object -Last 1
 
 $isPassed = select-string -pattern "passed" -InputObject $scriptResult
-
-Write-Output "sil-kit-registry.out:---------------------------------------------------------------------------"
-Get-Content $PSScriptRoot/sil-kit-registry.out
-Write-Output "------------------------------------------------------------------------------------------------"
 
 # Stop all the jobs
 Stop-Job -Name PingCmd, TapAdapter, Demo, SILKitRegistry
