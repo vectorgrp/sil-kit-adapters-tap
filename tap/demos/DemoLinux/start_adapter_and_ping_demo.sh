@@ -1,7 +1,7 @@
+#!/bin/sh
 # SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
 # SPDX-License-Identifier: MIT
 
-#!/bin/sh
 scriptDir=$( dirname $(realpath $0) )
 
 # check if user is root

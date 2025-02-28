@@ -1,7 +1,7 @@
+#!/bin/bash
 # SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
 # SPDX-License-Identifier: MIT
 
-#!/bin/bash
 script_root=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Set a default path for canoe4sw-se installation directory

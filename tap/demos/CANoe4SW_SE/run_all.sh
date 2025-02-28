@@ -1,7 +1,7 @@
+#!/bin/bash
 # SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
 # SPDX-License-Identifier: MIT
 
-#!/bin/bash
 scriptDir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 silKitDir=/home/dev/SilKit-4.0.50-ubuntu-18.04-x86_64-gcc/
 

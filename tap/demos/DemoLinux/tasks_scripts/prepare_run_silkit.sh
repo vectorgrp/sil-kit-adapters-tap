@@ -1,7 +1,7 @@
+#!/bin/bash
 # SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
 # SPDX-License-Identifier: MIT
 
-#!/bin/bash
 set -e
 
 silkit_registry_path=$(find . -name sil-kit-registry -executable -print -quit)
