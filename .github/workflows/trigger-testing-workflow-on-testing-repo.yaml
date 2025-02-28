@@ -10,9 +10,8 @@ jobs:
     with:
       repository_under_test : ${{ github.repository }}
       branch_under_test: ${{ github.event.pull_request.head.ref }}
-      ci_testing_branch: main
-      adapter_name: tap
-      canoe4sw_se_scripts_dir: demos/CANoe4SW_SE
-      windows_scripts: tap/demos/CANoe4SW_SE/run_all.ps1
+      linux_scripts: |
+        tap/demos/CANoe4SW_SE/run_all.sh
+      windows_scripts: |
+        tap/demos/CANoe4SW_SE/run_all.ps1
     secrets: inherit
-
