@@ -47,15 +47,14 @@ Start-Job -ScriptBlock $execDemo -ArgumentList $PSScriptRoot -Name Demo
 
 Start-Job -ScriptBlock $execPing -ArgumentList $PSScriptRoot -Name PingCmd
 
-# Get the last line telling the overall test verdict (passed/failed)
-$scriptResult = & $PSScriptRoot\run.ps1 | Select-Object -Last 1
-
-$isPassed = select-string -pattern "passed" -InputObject $scriptResult
+# Execute CANoe4SW_SE tests
+& $PSScriptRoot\run.ps1 | Out-File -FilePath $PSScriptRoot\run_canoe4sw_se.out
+$result = $LASTEXITCODE
 
 # Stop all the jobs
 Stop-Job -Name PingCmd, TapAdapter, Demo, SILKitRegistry
 
-if($isPassed)
+if($result -eq 0)
 {
     Write-Output "Tests passed"
     exit 0
