@@ -28,7 +28,7 @@ configure_silkit_adapter_version(${PROJECT_NAME})
 
 add_definitions(-DSILKIT_ADAPTER_VERSION="${PROJECT_VERSION}")
 
-set(SILKIT_VERSION "4.0.50" CACHE STRING "If no SIL Kit package is specified, this version will be downloaded")
+set(SILKIT_VERSION "4.0.55" CACHE STRING "If no SIL Kit package is specified, this version will be downloaded")
 set(SILKIT_FLAVOR "ubuntu-18.04-x86_64-gcc" CACHE STRING "If no SIL Kit package is specified, this package flavor will be downloaded")
 
 find_package(Threads REQUIRED)
@@ -82,7 +82,7 @@ else()
 		message(STATUS "No installed version of SIL Kit was found. Attempting to fetch [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}] from github.com")
         FetchContent_Declare(
             silkit
-            URL https://github.com/vectorgrp/sil-kit/releases/download/sil-kit%2Fv${SILKIT_VERSION}/SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}.zip
+            URL https://github.com/vectorgrp/sil-kit/releases/download/v${SILKIT_VERSION}/SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}.zip
             DOWNLOAD_DIR ${CMAKE_CURRENT_LIST_DIR}/Downloads
         )
 

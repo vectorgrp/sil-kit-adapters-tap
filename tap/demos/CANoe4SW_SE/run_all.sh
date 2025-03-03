@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 scriptDir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-silKitDir=/home/dev/SilKit-4.0.50-ubuntu-18.04-x86_64-gcc/
+silKitDir=/home/vector/SilKit/SilKit-4.0.55-ubuntu-18.04-x86_64-gcc
 
 logDir=$scriptDir/logs # define a directory for .out files
 mkdir -p $logDir # if it does not exist, create it
@@ -25,16 +25,15 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-$silKitDir/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501' -s &> $logDir/sil-kit-registry.out &
+$silKitDir/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501' &> $logDir/sil-kit-registry.out &
 sleep 1 # wait 1 second for the creation/existense of the .out file
-timeout 30s grep -q 'Registered signal handler' <(tail -f $logDir/sil-kit-registry.out -n +1) || { echo "[error] Timeout reached while waiting for sil-kit-registry to start"; exit 1; }
+timeout 30s grep -q 'Press Ctrl-C to terminate...' <(tail -f $logDir/sil-kit-registry.out -n +1) || { echo "[error] Timeout reached while waiting for sil-kit-registry to start"; exit 1; }
 
 $scriptDir/../DemoLinux/start_adapter_and_ping_demo.sh &> $logDir/start_adapter_and_ping_demo.out &
 timeout 30s grep -q 'Starting to ping the echo device...' <(tail -f $logDir/start_adapter_and_ping_demo.out -n +1) || { echo "[error] Timeout reached while waiting for start_adapter_and_ping_demo.sh to start"; exit 1; }
 
 $scriptDir/../../../bin/sil-kit-demo-ethernet-icmp-echo-device &> $logDir/sil-kit-demo-ethernet-icmp-echo-device.out &
 timeout 30s grep -q 'Press CTRL + C to stop the process...' <(tail -f $logDir/sil-kit-demo-ethernet-icmp-echo-device.out -n +1) || { echo "[error] Timeout reached while waiting for sil-kit-demo-ethernet-icmp-echo-device to start"; exit 1; }
-
 
 $scriptDir/run.sh
 
