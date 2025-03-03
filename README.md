@@ -77,7 +77,7 @@ If not already existent on your system you should also download a SIL Kit Releas
 ## Install the sil-kit-adapter-tap (optional)
 
 ### Linux installation with Debian package
-On Debian systems, the most straightforward way to install the sil-kit-adapter-tap is to use the Debian package `sil-kit-adapter-tap_*.deb` which is provided with each release (version v1.0.3 and above).
+On Debian systems, the most straightforward way to install the sil-kit-adapter-tap is to use the Debian package `sil-kit-adapter-tap_*.deb` which is provided with each release (version v1.1.0 and above).
 After downloading it, you can install it using the following command:
 ```
 sudo apt install ./sil-kit-adapter-tap_*.deb
