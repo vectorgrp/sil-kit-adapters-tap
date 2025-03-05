@@ -8,7 +8,8 @@
 #include <cstring>
 
 
-const std::array<std::string, 6> switchesWithArgument = {adapters::networkArg, adapters::tapNameArg, adapters::regUriArg, adapters::logLevelArg, 
+const std::array<std::string, 6> switchesWithArgument = {adapters::networkArg,         adapters::tapNameArg,
+                                                         adapters::regUriArg,          adapters::logLevelArg,
                                                          adapters::participantNameArg, adapters::configurationArg};
 
 const std::array<std::string, 2> switchesWithoutArguments = {adapters::helpArg, adapters::versionArg};
@@ -43,7 +44,7 @@ bool adapters::thereAreUnknownArguments(int argc, char** argv)
 
 void adapters::print_help(bool userRequested)
 {
-    print_version(); // print version first
+    // clang-format off
     std::cout << "Usage (defaults in curly braces if you omit the switch):" << std::endl
               << "sil-kit-adapter-tap\n"
                  "  ["<<participantNameArg<<" <participant's name{SilKitAdapterTap}>]\n"
@@ -65,6 +66,7 @@ void adapters::print_help(bool userRequested)
     if (!userRequested)
         std::cout << "\n"
                      "Pass "<<helpArg<<" to get this message.\n";
+    // clang-format on
 };
 
 void adapters::print_version()
@@ -74,9 +76,7 @@ void adapters::print_version()
 
 char** adapters::findArg(int argc, char** argv, const std::string& argument, char** args)
 {
-    auto found = std::find_if(args, argv + argc, [argument](const char* arg) -> bool {
-        return argument == arg;
-    });
+    auto found = std::find_if(args, argv + argc, [argument](const char* arg) -> bool { return argument == arg; });
     if (found < argv + argc)
     {
         return found;
@@ -101,4 +101,3 @@ std::string adapters::getArgDefault(int argc, char** argv, const std::string& ar
     else
         return defaultValue;
 };
-

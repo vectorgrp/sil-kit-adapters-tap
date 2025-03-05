@@ -30,13 +30,11 @@ using namespace std::chrono_literals;
 using namespace adapters;
 
 void promptForExit()
-{    
+{
     std::promise<int> signalPromise;
     auto signalValue = signalPromise.get_future();
-    RegisterSignalHandler([&signalPromise](auto sigNum) {
-        signalPromise.set_value(sigNum);
-    });
-        
+    RegisterSignalHandler([&signalPromise](auto sigNum) { signalPromise.set_value(sigNum); });
+
     std::cout << "Press CTRL + C to stop the process..." << std::endl;
 
     signalValue.wait();
@@ -47,18 +45,20 @@ void promptForExit()
 
 int main(int argc, char** argv)
 {
+    if (findArg(argc, argv, versionArg, argv) != NULL)
+    {
+        print_version();
+        return NO_ERROR;
+    }
+
+    print_version();
+
     if (findArg(argc, argv, helpArg, argv) != NULL)
     {
         print_help(true);
         return NO_ERROR;
     }
 
-    if(findArg(argc, argv, versionArg, argv) != NULL)
-    {
-        print_version();
-        return NO_ERROR;
-    }
-    
     const std::string configurationFile = getArgDefault(argc, argv, configurationArg, "");
     const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
 
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
                     {
                         configFileName = configurationFile.substr(configurationFile.find_last_of("/\\") + 1);
                     }
-                    std::cout << "[info] Be aware that argument given with " << *conflictualArgument 
+                    std::cout << "[info] Be aware that argument given with " << *conflictualArgument
                               << " can be overwritten by a different value defined in the given configuration file "
                               << configFileName << std::endl;
                 }
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
         auto logger = participant->GetLogger();
 
         logger->Info("Creating ethernet controller '" + ethernetControllerName + "'");
-        auto* ethController = participant->CreateEthernetController(ethernetControllerName,ethernetNetworkName);
+        auto* ethController = participant->CreateEthernetController(ethernetControllerName, ethernetNetworkName);
 
         const auto onReceiveEthernetFrameFromTapDevice = [&logger, ethController](std::vector<std::uint8_t> data) {
             if (data.size() < 60)
@@ -117,10 +117,11 @@ int main(int argc, char** argv)
             }
             const auto frameSize = data.size();
             static intptr_t transmitId = 0;
-            ethController->SendFrame(EthernetFrame{std::move(data)}, reinterpret_cast < void * >(++transmitId));
+            ethController->SendFrame(EthernetFrame{std::move(data)}, reinterpret_cast<void*>(++transmitId));
 
             std::ostringstream SILKitDebugMessage;
-            SILKitDebugMessage << "TAP device >> SIL Kit: Ethernet frame (" << frameSize << " bytes, txId=" << transmitId << ")";
+            SILKitDebugMessage << "TAP device >> SIL Kit: Ethernet frame (" << frameSize
+                               << " bytes, txId=" << transmitId << ")";
             logger->Debug(SILKitDebugMessage.str());
         };
 
@@ -163,26 +164,22 @@ int main(int argc, char** argv)
 
         systemMonitor->AddParticipantStatusHandler(
             [&runningStatePromise, participantName](const ParticipantStatus& status) {
-                if (participantName == status.participantName)
+            if (participantName == status.participantName)
+            {
+                if (status.state == ParticipantState::Running)
                 {
-                    if (status.state == ParticipantState::Running)
-                    {
-                        runningStatePromise.set_value();
-                    }
+                    runningStatePromise.set_value();
                 }
-            });
+            }
+        });
 
         // Called during startup
-        lifecycleService->SetCommunicationReadyHandler([&ethController]() {
-            ethController->Activate();
-        });
-        
+        lifecycleService->SetCommunicationReadyHandler([&ethController]() { ethController->Activate(); });
+
         auto finalStateFuture = lifecycleService->StartLifecycle();
 
-        std::thread t([&]() -> void {
-            ioContext.run();
-        });
-        
+        std::thread t([&]() -> void { ioContext.run(); });
+
         promptForExit();
 
         ioContext.stop();
@@ -191,14 +188,15 @@ int main(int argc, char** argv)
         {
             t.join();
         }
-            
+
         auto runningStateFuture = runningStatePromise.get_future();
         auto futureStatus = runningStateFuture.wait_for(15s);
         if (futureStatus != std::future_status::ready)
         {
             std::ostringstream SILKitDebugMessage;
-            SILKitDebugMessage << "Lifecycle Service Stopping: timed out while checking if the participant is currently running.";
-            logger->Debug(SILKitDebugMessage.str());            
+            SILKitDebugMessage
+                << "Lifecycle Service Stopping: timed out while checking if the participant is currently running.";
+            logger->Debug(SILKitDebugMessage.str());
         }
         lifecycleService->Stop("Adapter stopped by the user.");
 
@@ -207,23 +205,23 @@ int main(int argc, char** argv)
         {
             std::ostringstream SILKitDebugMessage;
             SILKitDebugMessage << "Lifecycle service stopping: timed out";
-            logger->Debug(SILKitDebugMessage.str());            
+            logger->Debug(SILKitDebugMessage.str());
         }
     }
     catch (const SilKit::ConfigurationError& error)
     {
-        std::cerr << "Invalid configuration: " << error.what() << std::endl;        
+        std::cerr << "Invalid configuration: " << error.what() << std::endl;
         return CONFIGURATION_ERROR;
     }
     catch (const InvalidCli&)
     {
         adapters::print_help();
-        std::cerr << std::endl << "Invalid command line arguments." << std::endl;        
+        std::cerr << std::endl << "Invalid command line arguments." << std::endl;
         return CLI_ERROR;
     }
     catch (const std::exception& error)
     {
-        std::cerr << "Something went wrong: " << error.what() << std::endl;        
+        std::cerr << "Something went wrong: " << error.what() << std::endl;
         return OTHER_ERROR;
     }
 
