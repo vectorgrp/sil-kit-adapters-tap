@@ -16,7 +16,7 @@ bool thereAreUnknownArguments(int argc, char** argv);
 
 /// <summary>
 /// Prints the help message containing all switches and arguments.
-/// 
+///
 ///   The --help switch will be omitted if the user requested it explicitely.
 /// </summary>
 /// <param name="userRequested">Set this to true to signify the user requested the printing.</param>
@@ -76,12 +76,11 @@ void assertAdditionalIterator(const iterator& it, const container& cont)
 /// <param name="argv">pointer to first char*</param>
 /// <param name="argument">examplar to search</param>
 /// <param name="action">Action to call with strings following each exemplar found in [argv,argv+argc[</param>
-template<typename Action>
+template <typename Action>
 void foreachArgDo(int argc, char** argv, const std::string& argument, const Action& action)
 {
-    for (char** arg = findArgOf(argc, argv, argument, argv); 
-                arg != NULL; 
-                arg = findArgOf(argc, argv, argument, arg + 1))
+    for (char** arg = findArgOf(argc, argv, argument, argv); arg != NULL;
+         arg = findArgOf(argc, argv, argument, arg + 1))
     {
         action(*arg);
     }

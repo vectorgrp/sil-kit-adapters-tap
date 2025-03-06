@@ -11,9 +11,12 @@ std::ostream& operator<<(std::ostream& ostream, const Ip4Protocol& protocol)
 {
     switch (protocol)
     {
-    case demo::Ip4Protocol::ICMP: return ostream << "Ip4Protocol::ICMP";
-    case demo::Ip4Protocol::TCP: return ostream << "Ip4Protocol::TCP";
-    case demo::Ip4Protocol::UDP: return ostream << "Ip4Protocol::UDP";
+    case demo::Ip4Protocol::ICMP:
+        return ostream << "Ip4Protocol::ICMP";
+    case demo::Ip4Protocol::TCP:
+        return ostream << "Ip4Protocol::TCP";
+    case demo::Ip4Protocol::UDP:
+        return ostream << "Ip4Protocol::UDP";
     }
     return ostream << "Ip4Protocol(" << unsigned(ToUnderlying(protocol)) << ")";
 }

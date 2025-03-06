@@ -30,11 +30,11 @@ public:
                   std::function<void(std::vector<std::uint8_t>)> onNewFrameHandler,
                   SilKit::Services::Logging::ILogger* logger);
 
-    template<class container>
+    template <class container>
     auto SendEthernetFrameToTapDevice(const container& data)
     {
         auto sizeSent = _tapDeviceStream.write_some(asio::buffer(data.data(), data.size()));
-        if (data.size() != sizeSent )
+        if (data.size() != sizeSent)
         {
             throw exceptions::InvalidFrameSizeError{};
         }
@@ -85,7 +85,7 @@ private:
     asio::posix::stream_descriptor _tapDeviceStream;
     int _fileDescriptor;
 
-    auto GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int;
+    auto GetTapDeviceFileDescriptor(const char* tapDeviceName) -> int;
 #endif
 };
 

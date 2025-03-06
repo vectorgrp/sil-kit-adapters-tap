@@ -77,5 +77,4 @@ void throwIf(bool b)
 inline auto& throwInvalidCliIf = throwIf<InvalidCli>;
 inline auto& throwInvalidFileDescriptorIf = throwIf<InvalidFileDescriptor>;
 
-} // namespace demo
-
+} // namespace exceptions

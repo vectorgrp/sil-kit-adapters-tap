@@ -18,8 +18,8 @@ using namespace exceptions;
 using namespace adapters;
 
 TapConnection::TapConnection(asio::io_context& io_context, const std::string& tapDevName,
-                  std::function<void(std::vector<std::uint8_t>)> onNewFrameHandler,
-                  SilKit::Services::Logging::ILogger* logger)
+                             std::function<void(std::vector<std::uint8_t>)> onNewFrameHandler,
+                             SilKit::Services::Logging::ILogger* logger)
     : _tapDeviceStream{io_context}
     , _onNewFrameHandler(std::move(onNewFrameHandler))
     , _logger(logger)
@@ -36,38 +36,39 @@ TapConnection::TapConnection(asio::io_context& io_context, const std::string& ta
 
 void TapConnection::ReceiveEthernetFrameFromTapDevice()
 {
-    _tapDeviceStream.async_read_some(
-        asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),
-        [this](const std::error_code ec, const std::size_t bytes_received) {
-            try
+    _tapDeviceStream.async_read_some(asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),
+                                     [this](const std::error_code ec, const std::size_t bytes_received) {
+        try
+        {
+            if (ec)
             {
-                if (ec)
-                {
-                    std::string SILKitErrorMessage = "Unable to receive data from TAP device.\n"
-                                                        "Error code: "+ std::to_string(ec.value()) + " (" + ec.message()+ ")\n"
-                                                        "Error category: " + ec.category().name();
-                    _logger->Error(SILKitErrorMessage);
-                }
-                else
-                {
-                    auto frame_data = std::vector<std::uint8_t>(bytes_received);
-                    asio::buffer_copy(asio::buffer(frame_data),
-                                        asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),
-                                        bytes_received);
-
-                    _onNewFrameHandler(std::move(frame_data));
-                }
-            }
-            catch (const std::exception& ex)
-            {
-                // Handle any exception that might occur
-                std::string SILKitErrorMessage = "Exception occurred: " + std::string(ex.what());
+                // clang-format off
+                std::string SILKitErrorMessage = "Unable to receive data from TAP device.\n"
+                                                 "Error code: "+ std::to_string(ec.value()) + " (" + ec.message()+ ")\n"
+                                                 "Error category: " + ec.category().name();
+                // clang-format on
                 _logger->Error(SILKitErrorMessage);
             }
-            // Continue with the next read
+            else
+            {
+                auto frame_data = std::vector<std::uint8_t>(bytes_received);
+                asio::buffer_copy(asio::buffer(frame_data),
+                                  asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),
+                                  bytes_received);
 
-            ReceiveEthernetFrameFromTapDevice();
-        });
+                _onNewFrameHandler(std::move(frame_data));
+            }
+        }
+        catch (const std::exception& ex)
+        {
+            // Handle any exception that might occur
+            std::string SILKitErrorMessage = "Exception occurred: " + std::string(ex.what());
+            _logger->Error(SILKitErrorMessage);
+        }
+        // Continue with the next read
+
+        ReceiveEthernetFrameFromTapDevice();
+    });
 }
 
 #if WIN32
@@ -77,7 +78,8 @@ TapConnection::~TapConnection()
     SetMediaStatus(_fileDescriptor, 0);
 }
 
-auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& winTapConnection, std::string& errorCmd, LONG& errorCode) -> int
+auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& winTapConnection, std::string& errorCmd,
+                                  LONG& errorCode) -> int
 {
     bool connectionFound = false;
 
@@ -86,7 +88,7 @@ auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& w
         {
             errorCmd = cmd;
             errorCode = resultCode;
-            
+
             return -1;
         }
         return 0;
@@ -94,22 +96,25 @@ auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& w
 
     // Open registry keys
     HKEY adapterKey;
-    LONG rcOpenAdapter = RegOpenKeyExW(HKEY_LOCAL_MACHINE,
-        L"SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318}",
-        0, KEY_READ, &adapterKey);
+    LONG rcOpenAdapter = RegOpenKeyExW(
+        HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Class\\{4D36E972-E325-11CE-BFC1-08002BE10318}", 0,
+        KEY_READ, &adapterKey);
 
-    if (checkCmdResult("RegOpenKeyExW (open adapter)", rcOpenAdapter) == -1) return FILE_DESCRIPTOR_ERROR;
+    if (checkCmdResult("RegOpenKeyExW (open adapter)", rcOpenAdapter) == -1)
+        return FILE_DESCRIPTOR_ERROR;
 
     HKEY connectionKey;
-    LONG rcOpenConnection = RegOpenKeyExW(HKEY_LOCAL_MACHINE,
-        L"SYSTEM\\CurrentControlSet\\Control\\Network\\{4D36E972-E325-11CE-BFC1-08002BE10318}",
-        0, KEY_READ, &connectionKey);
+    LONG rcOpenConnection = RegOpenKeyExW(
+        HKEY_LOCAL_MACHINE, L"SYSTEM\\CurrentControlSet\\Control\\Network\\{4D36E972-E325-11CE-BFC1-08002BE10318}", 0,
+        KEY_READ, &connectionKey);
 
-    if (checkCmdResult("RegOpenKeyExW (open connection)", rcOpenConnection) == -1) return FILE_DESCRIPTOR_ERROR;
+    if (checkCmdResult("RegOpenKeyExW (open connection)", rcOpenConnection) == -1)
+        return FILE_DESCRIPTOR_ERROR;
 
     DWORD numberOfSubKeys = 0;
     {
-        LONG rcQuery = RegQueryInfoKey(adapterKey, nullptr, nullptr, nullptr, &numberOfSubKeys, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+        LONG rcQuery = RegQueryInfoKey(adapterKey, nullptr, nullptr, nullptr, &numberOfSubKeys, nullptr, nullptr,
+                                       nullptr, nullptr, nullptr, nullptr, nullptr);
         if (rcQuery != ERROR_SUCCESS)
         {
             numberOfSubKeys = 0;
@@ -122,16 +127,20 @@ auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& w
         bool isTap = false;
         wchar_t adapterSubkey[256];
         DWORD keyNameSize = sizeof(adapterSubkey);
-        LONG rcEnumKey = RegEnumKeyExW(adapterKey, keyIndex, adapterSubkey, &keyNameSize, nullptr, nullptr, nullptr, nullptr);
+        LONG rcEnumKey =
+            RegEnumKeyExW(adapterKey, keyIndex, adapterSubkey, &keyNameSize, nullptr, nullptr, nullptr, nullptr);
 
-        if (checkCmdResult("RegEnumKeyExW", rcEnumKey) == -1) return FILE_DESCRIPTOR_ERROR;
+        if (checkCmdResult("RegEnumKeyExW", rcEnumKey) == -1)
+            return FILE_DESCRIPTOR_ERROR;
 
         wchar_t value[1024];
-        DWORD  valueSize = sizeof(value);
+        DWORD valueSize = sizeof(value);
         DWORD valueType;
-        LONG rcGetValue = RegGetValueW(adapterKey, adapterSubkey, L"ComponentId", RRF_RT_REG_SZ, &valueType, value, &valueSize);
+        LONG rcGetValue =
+            RegGetValueW(adapterKey, adapterSubkey, L"ComponentId", RRF_RT_REG_SZ, &valueType, value, &valueSize);
 
-        if (checkCmdResult("RegGetValueW (ComponentId)", rcGetValue) == -1) return FILE_DESCRIPTOR_ERROR;
+        if (checkCmdResult("RegGetValueW (ComponentId)", rcGetValue) == -1)
+            return FILE_DESCRIPTOR_ERROR;
 
         // The Windows TAP are installed with the devcon.exe tool by specifying the hardware ID tap0901
         if (wcscmp(value, L"tap0901") == 0)
@@ -142,29 +151,35 @@ auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& w
         if (isTap)
         {
             wchar_t netCfgInstanceId[1024];
-            DWORD  value1Size = sizeof(netCfgInstanceId);
+            DWORD value1Size = sizeof(netCfgInstanceId);
             DWORD value1Type;
-            LONG rcGetValue1 = RegGetValueW(adapterKey, adapterSubkey, L"NetCfgInstanceId", RRF_RT_REG_SZ, &value1Type, netCfgInstanceId, &value1Size);
+            LONG rcGetValue1 = RegGetValueW(adapterKey, adapterSubkey, L"NetCfgInstanceId", RRF_RT_REG_SZ, &value1Type,
+                                            netCfgInstanceId, &value1Size);
 
-            if (checkCmdResult("RegGetValueW (NetCfgInstanceIdp)", rcGetValue1) == -1) return FILE_DESCRIPTOR_ERROR;
+            if (checkCmdResult("RegGetValueW (NetCfgInstanceIdp)", rcGetValue1) == -1)
+                return FILE_DESCRIPTOR_ERROR;
 
             wchar_t deviceInstanceID[1024];
-            DWORD  value2Size = sizeof(deviceInstanceID);
+            DWORD value2Size = sizeof(deviceInstanceID);
             DWORD value2Type;
-            LONG rcGetValue2 = RegGetValueW(adapterKey, adapterSubkey, L"DeviceInstanceID", RRF_RT_REG_SZ, &value2Type, deviceInstanceID, &value2Size);
+            LONG rcGetValue2 = RegGetValueW(adapterKey, adapterSubkey, L"DeviceInstanceID", RRF_RT_REG_SZ, &value2Type,
+                                            deviceInstanceID, &value2Size);
 
-            if (checkCmdResult("RegGetValueW (DeviceInstanceID)", rcGetValue2) == -1) return FILE_DESCRIPTOR_ERROR;
+            if (checkCmdResult("RegGetValueW (DeviceInstanceID)", rcGetValue2) == -1)
+                return FILE_DESCRIPTOR_ERROR;
 
             wchar_t connectionSubKey[1024];
             wcscpy_s(connectionSubKey, 1024, netCfgInstanceId);
             wcscat_s(connectionSubKey, 1024, L"\\Connection");
 
             wchar_t connectionName[1024];
-            DWORD  value3Size = sizeof(connectionName);
+            DWORD value3Size = sizeof(connectionName);
             DWORD value3Type;
-            LONG rcGetValue3 = RegGetValueW(connectionKey, connectionSubKey, L"Name", RRF_RT_REG_SZ, &value3Type, connectionName, &value3Size);
+            LONG rcGetValue3 = RegGetValueW(connectionKey, connectionSubKey, L"Name", RRF_RT_REG_SZ, &value3Type,
+                                            connectionName, &value3Size);
 
-            if (checkCmdResult("RegGetValueW (Name)", rcGetValue3) == -1) return FILE_DESCRIPTOR_ERROR;
+            if (checkCmdResult("RegGetValueW (Name)", rcGetValue3) == -1)
+                return FILE_DESCRIPTOR_ERROR;
 
             if (connectionName == ToWString(tapDeviceName))
             {
@@ -204,7 +219,8 @@ auto TapConnection::SetMediaStatus(HANDLE hDevice, uint32_t status) -> bool
     DWORD len;
     OVERLAPPED overlapped;
     memset(&overlapped, 0, sizeof(overlapped));
-    BOOL rcControl = DeviceIoControl(hDevice, dwIoControlCode, &status, sizeof(status), &status, sizeof(len), &len, &overlapped);
+    BOOL rcControl =
+        DeviceIoControl(hDevice, dwIoControlCode, &status, sizeof(status), &status, sizeof(len), &len, &overlapped);
     if (rcControl != 0)
     {
         return true;
@@ -249,11 +265,10 @@ auto TapConnection::ToWString(const char* str) const -> std::wstring
 auto TapConnection::ToString(const std::wstring& wstring) const -> std::string
 {
     std::string str;
-    std::transform(wstring.begin(), wstring.end(), std::back_inserter(str), [](wchar_t c) {
-        return static_cast<char>(c);
-    });
+    std::transform(wstring.begin(), wstring.end(), std::back_inserter(str),
+                   [](wchar_t c) { return static_cast<char>(c); });
     return str;
-}   
+}
 
 auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> HANDLE
 {
@@ -299,8 +314,8 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> HAN
         }
         else
         {
-            _logger->Error("Failed to enable network media of TAP adapter " + std::string(tapDeviceName) + ". The adapter typically remains in "
-                            "state 'unconnected'.");
+            _logger->Error("Failed to enable network media of TAP adapter " + std::string(tapDeviceName)
+                           + ". The adapter typically remains in state 'unconnected'.");
             return nullptr;
         }
     }
@@ -309,13 +324,14 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> HAN
 }
 
 #else // UNIX
-auto TapConnection::GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int
+auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> int
 {
     // Check if tapDeviceName is null, empty, or too long, IFNAMSIZ is a constant that defines the maximum possible buffer size for an interface name (including its terminating zero byte)
     if (tapDeviceName == nullptr || strlen(tapDeviceName) >= IFNAMSIZ)
     {
         _logger->Error("Invalid TAP device name used for [--tap-name] arg.\n"
-                       "(Hint): Ensure that the name provided is within a valid length between (1 and " + std::to_string(IFNAMSIZ - 1) + ") characters.");
+                       "(Hint): Ensure that the name provided is within a valid length between (1 and "
+                       + std::to_string(IFNAMSIZ - 1) + ") characters.");
         return FILE_DESCRIPTOR_ERROR;
     }
 
@@ -328,11 +344,12 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int
 #endif
 
     // Check if tapDeviceName exists in the list of all network interfaces
-    if ((access(pathToTapDevice.str().c_str(), F_OK) != 0) )
+    if ((access(pathToTapDevice.str().c_str(), F_OK) != 0))
     {
         int ioctlError = errno;
-        _logger->Error("Failed to execute IOCTL system call with error code: " + std::to_string(ioctlError) + extractErrorMessage(ioctlError) +
-                       "\n(Hint): Ensure that the network interface \"" + std::string(tapDeviceName) + "\" specified in [--tap-name] exists and is operational.");
+        _logger->Error("Failed to execute IOCTL system call with error code: " + std::to_string(ioctlError)
+                       + extractErrorMessage(ioctlError) + "\n(Hint): Ensure that the network interface \""
+                       + std::string(tapDeviceName) + "\" specified in [--tap-name] exists and is operational.");
         return FILE_DESCRIPTOR_ERROR;
     }
 
@@ -344,14 +361,15 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int
 #endif
     {
         int fdError = errno;
-        _logger->Error("File descriptor openning failed with error code: " + std::to_string(fdError) + extractErrorMessage(fdError));
+        _logger->Error("File descriptor openning failed with error code: " + std::to_string(fdError)
+                       + extractErrorMessage(fdError));
         return FILE_DESCRIPTOR_ERROR;
     }
 
     struct ifreq ifr;
     memset(&ifr, 0, sizeof(ifr));
-    strncpy(ifr.ifr_name, tapDeviceName, IFNAMSIZ-1);
-    ifr.ifr_name[IFNAMSIZ-1] = '\0';
+    strncpy(ifr.ifr_name, tapDeviceName, IFNAMSIZ - 1);
+    ifr.ifr_name[IFNAMSIZ - 1] = '\0';
 
 #if defined(__linux__)
     // Linux only
@@ -359,7 +377,8 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int
     if (ioctl(tapFileDescriptor, TUNSETIFF, reinterpret_cast<void*>(&ifr)) < 0)
     {
         int fdError = errno;
-        _logger->Error("Failed to set TUNSETIFF flag to the TAP device: " + std::to_string(fdError) + extractErrorMessage(fdError));
+        _logger->Error("Failed to set TUNSETIFF flag to the TAP device: " + std::to_string(fdError)
+                       + extractErrorMessage(fdError));
         close(tapFileDescriptor);
         return FILE_DESCRIPTOR_ERROR;
     }
@@ -369,10 +388,11 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int
 
     // Check if tapDeviceName is up or down when starting the adapter
     int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    if (sockfd < 0) 
+    if (sockfd < 0)
     {
         int ioctlError = errno;
-        _logger->Error("Failed to create a socket to perform IOCTL call on TAP device with error code: " + std::to_string(ioctlError) + extractErrorMessage(ioctlError));
+        _logger->Error("Failed to create a socket to perform IOCTL call on TAP device with error code: "
+                       + std::to_string(ioctlError) + extractErrorMessage(ioctlError));
         close(tapFileDescriptor);
         return OTHER_ERROR;
     }
@@ -381,8 +401,9 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char *tapDeviceName) -> int
     if (ioctl(sockfd, SIOCGIFFLAGS, &ifr) < 0)
     {
         int ioctlError = errno;
-        _logger->Error("Failed to execute IOCTL system call with error code: " + std::to_string(ioctlError) + extractErrorMessage(ioctlError) +
-                       "\n(Hint): Ensure that the network interface \"" + std::string(tapDeviceName) + "\" specified in [--tap-name] exists and is operational.");
+        _logger->Error("Failed to execute IOCTL system call with error code: " + std::to_string(ioctlError)
+                       + extractErrorMessage(ioctlError) + "\n(Hint): Ensure that the network interface \""
+                       + std::string(tapDeviceName) + "\" specified in [--tap-name] exists and is operational.");
         close(tapFileDescriptor);
         return OTHER_ERROR;
     }

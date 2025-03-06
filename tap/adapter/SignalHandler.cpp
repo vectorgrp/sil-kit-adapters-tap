@@ -36,7 +36,7 @@ static std::unique_ptr<SignalMonitor> gSignalMonitor;
 // Inline Platform Specific Implementations
 ////////////////////////////////////////////
 #if WIN32
-#    include <windows.h>
+#include <windows.h>
 
 namespace {
 
@@ -113,11 +113,11 @@ BOOL WINAPI systemHandler(DWORD ctrlType)
 
 #else //UNIX
 
-#    include <csignal>
-#    include <cstring>
-#    include <cerrno>
-#    include <fcntl.h>
-#    include <unistd.h>
+#include <csignal>
+#include <cstring>
+#include <cerrno>
+#include <fcntl.h>
+#include <unistd.h>
 
 namespace {
 

@@ -15,4 +15,4 @@ enum ReturnCode
     OTHER_ERROR,
     FILE_DESCRIPTOR_ERROR = -1
 };
-}
+} // namespace adapters

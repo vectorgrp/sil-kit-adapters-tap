@@ -25,9 +25,15 @@ public:
     {
     }
 
-    [[nodiscard]] auto GetOffset() const -> std::size_t { return _offset; }
+    [[nodiscard]] auto GetOffset() const -> std::size_t
+    {
+        return _offset;
+    }
 
-    [[nodiscard]] auto GetChecksum() const -> std::uint16_t { return _checksum.GetChecksum(); }
+    [[nodiscard]] auto GetChecksum() const -> std::uint16_t
+    {
+        return _checksum.GetChecksum();
+    }
 
     auto Skip(const std::size_t byteCount) -> std::size_t
     {

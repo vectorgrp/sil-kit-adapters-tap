@@ -11,8 +11,10 @@ std::ostream& operator<<(std::ostream& ostream, const Icmp4Type& icmp4Type)
 {
     switch (icmp4Type)
     {
-    case demo::Icmp4Type::EchoReply: return ostream << "Icmp4Type::EchoReply";
-    case demo::Icmp4Type::EchoRequest: return ostream << "Icmp4Type::EchoRequest";
+    case demo::Icmp4Type::EchoReply:
+        return ostream << "Icmp4Type::EchoReply";
+    case demo::Icmp4Type::EchoRequest:
+        return ostream << "Icmp4Type::EchoRequest";
     }
     return ostream << "Icmp4Type(" << unsigned(ToUnderlying(icmp4Type)) << ")";
 }

@@ -66,7 +66,10 @@ private:
         }
     }
 
-    void AddPair(const std::uint8_t a, const std::uint8_t b) { _accumulator += (a << 8u) | b; }
+    void AddPair(const std::uint8_t a, const std::uint8_t b)
+    {
+        _accumulator += (a << 8u) | b;
+    }
 
 private:
     std::uint64_t _accumulator = 0;

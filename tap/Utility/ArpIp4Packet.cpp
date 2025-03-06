@@ -11,8 +11,10 @@ std::ostream& operator<<(std::ostream& ostream, const ArpOperation& arpOperation
 {
     switch (arpOperation)
     {
-    case demo::ArpOperation::Request: return ostream << "ArpOperation::Request";
-    case demo::ArpOperation::Reply: return ostream << "ArpOperation::Reply";
+    case demo::ArpOperation::Request:
+        return ostream << "ArpOperation::Request";
+    case demo::ArpOperation::Reply:
+        return ostream << "ArpOperation::Reply";
     }
     return ostream << "ArpOperation(" << ToUnderlying(arpOperation) << ")";
 }

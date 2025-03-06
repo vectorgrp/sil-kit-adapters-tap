@@ -35,7 +35,6 @@ namespace demo {
 
 class Device
 {
-
 public:
     Device(EthernetAddress ethernetAddress, Ip4Address ip4Address, SilKit::Services::Logging::ILogger* logger,
            std::function<void(std::vector<std::uint8_t>)> sendFrameCallback)
@@ -50,7 +49,10 @@ public:
     void Process(asio::const_buffer incomingData);
 
 public:
-    std::vector<std::uint8_t> AllocateBuffer(std::size_t size) { return std::vector<std::uint8_t>(size); }
+    std::vector<std::uint8_t> AllocateBuffer(std::size_t size)
+    {
+        return std::vector<std::uint8_t>(size);
+    }
 
 private:
     EthernetAddress _ethernetAddress;
