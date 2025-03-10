@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Download the package
         id: download-pkg
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
       - name: Get the .deb file path
         run: |
           dir_path=$(find . -maxdepth 2 -name "sil-kit-adapter-tap_*.deb")
