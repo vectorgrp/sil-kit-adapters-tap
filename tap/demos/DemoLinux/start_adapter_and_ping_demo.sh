@@ -13,11 +13,15 @@ fi
 logDir=$scriptDir/../CANoe4SW_SE/logs # define a directory for .out files
 mkdir -p $logDir # if it does not exist, create it
 
+# path to the fifo
+fifoPath="/data/local"
+mkdir -p $fifoPath
+
 child_processes=""
 
 # cleanup function called on exit
 cleanup() {
-  echo $child_processes | xargs kill
+  echo $child_processes | xargs kill > /dev/null 2>&1
   
   if ip netns list | grep -q tap_demo_ns; then
     ip netns delete tap_demo_ns
@@ -25,7 +29,7 @@ cleanup() {
 
   ip tuntap del dev silkit_tap mode tap
 
-  rm -f "$scriptDir/temp_fifo"
+  rm -f "$fifoPath/temp_fifo"
 }
 
 # cleanup trap 
@@ -46,11 +50,11 @@ child_processes="$child_processes $!"
 
 sleep 1 # wait 1 second for the creation/existense of the .out file
 
-mkfifo "$scriptDir/temp_fifo"
+mkfifo "$fifoPath/temp_fifo"
 
-tail -n +1 -f "$logDir/sil-kit-adapter-tap.out" > "$scriptDir/temp_fifo" &
+tail -n +1 -f "$logDir/sil-kit-adapter-tap.out" > "$fifoPath/temp_fifo" &
 
-timeout 30s grep -q 'Press CTRL + C to stop the process...' "$scriptDir/temp_fifo" || { echo "[error] Timeout reached while waiting for sil-kit-adapter-tap to start"; exit 1; }
+timeout --foreground 30s grep -q 'Press CTRL + C to stop the process...' "$fifoPath/temp_fifo" || { echo "[error] Timeout reached while waiting for sil-kit-adapter-tap to start"; exit 1; }
 echo "[info] sil-kit-adapter-tap has been started"
 
 # Hint: It is important to establish the connection to the the adapter before moving the tap device to its separate namespace
