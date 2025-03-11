@@ -9,7 +9,7 @@ silkit_registry_path=$(find . -name sil-kit-registry -executable -print -quit)
 
 if [ -n "$silkit_registry_path" ]; then
     echo "[Info] Found sil-kit-registry at: $silkit_registry_path, launching it..."
-    "$silkit_registry_path" --listen-uri silkit://0.0.0.0:8501 -s
+    "$silkit_registry_path" --listen-uri silkit://0.0.0.0:8501
 else
   # Use find to search for downloaded SILKit zip file and store the result in zip_file_path
   zip_file_path=$(find . -type f -name "*SilKit*.zip" -print -quit)
