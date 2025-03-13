@@ -2,6 +2,12 @@
 # SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
 # SPDX-License-Identifier: MIT
 
+# check if user is root
+if [[ $EUID -ne 0 ]]; then
+    echo "This script must be run as root / via sudo!"
+    exit 1
+fi
+
 script_root=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Set a default path for canoe4sw-se installation directory
