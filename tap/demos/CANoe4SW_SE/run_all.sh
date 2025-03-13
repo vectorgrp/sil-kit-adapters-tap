@@ -25,6 +25,8 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
+touch $logDir/sil-kit-registry.out $logDir/start_adapter_and_ping_demo.out $logDir/sil-kit-demo-ethernet-icmp-echo-device.out
+
 $silKitDir/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501' &> $logDir/sil-kit-registry.out &
 sleep 1 # wait 1 second for the creation/existense of the .out file
 timeout 30s grep -q 'Press Ctrl-C to terminate...' <(tail ---disable-inotify -f $logDir/sil-kit-registry.out -n +1) || { echo "[error] Timeout reached while waiting for sil-kit-registry to start"; exit 1; }
