@@ -1,4 +1,4 @@
-## Create CANoe configuration (CANoe 18 and newer)
+## Create CANoe configuration
 
 Create a new CANoe configuration based on the template `Ethernet (Application Objects)`.
 

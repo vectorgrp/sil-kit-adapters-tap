@@ -29,12 +29,12 @@ EthernetControllers:
 
 ## SIL Kit Channel Mapping
 
-In a last configuration step, the simulation and channel settings need to be adapted in CANoe. First change the simulation mode to `Real Bus`.
+In a last configuration step, the simulation and channel settings need to be adapted in CANoe. 
+
+**Only applies to CANoe 18**: First change the simulation mode to `Real Bus` to being able to alter the channel settings.
 
 ![Switch simulation mode to real bus](../images/SwitchToRealBus.png)  
 
 Now switch to the `Hardware` tab and click on `Channel Mapping`. In this window one Ethernet channel should be shown. In the dropdown menu for the option `Hardware` set the value to `SIL Kit`.
 
-![SIL Kit channel mapping](../images/ChannelMapping.png)  
-
-After you changed the mapping you can switch back to `Simulated Bus (animated with factor=1)` again.
+![SIL Kit channel mapping](../images/ChannelMapping.png)

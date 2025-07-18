@@ -1,6 +1,6 @@
 # From MICROSAR Adaptive delivery to simulation with CANoe
 
-This document will guide you on how to use CANoe as a test tool for an Adaptive application, that is built based on a MICROSAR Adaptive BSW Package. A MICROSAR Adaptive delivery contains some examples. We will use one of these examples that is called *start application*. Connect it to CANoe and simulate parts of it with its toolbox. These instructions are written based on an Adaptive MICROSAR stack version r8.00.02 (D94) interacting with CANoe 17 and CANoe 18. With every newer release of the Adaptive stack or CANoe, there might be deviations from this guide, though it shall be possible to adapt the commands with the user guides provided with the tools.  
+This document will guide you on how to use CANoe as a test tool for an Adaptive application, that is built based on a MICROSAR Adaptive BSW Package. A MICROSAR Adaptive delivery contains some examples. We will use one of these examples that is called *start application*. Connect it to CANoe and simulate parts of it with its toolbox. These instructions are written based on an Adaptive MICROSAR stack version r8.00.02 (D94) interacting with CANoe 18 and CANoe 19. With every newer release of the Adaptive stack or CANoe, there might be deviations from this guide, though it shall be possible to adapt the commands with the user guides provided with the tools.  
 The *start application* contains one Adaptive machine with multiple executables. It does not realize an automotive user story, but uses all relevant parts of an Adaptive application with comprehensive names. It consists of several use cases. In this guide, we will focus on the Communication Management use case (StartApplicationCmClient1 and StartApplicationCmServer1).
 
 It relies on the SomeIP Daemon that is part of the delivery. Communication in between the executables is realized with SomeIP and IPC. The original *start application* may use the execution manager and also contains some python scripts to trigger the single executables.
@@ -137,22 +137,30 @@ At this point, the server executable can be started in the Linux system. For the
 
 ![Errors due to missing execution manager](images/errors_missing_em.png)
 
-## Setup CANoe as a client tester and SIL Kit participant
-Finally it is time to setup a CANoe configuration as a SIL Kit participant which serves as a client mockup for our server application under tests. Depending on the CANoe version there are different workflows available to achieve this. The details for the individual workflows are listed in the sections below.
+## Setup CANoe (CANoe 18 and newer) as a client tester and SIL Kit participant
+Finally it is time to setup a CANoe configuration as a SIL Kit participant which serves as a client mockup for our server application under test.
 
-**Important Hint:** What is common for both workflows is that you have to leave out the .arxml files which belong to the client executable when using the AUTOSAR Preprocessor in CANoe to merge the system descriptions. Otherwise the client mockup can not be created. In this particular demo this will be the following selected files to omit:
+You have to leave out the information which belong to the client executable when using the AUTOSAR Preprocessor in CANoe to merge the system descriptions. Otherwise the client mockup can not be created. There are two common options to achieve this.
+
+**Option 1:** This option works for all recent CANoe and AUTOSAR Preprocessor versions. You just have to leave out the arxml files which contain the information of the executable you want to have covered by CANoe. In this particular demo the following selected files have to be omitted:
 
 ![Client .arxml files to omit](images/start_app_client_arxml_files.png)
 
+**Option 2:** With CANoe 19 and newer (including AUTOSAR preprocessor version >= 11.0.33) alternatively executables can be removed via their short name in an arxml file with the `RemoveExecutablePatch` applied as a Custom Patch. The default paths are `C:\Program Files\Vector AUTOSAR Preprocessor\CustomPatches\Vector\R20-11\RemoveExecutable\Vector.RemoveExecutable.dll` and `C:\ProgramData\Vector\AUTOSAR Preprocessor\Vector\R20-11\RemoveExecutable\RemoveExecutableTemplate.yaml`.
 
-### CANoe Simulation Setup workflow (CANoe 18 and newer)
-The step-by-step instructions in this section showcase the more modern approach via the [CANoe Simulation Setup and Distributed Objects.](readme-sub-sections/interaction_with_CANoe18_and_DOs.md)
+Specify the executable you want to remove, such as `startapp_cm_client1`, in the `RemoveExecutablePatch` yaml file (see template yaml file) as follows:
 
-### CANoe Communication Setup workflow (CANoe 17 and newer)
-The step-by-step instructions in this section showcase the legacy workflow via the [CANoe Communication Setup and Communication Objects.](readme-sub-sections/interaction_with_CANoe17_and_COs.md)
+![RemoveExecutablePatch yaml file](images/remove_executable_yaml.png)
 
-### CANoe common SIL Kit configuration steps
-The step-by-step instructions in [this section](readme-sub-sections/interaction_with_CANoe_common_steps.md) apply to both workflows showcased above.
+In the AUTOSAR Preprocessor `RemoveExecutablePatch` and `Vector.GenerateVectorSimulationNode` must be added as custom patches to remove the specified executables and generate the necessary elements for the remaining bus simulation. Be aware that you have to deselect the default generation of elements for the remaining bus simulation:
+
+![Apply Custom Patches](images/apply_custom_patches.png)
+
+### CANoe Simulation Setup
+The step-by-step instructions in [this section](readme-sub-sections/interaction_with_CANoe_and_DOs.md) showcase what has to be done to setup the CANoe Simulation Setup.
+
+### CANoe SIL Kit configuration steps
+The step-by-step instructions in [this section](readme-sub-sections/interaction_with_CANoe_and_SIL_Kit.md) showcase what has to be done to setup CANoe as a SIL Kit participant.
 
 ### Start the simulation in CANoe
 
