@@ -159,6 +159,7 @@ install(
         PATTERN *.cfg
         PATTERN *.md
         PATTERN *.png
+        PATTERN *.1
         PATTERN Dockerfile
         PATTERN CMakeLists.txt
 
