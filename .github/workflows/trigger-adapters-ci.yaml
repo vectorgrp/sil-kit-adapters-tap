@@ -1,12 +1,17 @@
 name: trigger sil-kit-adapters-ci
 on:
+  workflow_dispatch:
   pull_request:
     types: [opened, reopened, synchronize]
 
 jobs:
-  call-check-licenses-workflow:
+  trigger-adapters-ci:
     uses: pnd/sil-kit-adapters-ci-testing/.github/workflows/sil-kit-adapters-ci.yaml@main
     with:
       repository_under_test : ${{ github.repository }}
       branch_under_test: ${{ github.event.pull_request.head.ref }}
+      linux_scripts: |
+        tap/demos/CANoe4SW_SE/run_all.sh
+      windows_scripts: |
+        tap/demos/CANoe4SW_SE/run_all.ps1
     secrets: inherit
