@@ -1,132 +1,51 @@
 # SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
 # SPDX-License-Identifier: MIT
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.13)
 
 project(VectorSilKitAdapterTap)
-include(FetchContent)
 
-option(ENABLE_ASAN "Enable -f sanitize=address for builds (requires gcc, clang,  VS2019)" OFF)
-option(ENABLE_UBSAN "Enable -f sanitize=undefined for builds (requires gcc, clang)" OFF)
-option(ENABLE_THREADSAN "Enable -f sanitize=thread for builds (requires gcc, clang)" OFF)
 option(BUILD_LINUX_PACKAGE "Creates a SIL Kit Adapter TAP build suitable for package managers in Linux Distributions (.deb)" OFF)
 
 if(BUILD_LINUX_PACKAGE)
     add_subdirectory(docs/man)
 endif()
 
-set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
-
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-set(CMAKE_CXX_STANDARD 17)
+include(common/cmake/RepoTargets.cmake)
+include(common/cmake/Building.cmake)
 
 set(SILKIT_ADAPTER_TAP_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 set(SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 
-
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
-include(SilKitAdapterVersion)
+
+include(${CMAKE_CURRENT_LIST_DIR}/cmake/SilKitAdapterVersion.cmake)
 configure_silkit_adapter_version(${PROJECT_NAME})
 
 add_definitions(-DSILKIT_ADAPTER_VERSION="${PROJECT_VERSION}")
 
-set(SILKIT_VERSION "4.0.55" CACHE STRING "If no SIL Kit package is specified, this version will be downloaded")
-set(SILKIT_FLAVOR "ubuntu-18.04-x86_64-gcc" CACHE STRING "If no SIL Kit package is specified, this package flavor will be downloaded")
-
-find_package(Threads REQUIRED)
-add_library(asio INTERFACE)
-target_include_directories(asio INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/third_party/asio/asio/include)
-target_compile_definitions(asio INTERFACE ASIO_STANDALONE=1)
-target_link_libraries(asio INTERFACE Threads::Threads)
-
 if (WIN32)
-    # set the default install paths for Windows 32 and 64 bits
-    if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-        set(CMAKE_INSTALL_PREFIX "C:/Program Files/Vector SIL Kit Adapter TAP ${PROJECT_VERSION}" CACHE PATH "Default install path" FORCE)
-    elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-        set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Vector SIL Kit Adapter TAP ${PROJECT_VERSION}" CACHE PATH "Default install path" FORCE)
-    endif()
-    
+    if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+        # set the default install paths for Windows 32 and 64 bits
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            set(CMAKE_INSTALL_PREFIX "C:/Program Files/Vector SIL Kit Adapter TAP ${PROJECT_VERSION}" CACHE PATH "Default install path" FORCE)
+        elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+            set(CMAKE_INSTALL_PREFIX "C:/Program Files (x86)/Vector SIL Kit Adapter TAP ${PROJECT_VERSION}" CACHE PATH "Default install path" FORCE)
+        endif()
+    endif(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+
     target_compile_definitions(asio INTERFACE _SILENCE_CXX17_ALLOCATOR_VOID_DEPRECATION_WARNING=1)
     target_compile_definitions(asio INTERFACE WINVER=0x0601 _WIN32_WINNT=0x0601) # Windows 7
 
-    # Set SIL Kit lib name
-    set(SILKIT_DLL_NAME $<IF:$<CONFIG:Release>,SilKit.dll,SilKitd.dll>)
-    set(SILKIT_LIB_NAME $<IF:$<CONFIG:Release>,SilKit.lib,SilKitd.lib>)
-else()
-    # Set SIL Kit lib name
-    if(CMAKE_BUILD_TYPE STREQUAL "Release")
-        set(SILKIT_SO_NAME "libSilKit.so")
-    else() # Debug or RelWithDebInfo
-        set(SILKIT_SO_NAME "libSilKitd.so")
-    endif()
 endif()
 
-if(DEFINED SILKIT_PACKAGE_DIR)
-    # if the user forces using a specific SIL Kit package, use it
-	message(STATUS "SILKIT_PACKAGE_DIR has been set to: ${SILKIT_PACKAGE_DIR}, CMake will look for a SIL Kit package in that directory")
-    find_package(SilKit 4.0.40
-        REQUIRED
-        CONFIG
-        NO_CMAKE_PACKAGE_REGISTRY
-        NO_DEFAULT_PATH
-        PATHS "${SILKIT_PACKAGE_DIR}"
-    )
-else()
-# otherwise, look for an installed version of SIL Kit
-    message(STATUS "SILKIT_PACKAGE_DIR has not been set by user. Attempting to find an installed version of SIL Kit")
-    find_package(SilKit 4.0.40
-        CONFIG
-    )
-    
-    if(NOT SilKit_FOUND)
-	# if installed SIL Kit is not found, fetch it from github.com
-		message(STATUS "No installed version of SIL Kit was found. Attempting to fetch [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}] from github.com")
-        FetchContent_Declare(
-            silkit
-            URL https://github.com/vectorgrp/sil-kit/releases/download/v${SILKIT_VERSION}/SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}.zip
-            DOWNLOAD_DIR ${CMAKE_CURRENT_LIST_DIR}/Downloads
-        )
-
-        message(STATUS "SIL Kit: fetching [SilKit-${SILKIT_VERSION}-${SILKIT_FLAVOR}]")
-        FetchContent_MakeAvailable(silkit)
-
-        set(SILKIT_SOURCE_DIR ${silkit_SOURCE_DIR}/SilKit-Source)
-        message(STATUS "SIL Kit: using source code from: \"${SILKIT_SOURCE_DIR}\"")
-        message(STATUS "SIL Kit: using pre-built binaries from: ${silkit_SOURCE_DIR}")
-
-        message(STATUS "Searching SilKit package which has been fetched from github.com")
-        find_package(SilKit 4.0.40
-            REQUIRED
-            CONFIG
-            NO_CMAKE_PACKAGE_REGISTRY
-            NO_DEFAULT_PATH
-            PATHS "${silkit_SOURCE_DIR}"
-        )
-    endif()
-endif()
-
-if(TARGET SilKit::SilKit)
-	message(STATUS "SIL Kit package has been successfully imported as a CMake target. [version : ${SilKit_VERSION}]")
-else()
-	message(FATAL_ERROR "Something went wrong : Could not find SIL Kit package.")
-endif()
-
-
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
-include(BuildSettings)
 enable_address_sanitizer(${ENABLE_ASAN})
 enable_undefined_sanitizer(${ENABLE_UBSAN})
 enable_thread_sanitizer(${ENABLE_THREADSAN})
 
-if(NOT DEFINED PACKAGE_FILENAME_SUFFIX)
-    set(PACKAGE_FILENAME_SUFFIX "-${PROJECT_VERSION}")
-endif()
-
-add_subdirectory(tap/Utility)
 add_subdirectory(tap/adapter)
 add_subdirectory(tap/demos)
+add_subdirectory(tap/Utility)
 
 ################################################################################
 # Distribution of the source code and binaries
@@ -135,186 +54,62 @@ add_subdirectory(tap/demos)
 # Copy all files from the source and bin directory to the proper destination
 # Leave out git repo related data
 
-install(
-    DIRECTORY            
-        ${CMAKE_CURRENT_SOURCE_DIR}/tap
-        ${CMAKE_CURRENT_SOURCE_DIR}/adaptive
-        ${CMAKE_CURRENT_SOURCE_DIR}/cmake
-        ${CMAKE_CURRENT_SOURCE_DIR}/docs
-        ${CMAKE_CURRENT_SOURCE_DIR}/.devcontainer
-        ${CMAKE_CURRENT_SOURCE_DIR}/.vscode
-    DESTINATION .
-    COMPONENT source
-    EXCLUDE_FROM_ALL
+include(common/cmake/InstallFunctions.cmake)
 
-    FILES_MATCHING
-        PATTERN *.cpp
-        PATTERN *.hpp
-        PATTERN *.cmake
-        PATTERN *.ps1
-        PATTERN *.sh
-        PATTERN *.json
-        PATTERN *.yaml
-        PATTERN *.can
-        PATTERN *.cfg
-        PATTERN *.md
-        PATTERN *.png
-        PATTERN *.1
-        PATTERN Dockerfile
-        PATTERN CMakeLists.txt
-
-    REGEX "\.git$" EXCLUDE
-    REGEX "\.github$" EXCLUDE
+install_adapter_source(            
+    ${CMAKE_CURRENT_SOURCE_DIR}/tap
+    ${CMAKE_CURRENT_SOURCE_DIR}/common
+    ${CMAKE_CURRENT_SOURCE_DIR}/adaptive
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake
+    ${CMAKE_CURRENT_SOURCE_DIR}/docs
+    ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+    ${CMAKE_CURRENT_SOURCE_DIR}/.devcontainer
+    ${CMAKE_CURRENT_SOURCE_DIR}/.vscode
 )
 
-install(
-    DIRECTORY            
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party
-    DESTINATION .
-    COMPONENT source
-    EXCLUDE_FROM_ALL   
-    REGEX "\.git$" EXCLUDE
-    REGEX "\.github$" EXCLUDE
+install_root_source_files()
+
+install_scripts_to(tap/demos/DemoLinux
+    ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/start_adapter_and_ping_demo.sh
 )
 
-install(
-    FILES            
-        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/start_adapter_and_ping_demo.sh
-    DESTINATION tap/demos/DemoLinux
-    PERMISSIONS
-        OWNER_READ OWNER_WRITE OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE
-    COMPONENT source
-    EXCLUDE_FROM_ALL
+install_scripts_to(tap/demos/DemoLinux/tasks_scripts
+    ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/build_adapter.sh
+    ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/prepare_run_silkit.sh
+    ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/run_IcmpEchoDevice.sh
+    ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/stop_processes.sh
 )
 
-install(
-    FILES            
-        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/build_adapter.sh
-        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/prepare_run_silkit.sh
-        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/run_IcmpEchoDevice.sh
-        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/DemoLinux/tasks_scripts/stop_processes.sh
-    DESTINATION tap/demos/DemoLinux/tasks_scripts
-    PERMISSIONS
-        OWNER_READ OWNER_WRITE OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE
-    COMPONENT source
-    EXCLUDE_FROM_ALL
+install_scripts_to(tap/demos/CANoe4SW_SE
+    ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/CANoe4SW_SE/run.sh
+    ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/CANoe4SW_SE/run_all.sh
 )
 
-
-install(
-    FILES            
-        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/CANoe4SW_SE/run.sh
-        ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/CANoe4SW_SE/run_all.sh
-    DESTINATION tap/demos/CANoe4SW_SE
-    PERMISSIONS
-        OWNER_READ OWNER_WRITE OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE
-    COMPONENT source
-    EXCLUDE_FROM_ALL
-)
-
-install(
-    FILES            
-        ${CMAKE_CURRENT_SOURCE_DIR}/adaptive/helper-scripts/start_app_sil_kit_adapters_setup.sh
-    DESTINATION adaptive/helper-scripts
-    PERMISSIONS
-        OWNER_READ OWNER_WRITE OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE
-    COMPONENT source
-    EXCLUDE_FROM_ALL
-)
-
-install(
-    FILES
-        CMakeLists.txt
-        CMakePresets.json
-        LICENSE
-        README.md
-        SECURITY.md
-        CONTRIBUTING.md
-    DESTINATION .
-    COMPONENT source
-    EXCLUDE_FROM_ALL
+install_scripts_to(adaptive/helper-scripts
+    ${CMAKE_CURRENT_SOURCE_DIR}/adaptive/helper-scripts/start_app_sil_kit_adapters_setup.sh
 )
 
 include(GNUInstallDirs)
 
-if(WIN32)
-    install(
-        FILES
-            ${SILKIT_ADAPTER_TAP_OUTPUT_DIRECTORY}/${SILKIT_DLL_NAME}
-        DESTINATION ${CMAKE_INSTALL_BINDIR}
-        COMPONENT lib
-        EXCLUDE_FROM_ALL
-    )
-    install(
-        FILES
-            ${SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY}/${SILKIT_LIB_NAME}
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        COMPONENT lib
-        EXCLUDE_FROM_ALL
-    )
-else()
-    install(
-        FILES
-            ${SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY}/${SILKIT_SO_NAME}
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        PERMISSIONS
-            OWNER_READ OWNER_WRITE
-            GROUP_READ
-            WORLD_READ
-        COMPONENT lib
-        EXCLUDE_FROM_ALL
-    )
+install_silkit_lib(
+    ${SILKIT_ADAPTER_TAP_OUTPUT_DIRECTORY}
+    ${SILKIT_ADAPTER_TAP_LIBRARY_DIRECTORY}
+)
+
+install_demo(sil-kit-demo-ethernet-icmp-echo-device)
+install_adapter(sil-kit-adapter-tap)
+
+include(common/cmake/Packaging.cmake)
+
+if(NOT DEFINED PACKAGE_FILENAME_SUFFIX)
+    set(PACKAGE_FILENAME_SUFFIX "-${PROJECT_VERSION}")
 endif()
 
-install(
-    TARGETS
-        sil-kit-demo-ethernet-icmp-echo-device
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
-    PERMISSIONS
-        OWNER_READ OWNER_WRITE OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE    
-    EXCLUDE_FROM_ALL
+declare_package(
+    "SilKit-Adapter-TAP"
+    "binary release of SIL Kit Adapter TAP"
 )
 
-# only sil-kit-adapter-tap should be installed to /usr/local/bin by calling --target install (therefore it is not excluded)
-install(
-    TARGETS
-        sil-kit-adapter-tap
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}/sil-kit-adapter-tap COMPONENT Development   
-    PERMISSIONS
-        OWNER_READ OWNER_WRITE OWNER_EXECUTE
-        GROUP_READ GROUP_EXECUTE
-        WORLD_READ WORLD_EXECUTE
-)
-
-###############################################################################
-# Packaging
-###############################################################################
-
-set(CPACK_GENERATOR "ZIP")
-
-set(CPACK_PACKAGE_DESCRIPTION "binary release of SIL Kit Adapter TAP")
-set(CPACK_PACKAGE_NAME "SilKit-Adapter-TAP")
-set(CPACK_PACKAGE_VENDOR "Vector Informatik")
-set(CPACK_PACKAGE_CONTACT "support@vector.com")
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}${PACKAGE_FILENAME_SUFFIX}")
 set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
-
-set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
-set(CPACK_COMPONENTS_ALL_IN_ONE_PACKAGE ON)
-set(CPACK_COMPONENT_INCLUDE_TOPLEVEL_DIRECTORY ON)
-
-include(CPack)
