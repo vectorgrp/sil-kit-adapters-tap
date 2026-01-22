@@ -1,0 +1,35 @@
+name: trigger ska-quality-checks
+on:
+  workflow_dispatch:
+    inputs:
+      branch_under_test:
+          required: false
+          type: string
+  workflow_call:
+    inputs:
+      common_repo_commit:
+        required: false
+        type: string
+      branch_under_test:
+        required: false
+        type: string
+      linux_runner:
+        required: true
+        type: string
+        default: '["self-hosted", "linux", "ska", "testing"]'
+  pull_request:
+    types: [opened, reopened, synchronize]
+
+concurrency:
+  group: serialization_group_tap
+  cancel-in-progress: false
+
+jobs:
+  trigger-quality-checks:
+    uses: pnd/sil-kit-adapters-ci-testing/.github/workflows/ska-quality-checks.yaml@main
+    with:
+      repository_under_test : 'pnd/sil-kit-adapters-tap'
+      branch_under_test: ${{ inputs.branch_under_test != '' && inputs.branch_under_test || (github.event_name == 'pull_request' && github.event.pull_request.head.ref || 'main') }}
+      common_repo_commit: ${{ inputs.common_repo_commit }}
+      linux_runner: ${{ inputs.linux_runner != '' && inputs.linux_runner || '["self-hosted", "linux", "ska", "testing"]' }}
+    secrets: inherit
