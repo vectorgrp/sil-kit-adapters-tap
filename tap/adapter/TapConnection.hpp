@@ -41,7 +41,7 @@ public:
     }
 
 private:
-    std::array<std::uint8_t, 1600> _ethernetFrameBuffer;
+    std::array<std::uint8_t, 70000> _ethernetFrameBuffer;
     std::function<void(std::vector<std::uint8_t>)> _onNewFrameHandler;
     SilKit::Services::Logging::ILogger* _logger;
 
