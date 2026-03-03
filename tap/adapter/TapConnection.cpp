@@ -394,6 +394,7 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> int
         _logger->Error("Failed to create a socket to perform IOCTL call on TAP device with error code: "
                        + std::to_string(ioctlError) + extractErrorMessage(ioctlError));
         close(tapFileDescriptor);
+        close(sockfd);
         return OTHER_ERROR;
     }
 
@@ -405,6 +406,7 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> int
                        + extractErrorMessage(ioctlError) + "\n(Hint): Ensure that the network interface \""
                        + std::string(tapDeviceName) + "\" specified in [--tap-name] exists and is operational.");
         close(tapFileDescriptor);
+        close(sockfd);
         return OTHER_ERROR;
     }
 
@@ -417,6 +419,7 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> int
         _logger->Info("TAP device is currently up");
     }
 
+    close(sockfd);
     return tapFileDescriptor;
 }
 #endif
