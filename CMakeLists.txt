@@ -81,6 +81,7 @@ install_scripts_to(tap/demos/DemoLinux/tasks_scripts
 )
 
 install_scripts_to(tap/demos/CANoe4SW_SE
+    ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/CANoe4SW_SE/createEnvironment.sh
     ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/CANoe4SW_SE/run.sh
     ${CMAKE_CURRENT_SOURCE_DIR}/tap/demos/CANoe4SW_SE/run_all.sh
 )

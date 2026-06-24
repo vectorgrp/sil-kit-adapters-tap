@@ -36,4 +36,5 @@ jobs:
         tap/demos/CANoe4SW_SE/run_all.sh
       windows_scripts: |
         tap/demos/CANoe4SW_SE/run_all.ps1
+      windows_use_container: false
     secrets: inherit
