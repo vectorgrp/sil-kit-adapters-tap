@@ -133,6 +133,19 @@ The application *optionally* takes the following command line arguments (default
 
 **Note:** SIL Kit-specific CLI arguments will be overwritten by the config file specified by ``--configuration``.
 
+### MTU Size Reconfiguration
+By default, TAP devices are created with an MTU (Maximum Transmission Unit) of 1500 bytes, which corresponds to standard Ethernet. If your simulation involves larger Ethernet frames, you need to increase the MTU of the TAP device accordingly. Additionally, increasing the MTU can improve the performances.
+
+**Linux:**
+
+    sudo ip link set dev silkit_tap mtu <size>
+
+Or inside a network namespace:
+
+    sudo ip -netns <namespace> link set silkit_tap mtu <size>
+
+**Note:** The TAP-Windows driver (tap0901) limits the MTU to the range 100–1500. On Linux, the maximum MTU for TAP devices is 65521 bytes.
+
 ## Linux TAP Demo
 The aim of this demo is to showcase a simple adapter forwarding ethernet traffic from and to a Linux TAP device through
 Vector SIL Kit. Traffic being exchanged are ping (ICMP) requests, and the answering device replies to them.

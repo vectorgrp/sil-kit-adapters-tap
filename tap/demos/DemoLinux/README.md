@@ -38,6 +38,10 @@ Now is a good point to start the ``sil-kit-registry``, the ``sil-kit-demo-ethern
     
 The applications will produce output when they send and receive Ethernet frames from the TAP device or the Vector SIL Kit. The console output of ``sil-kit-adapter-tap`` is redirected to ``./bin/sil-kit-adapter-tap.out``.
 
+**Note:** If you need to handle Ethernet frames larger than 1500 bytes, increase the MTU of the TAP device (up to 65520 bytes):
+
+    ip -netns tap_demo_ns link set silkit_tap mtu <size>
+
 ## ICMP Ping and Pong
 The ping requests should all receive responses.
     
