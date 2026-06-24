@@ -128,10 +128,18 @@ The application *optionally* takes the following command line arguments (default
       [--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>]
       [--tap-name <tap device's name{silkit_tap}>]
       [--network <SIL Kit ethernet network{Ethernet1}>]
+      [--vlan-tag <VLAN ID (0..4094)>]
       [--version]
       [--help]
 
 **Note:** SIL Kit-specific CLI arguments will be overwritten by the config file specified by ``--configuration``.
+
+### VLAN Tagging Support
+The ``--vlan-tag`` option enables transparent 802.1Q VLAN tagging for TAP devices that do not support VLAN tags natively (e.g. the OpenVPN TAP driver on Windows). On Linux, where TAP devices support VLANs, this option can still simplify setups by removing the need for OS-level VLAN configuration.
+
+When a VLAN ID is specified:
+- **TAP device → SIL Kit:** The adapter injects an 802.1Q VLAN tag (with the given VID, PCP=0, DEI=0) into each Ethernet frame received from the TAP device before forwarding it to the SIL Kit network.
+- **SIL Kit → TAP device:** The adapter checks each incoming frame for a matching 802.1Q VLAN tag. If the VLAN ID matches, the tag is removed and the untagged frame is forwarded to the TAP device. Frames with a non-matching or missing VLAN tag are dropped.
 
 ### MTU Size Reconfiguration
 By default, TAP devices are created with an MTU (Maximum Transmission Unit) of 1500 bytes, which corresponds to standard Ethernet. If your simulation involves larger Ethernet frames, you need to increase the MTU of the TAP device accordingly. Additionally, increasing the MTU can improve the performances.

@@ -6,6 +6,7 @@
 #include <optional>
 #include <iosfwd>
 #include <cstdint>
+#include <vector>
 
 #include "Enums.hpp"
 #include "ReadUintBe.hpp"
@@ -35,7 +36,7 @@ struct EthernetVlanTag
 inline auto WriteEthernetVlanTag(asio::mutable_buffer target, const EthernetVlanTag& ethernetVlanTag) -> std::size_t
 {
     target += WriteUintBe(target, ethernetVlanTag.tpid);
-    target += WriteUintBe(target + 2, ethernetVlanTag.data);
+    target += WriteUintBe(target, ethernetVlanTag.data);
     return 4;
 }
 
@@ -107,3 +108,59 @@ std::ostream& operator<<(std::ostream& ostream, const EthernetVlanTag& ethernetV
 std::ostream& operator<<(std::ostream& ostream, const EthernetHeader& ethernetHeader);
 
 } // namespace demo
+
+namespace adapters {
+namespace vlan {
+
+// Injects an 802.1Q VLAN tag (TPID 0x8100, PCP=0, DEI=0) with the given VID
+// into the frame at offset 12 (between source MAC and EtherType).
+// Returns the modified frame.
+inline auto InjectVlanTag(std::vector<std::uint8_t> frame, std::uint16_t vid) -> std::vector<std::uint8_t>
+{
+    // Need at least: Dst(6) + Src(6) + EtherType(2) = 14 bytes
+    if (frame.size() < 14)
+    {
+        return frame;
+    }
+
+    const std::uint8_t vlanBytes[4] = {0x81, 0x00, static_cast<std::uint8_t>(vid >> 8),
+                                       static_cast<std::uint8_t>(vid & 0xFF)};
+    frame.insert(frame.begin() + 12, vlanBytes, vlanBytes + 4);
+    return frame;
+}
+
+// Extracts the 802.1Q VLAN ID from a raw Ethernet frame.
+// Returns the VID if an 802.1Q tag is present, or std::nullopt otherwise.
+template <typename Container>
+inline auto ExtractVlanId(const Container& frame) -> std::optional<std::uint16_t>
+{
+    // Need at least: Dst(6) + Src(6) + TPID(2) + TCI(2) + EtherType(2) = 18 bytes
+    if (frame.size() < 18)
+    {
+        return std::nullopt;
+    }
+
+    const std::uint16_t tpid = (static_cast<std::uint16_t>(frame[12]) << 8) | static_cast<std::uint16_t>(frame[13]);
+    if (tpid != static_cast<std::uint16_t>(demo::EtherType::Vlan_802_1q))
+    {
+        return std::nullopt;
+    }
+
+    const std::uint16_t tci = (static_cast<std::uint16_t>(frame[14]) << 8) | static_cast<std::uint16_t>(frame[15]);
+    return static_cast<std::uint16_t>(tci & 0x0FFF);
+}
+
+// Removes the 4-byte 802.1Q VLAN tag from a raw Ethernet frame.
+// Returns a new frame without the tag. The caller must ensure a VLAN tag is present.
+template <typename Container>
+inline auto RemoveVlanTag(const Container& frame) -> std::vector<std::uint8_t>
+{
+    std::vector<std::uint8_t> stripped;
+    stripped.reserve(frame.size() - 4);
+    stripped.insert(stripped.end(), frame.begin(), frame.begin() + 12);
+    stripped.insert(stripped.end(), frame.begin() + 16, frame.end());
+    return stripped;
+}
+
+} // namespace vlan
+} // namespace adapters

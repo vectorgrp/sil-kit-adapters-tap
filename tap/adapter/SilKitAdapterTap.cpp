@@ -8,8 +8,10 @@
 #include <thread>
 #include <vector>
 #include <cstdint>
+#include <optional>
 
 #include "Exceptions.hpp"
+#include "EthernetHeader.hpp"
 #include "Parsing.hpp"
 #include "SignalHandler.hpp"
 #include "TapConnection.hpp"
@@ -67,6 +69,28 @@ int main(int argc, char** argv)
     const std::string ethernetNetworkName = getArgDefault(argc, argv, networkArg, "Ethernet1");
     const std::string ethernetControllerName = "SilKit_ETH_CTRL_1";
 
+    const std::string vlanTagStr = getArgDefault(argc, argv, vlanTagArg, "");
+    std::optional<std::uint16_t> vlanId;
+    if (!vlanTagStr.empty())
+    {
+        try
+        {
+            unsigned long parsedId = std::stoul(vlanTagStr);
+            if (parsedId > 4094)
+            {
+                std::cerr << "Error: VLAN ID must be in range 0..4094, got " << parsedId << std::endl;
+                return CLI_ERROR;
+            }
+            vlanId = static_cast<std::uint16_t>(parsedId);
+        }
+        catch (const std::exception&)
+        {
+            std::cerr << "Error: Invalid VLAN ID '" << vlanTagStr << "', expected a number in range 0..4094"
+                      << std::endl;
+            return CLI_ERROR;
+        }
+    }
+
     asio::io_context ioContext;
 
     try
@@ -111,8 +135,18 @@ int main(int argc, char** argv)
         logger->Info("Creating ethernet controller '" + ethernetControllerName + "'");
         auto* ethController = participant->CreateEthernetController(ethernetControllerName, ethernetNetworkName);
 
-        const auto onReceiveEthernetFrameFromTapDevice = [&logger, debugActivated,
-                                                          ethController](std::vector<std::uint8_t> data) {
+        if (vlanId.has_value())
+        {
+            logger->Info("VLAN tagging enabled: injecting 802.1Q VLAN ID " + std::to_string(*vlanId));
+        }
+
+        const auto onReceiveEthernetFrameFromTapDevice = [&logger, debugActivated, ethController,
+                                                          vlanId](std::vector<std::uint8_t> data) {
+            if (vlanId.has_value())
+            {
+                data = vlan::InjectVlanTag(std::move(data), *vlanId);
+            }
+
             if (data.size() < 60)
             {
                 data.resize(60, 0);
@@ -125,7 +159,12 @@ int main(int argc, char** argv)
             {
                 std::ostringstream SILKitDebugMessage;
                 SILKitDebugMessage << "TAP device >> SIL Kit: Ethernet frame (" << frameSize
-                                   << " bytes, txId=" << transmitId << ")";
+                                   << " bytes, txId=" << transmitId;
+                if (vlanId.has_value())
+                {
+                    SILKitDebugMessage << ", VLAN ID " << *vlanId;
+                }
+                SILKitDebugMessage << ")";
                 logger->Debug(SILKitDebugMessage.str());
             }
         };
@@ -133,17 +172,39 @@ int main(int argc, char** argv)
         logger->Info("Creating TAP device ethernet connector for [" + tapDevName + "]");
         TapConnection tapConnection{ioContext, tapDevName, onReceiveEthernetFrameFromTapDevice, logger};
 
-        const auto onReceiveEthernetMessageFromSilKit = [&logger, debugActivated, &tapConnection](
+        const auto onReceiveEthernetMessageFromSilKit = [&logger, debugActivated, &tapConnection, vlanId](
                                                             IEthernetController* /*controller*/,
                                                             const EthernetFrameEvent& msg) {
             auto rawFrame = msg.frame.raw;
-            tapConnection.SendEthernetFrameToTapDevice(rawFrame);
 
-            if (debugActivated)
+            if (vlanId.has_value())
             {
-                std::ostringstream SILKitDebugMessage;
-                SILKitDebugMessage << "SIL Kit >> TAP device: Ethernet frame (" << rawFrame.size() << " bytes)";
-                logger->Debug(SILKitDebugMessage.str());
+                const auto vid = vlan::ExtractVlanId(rawFrame);
+                if (!vid.has_value() || *vid != *vlanId)
+                    return; // No 802.1Q tag or VLAN ID mismatch, drop frame
+
+                auto strippedFrame = vlan::RemoveVlanTag(rawFrame);
+                tapConnection.SendEthernetFrameToTapDevice(strippedFrame);
+
+                if (debugActivated)
+                {
+                    std::ostringstream SILKitDebugMessage;
+                    SILKitDebugMessage << "SIL Kit >> TAP device: Ethernet frame (" << rawFrame.size()
+                                       << " bytes, removed VLAN ID " << *vid << ", sent " << strippedFrame.size()
+                                       << " bytes)";
+                    logger->Debug(SILKitDebugMessage.str());
+                }
+            }
+            else
+            {
+                tapConnection.SendEthernetFrameToTapDevice(rawFrame);
+
+                if (debugActivated)
+                {
+                    std::ostringstream SILKitDebugMessage;
+                    SILKitDebugMessage << "SIL Kit >> TAP device: Ethernet frame (" << rawFrame.size() << " bytes)";
+                    logger->Debug(SILKitDebugMessage.str());
+                }
             }
         };
 

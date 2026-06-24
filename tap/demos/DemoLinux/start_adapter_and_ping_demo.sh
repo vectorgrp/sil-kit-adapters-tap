@@ -4,6 +4,26 @@
 
 scriptDir=$( dirname $(realpath $0) )
 
+# Parse optional --vlan-tag argument
+vlanTagArg=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --vlan-tag)
+      if [ -n "$2" ]; then
+        vlanTagArg="--vlan-tag $2"
+        shift 2
+      else
+        echo "[error] --vlan-tag requires a VLAN ID argument"
+        exit 1
+      fi
+      ;;
+    *)
+      echo "[error] Unknown argument: $1"
+      exit 1
+      ;;
+  esac
+done
+
 # check if user is root
 if [ "$(id -u)" -ne 0 ]; then
     echo "[error] This script must be run as root / via sudo!"
@@ -44,8 +64,11 @@ echo "[info] Creating tap device silkit_tap"
 ip tuntap add dev silkit_tap mode tap
 
 echo "[info] Starting sil-kit-adapter-tap..."
+if [ -n "$vlanTagArg" ]; then
+    echo "[info] VLAN tagging enabled: $vlanTagArg"
+fi
 
-$scriptDir/../../../bin/sil-kit-adapter-tap --configuration $scriptDir/../SilKitConfig_Adapter.silkit.yaml > $logDir/sil-kit-adapter-tap.out &
+$scriptDir/../../../bin/sil-kit-adapter-tap --configuration $scriptDir/../SilKitConfig_Adapter.silkit.yaml $vlanTagArg > $logDir/sil-kit-adapter-tap.out &
 child_processes="$child_processes $!"
 
 sleep 1 # wait 1 second for the creation/existense of the .out file

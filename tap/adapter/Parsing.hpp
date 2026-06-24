@@ -126,4 +126,9 @@ const std::string versionArg = "--version";
 /// </summary>
 const std::string helpArg = "--help";
 
+/// <summary>
+/// string containing the argument preceding the optional VLAN tag ID.
+/// </summary>
+const std::string vlanTagArg = "--vlan-tag";
+
 } // namespace adapters

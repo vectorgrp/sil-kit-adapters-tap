@@ -25,7 +25,7 @@ using namespace std::chrono_literals;
 
 const std::array<const std::string, 4> demoSwitchesWithArgument = {networkArg, regUriArg, logLevelArg,
                                                                    participantNameArg};
-const std::array<const std::string, 1> demoSwitchesWithoutArgument = {helpArg};
+const std::array<const std::string, 2> demoSwitchesWithoutArgument = {helpArg, vlanTagArg};
 
 void promptForExit()
 {
@@ -48,7 +48,8 @@ void print_demo_help(bool userRequested)
     std::cout << "sil-kit-demo-ethernet-icmp-echo-device [" << participantNameArg << " <participant's name{EthernetDevice}>]\n"
         "  [" << regUriArg << " silkit://<host{localhost}>:<port{8501}>]\n"
         "  [" << networkArg << " <SIL Kit Ethernet network name{tap_demo}>]\n"
-        "  [" << logLevelArg << " <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n";
+        "  [" << logLevelArg << " <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n"
+        "  [" << vlanTagArg << " (log VLAN tag information from received frames)]\n";
         std::cout << "\n"
         "Example:\n"
         "sil-kit-demo-ethernet-icmp-echo-device " << participantNameArg << " EchoDevice " << networkArg << " tap_network " << logLevelArg << " Off\n ";
@@ -104,6 +105,7 @@ int main(int argc, char** argv)
     const std::string participantName = getArgDefault(argc, argv, participantNameArg, "EthernetDevice");
     const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
     const std::string ethernetNetworkName = getArgDefault(argc, argv, networkArg, "tap_demo");
+    const bool useVlanTag = (findArg(argc, argv, vlanTagArg, argv) != nullptr);
 
     const std::string ethernetControllerName = participantName + "_Eth1";
     const std::string participantConfigurationString =
@@ -124,23 +126,41 @@ int main(int argc, char** argv)
 
         static constexpr auto ethernetAddress = demo::EthernetAddress{0x52, 0x54, 0x56, 0x53, 0x4B, 0x55};
         static constexpr auto ip4Address = demo::Ip4Address{192, 168, 7, 35};
-        auto demoDevice =
-            demo::Device{ethernetAddress, ip4Address, logger, [&logger, ethController](std::vector<std::uint8_t> data) {
+        auto demoDevice = demo::Device{ethernetAddress, ip4Address, logger,
+                                       [&logger, ethController, useVlanTag](std::vector<std::uint8_t> data) {
             const auto frameSize = data.size();
+            std::optional<std::uint16_t> vid;
+            if (useVlanTag)
+            {
+                vid = adapters::vlan::ExtractVlanId(data);
+            }
             static intptr_t transmitId = 0;
             ethController->SendFrame(EthernetFrame{std::move(data)}, reinterpret_cast<void*>(++transmitId));
 
             std::ostringstream SILKitDebugMessage;
-            SILKitDebugMessage << "Demo >> SIL Kit: Ethernet frame (" << frameSize << " bytes, txId=" << transmitId
-                               << ")";
+            SILKitDebugMessage << "Demo >> SIL Kit: Ethernet frame (" << frameSize << " bytes, txId=" << transmitId;
+            if (vid.has_value())
+            {
+                SILKitDebugMessage << ", VLAN ID " << *vid;
+            }
+            SILKitDebugMessage << ")";
             logger->Debug(SILKitDebugMessage.str());
         }};
 
-        auto onReceivedEthernetMessageFromSILKit = [&logger, &demoDevice](IEthernetController* /*controller*/,
-                                                                          const EthernetFrameEvent& msg) {
+        auto onReceivedEthernetMessageFromSILKit =
+            [&logger, &demoDevice, useVlanTag](IEthernetController* /*controller*/, const EthernetFrameEvent& msg) {
             auto rawFrame = msg.frame.raw;
             std::ostringstream SILKitDebugMessage;
-            SILKitDebugMessage << "SIL Kit >> Demo: Ethernet frame (" << rawFrame.size() << " bytes)";
+            SILKitDebugMessage << "SIL Kit >> Demo: Ethernet frame (" << rawFrame.size() << " bytes";
+            if (useVlanTag)
+            {
+                const auto vid = adapters::vlan::ExtractVlanId(rawFrame);
+                if (vid.has_value())
+                {
+                    SILKitDebugMessage << ", VLAN ID " << *vid;
+                }
+            }
+            SILKitDebugMessage << ")";
             logger->Debug(SILKitDebugMessage.str());
             demoDevice.Process(asio::buffer(rawFrame.data(), rawFrame.size()));
         };

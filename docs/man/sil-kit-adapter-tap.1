@@ -4,7 +4,7 @@
 sil-kit-adapter-tap \- Manual page for Vector SIL Kit Adapter TAP
 .SH SYNOPSIS
 .B sil-kit-adapter-tap
-[\fI\,--version\/\fR] [\fI\,--name <participant's name{SilKitAdapterTap}>\/\fR] [\fI\,--configuration <path to .silkit.yaml or .json configuration file>\/\fR] [\fI\,--registry-uri silkit://<host{localhost}>:<port{8501}>\/\fR] [\fI\,--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>\/\fR] [\fI\,--tap-name <tap device's name{silkit_tap}>\/\fR] [\fI\,--network <SIL Kit ethernet network{tap_demo}>\/\fR]
+[\fI\,--version\/\fR] [\fI\,--name <participant's name{SilKitAdapterTap}>\/\fR] [\fI\,--configuration <path to .silkit.yaml or .json configuration file>\/\fR] [\fI\,--registry-uri silkit://<host{localhost}>:<port{8501}>\/\fR] [\fI\,--log <Trace|Debug|Warn|{Info}|Error|Critical|Off>\/\fR] [\fI\,--tap-name <tap device's name{silkit_tap}>\/\fR] [\fI\,--network <SIL Kit ethernet network{tap_demo}>\/\fR] [\fI\,--vlan-tag <VLAN ID (0..4094)>\/\fR]
 .SH DESCRIPTION
 Vector SIL Kit Adapter TAP
 .PP
@@ -23,6 +23,8 @@ Log to stdout with level 'Trace', 'Debug', 'Warn', 'Info', 'Error', 'Critical', 
 Name of the TAP device. Defaults to 'silkit_tap'.
 .IP "--network <SIL Kit ethernet network>"
 Name of the SIL Kit ethernet network. Defaults to 'tap_demo'.
+.IP "--vlan-tag <VLAN ID>"
+Optional 802.1Q VLAN ID (0..4094).
 .SH "SEE ALSO"
 The full documentation for
 .I sil-kit-adapter-tap

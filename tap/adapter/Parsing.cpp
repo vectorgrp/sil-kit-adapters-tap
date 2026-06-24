@@ -8,9 +8,9 @@
 #include <cstring>
 
 
-const std::array<std::string, 6> switchesWithArgument = {adapters::networkArg,         adapters::tapNameArg,
-                                                         adapters::regUriArg,          adapters::logLevelArg,
-                                                         adapters::participantNameArg, adapters::configurationArg};
+const std::array<std::string, 7> switchesWithArgument = {
+    adapters::networkArg,         adapters::tapNameArg,       adapters::regUriArg, adapters::logLevelArg,
+    adapters::participantNameArg, adapters::configurationArg, adapters::vlanTagArg};
 
 const std::array<std::string, 2> switchesWithoutArguments = {adapters::helpArg, adapters::versionArg};
 
@@ -53,12 +53,13 @@ void adapters::print_help(bool userRequested)
                  "  ["<<logLevelArg<<" <Trace|Debug|Warn|{Info}|Error|Critical|Off>]\n"
                  "  ["<<tapNameArg<<" <tap device's name{silkit_tap}>]\n"
                  "  ["<<networkArg<<" <SIL Kit ethernet network{Ethernet1}>]\n"
+                 "  ["<<vlanTagArg<<" <VLAN ID to inject on frames>]\n"
                  "\n"
                  "SIL Kit-specific CLI arguments will be overwritten by the config file passed by " << configurationArg << ".\n";
     std::cout << "\n"
                  "Example:\n"
-                 "sil-kit-adapter-tap "<<participantNameArg<<" EthernetTapBridge "
-             <<  networkArg<<" tap_bridge\n";
+                 "sil-kit-adapter-tap " << participantNameArg << " EthernetTapBridge "
+              <<  networkArg << " tap_bridge " << vlanTagArg << " 4\n";
 
     std::cout << "\n"
                      "Pass "<<versionArg<<" to get the version of the Adapter.\n";
