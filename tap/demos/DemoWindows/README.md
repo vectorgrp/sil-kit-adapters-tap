@@ -54,7 +54,7 @@ Now is a good point to start the ``sil-kit-registry``, the ``sil-kit-adapter-tap
 
     .\bin\sil-kit-demo-ethernet-icmp-echo-device.exe --log Debug
     
-The applications will produce output when they send and receive Ethernet frames from the TAP device or the Vector SIL Kit.
+The applications will produce output when they send and receive Ethernet frames from the TAP device or the SIL Kit.
 
 ## ICMP Ping and Pong
 To ping the ``sil-kit-demo-ethernet-icmp-echo-device`` and make sure the route over the Windows TAP is taken, specify the source as follow:

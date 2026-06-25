@@ -6,7 +6,7 @@ Enable SIL Kit in CANoe by entering the global: `Options -> Extensions -> SIL Ki
 
 2. **Participant Name**: This name is the identifier of CANoe in the context of SIL Kit communication.  
 
-3. **Configuration File**: For our first example the name of the network in CANoe ("Ethernet1") equals the name of the SIL Kit network that is passed to the Vector SIL Kit Adapter TAP. Therefore we do not need to specify a configuration file because both participants will be in the same SIL Kit network by default.
+3. **Configuration File**: For our first example the name of the network in CANoe ("Ethernet1") equals the name of the SIL Kit network that is passed to the SIL Kit Adapter TAP. Therefore we do not need to specify a configuration file because both participants will be in the same SIL Kit network by default.
 
       ![Enable SIL Kit in global options](../images/EnableSILKit.png)
 
@@ -23,7 +23,7 @@ EthernetControllers:
   Network: "silkit_network"
 ```
 
-**Important**: The "Name" of the "EthernetControllers" in the YAML file must match the pattern "CANoeEthNetworkName/CANoeSimulationPortName". The value given at "Network" needs to match the network name which has been set for Vector SIL Kit Adapter TAP as well. To check the names of the Simulation Ports in CANoe, go to the `Hardware` tab and select `Port Configuration`:
+**Important**: The "Name" of the "EthernetControllers" in the YAML file must match the pattern "CANoeEthNetworkName/CANoeSimulationPortName". The value given at "Network" needs to match the network name which has been set for SIL Kit Adapter TAP as well. To check the names of the Simulation Ports in CANoe, go to the `Hardware` tab and select `Port Configuration`:
 
 ![Port Configuration](../images/PortConfiguration.png)
 

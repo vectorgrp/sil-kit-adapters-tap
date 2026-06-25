@@ -6,7 +6,7 @@ The *start application* contains one Adaptive machine with multiple executables.
 It relies on the SomeIP Daemon that is part of the delivery. Communication in between the executables is realized with SomeIP and IPC. The original *start application* may use the execution manager and also contains some python scripts to trigger the single executables.
 This guide is based on the usage of a VM with Ubuntu 22.04. We will use the Linux VM for building the stack including the *start application* example and for running the Adaptive executables. Any other virtualization platform may be used as long as it is suitable to build the Adaptive stack and the SIL Kit components. 
 
-CANoe will connect to the VM via Vector SIL Kit as a SIL Kit participant. The counterpart running on the VM is the SIL Kit Adapter TAP which connects as another participant to the SIL Kit network as well.
+CANoe will connect to the VM via SIL Kit as a SIL Kit participant. The counterpart running on the VM is the SIL Kit Adapter TAP which connects as another participant to the SIL Kit network as well.
 
 ## Build the Adaptive MICROSAR stack and the *start application*
 
@@ -16,11 +16,11 @@ The *start application* is part of the delivery at ``Examples/startapplication``
 
 **Hint:** If you want to get rid of the non-fatal errors and warnings due to the missing execution manger you can disable its usage in the CMakeLists.txt of the *start application* by setting ``AMSR_ENABLE_EXEC_MANAGER`` to ``OFF``.
 
-## Obtain the Vector SIL Kit components
+## Obtain the SIL Kit components
 
-Download a preview or release of the adapter directly from [Vector SIL Kit Adapter TAP Releases](https://github.com/vectorgrp/sil-kit-adapters-tap/releases) or build the Vector SIL Kit Adapter TAP [on your own](https://github.com/vectorgrp/sil-kit-adapters-tap#a-getting-started-with-self-built-adapter-and-demos).
+Download a preview or release of the adapter directly from [SIL Kit Adapter TAP Releases](https://github.com/vectorgrp/sil-kit-adapters-tap/releases) or build the SIL Kit Adapter TAP [on your own](https://github.com/vectorgrp/sil-kit-adapters-tap#a-getting-started-with-self-built-adapter-and-demos).
 
-For both options you need a sil-kit-registry contained in the SIL Kit Release, which you can download directly from [Vector SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases).
+For both options you need a sil-kit-registry contained in the SIL Kit Release, which you can download directly from [SIL Kit Releases](https://github.com/vectorgrp/sil-kit/releases).
 
 ## Start the sil-kit-registry
 
@@ -68,7 +68,7 @@ This sketch shows the components of our setup and how they are connected:
 
 ### Setting up the network and starting the adapter
 
-The user manual of the *start application* suggests to create a network adapter with the IP address 192.168.7.2, we omitted this step and will now create a TAP device in the Linux system with the same address. The TAP device will enable the connection with CANoe using the Vector SIL Kit Adapter TAP. The TAP device is put in an extra namespace to separate the traffic completely. The Vector SIL Kit Adapter TAP needs to run before moving the TAP device to the network namespace. Finally the SomeIP Daemon has to be started in context of this namespace. It is a good idea to put all the necessary commands in a shell script and also extend it with some commands to kill the applications from a previous run (see [helper-script](helper-scripts/start_app_sil_kit_adapters_setup.sh) as a possible template).
+The user manual of the *start application* suggests to create a network adapter with the IP address 192.168.7.2, we omitted this step and will now create a TAP device in the Linux system with the same address. The TAP device will enable the connection with CANoe using the SIL Kit Adapter TAP. The TAP device is put in an extra namespace to separate the traffic completely. The SIL Kit Adapter TAP needs to run before moving the TAP device to the network namespace. Finally the SomeIP Daemon has to be started in context of this namespace. It is a good idea to put all the necessary commands in a shell script and also extend it with some commands to kill the applications from a previous run (see [helper-script](helper-scripts/start_app_sil_kit_adapters_setup.sh) as a possible template).
 
 1. Create TAP device `silkit_tap`
 
@@ -76,7 +76,7 @@ The user manual of the *start application* suggests to create a network adapter 
     sudo ip tuntap add dev silkit_tap mode tap
     ```
 
-2. Start the Vector SIL Kit Adapter TAP and set the network name to the same one that will be used by CANoe.
+2. Start the SIL Kit Adapter TAP and set the network name to the same one that will be used by CANoe.
 
     ```bash
     /path/to/sil-kit-adapters-tap/bin/sil-kit-adapter-tap --network 'Ethernet1'

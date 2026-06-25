@@ -6,7 +6,7 @@ UseCRLF:         false
 UseTab:          Never
 
 ---
-# Vector SilKit style
+# SilKit style
 Language:        Cpp
 AccessModifierOffset: -4 
 AlignAfterOpenBracket: Align

@@ -36,7 +36,7 @@ Now is a good point to start the ``sil-kit-registry``, the ``sil-kit-demo-ethern
 
     sudo ./tap/demos/DemoLinux/start_adapter_and_ping_demo.sh
     
-The applications will produce output when they send and receive Ethernet frames from the TAP device or the Vector SIL Kit. The console output of ``sil-kit-adapter-tap`` is redirected to ``./bin/sil-kit-adapter-tap.out``.
+The applications will produce output when they send and receive Ethernet frames from the TAP device or the SIL Kit. The console output of ``sil-kit-adapter-tap`` is redirected to ``./bin/sil-kit-adapter-tap.out``.
 
 **Note:** If you need to handle Ethernet frames larger than 1500 bytes, increase the MTU of the TAP device (up to 65520 bytes):
 
