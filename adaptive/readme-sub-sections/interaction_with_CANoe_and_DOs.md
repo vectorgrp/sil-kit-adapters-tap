@@ -18,11 +18,15 @@ Leave the settings in the AUTOSAR Preprocessor at their default values:
 
 ![AUTOSAR preprocessor settings](../images/autosar_preprocessor_settings.png)
 
-The combined system descriptions (ARXML) can be added to the simulation setup via the *Databases Import Wizard*:
+The combined system descriptions (ARXML) can be added to the simulation setup via the *Add...* button:
 
-![Simulation Setup Import Wizard](../images/sim_setup_import_wizard.png)
+![Add...](../images/CANoe_Database_Add.png)
 
-Use the `Select...` button to choose the file, assign both available nodes and complete the wizard process:
+After that use the *Node Synchronization...* feature on the database itself:
+
+![Node Synchronization...](../images/CANoe_Database_node_sync.png)
+
+Assign both available nodes and complete the wizard process:
 
 ![Simulation Setup Import Wizard node selection](../images/wizard_definiton_of_nodes.png)
 
