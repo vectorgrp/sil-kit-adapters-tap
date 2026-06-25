@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MIT
 
 scriptDir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-silKitDir=/home/vector/SilKit/SilKit-4.0.55-ubuntu-18.04-x86_64-gcc
+silKitDir=/home/vector/SilKit/SilKit-5.0.4-ubuntu-22.04-x86_64-gcc
 
 logDir=$scriptDir/logs # define a directory for .out files
 mkdir -p $logDir # if it does not exist, create it
