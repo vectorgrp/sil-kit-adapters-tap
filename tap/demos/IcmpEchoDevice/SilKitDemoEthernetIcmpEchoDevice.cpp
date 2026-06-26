@@ -14,32 +14,15 @@
 #include "silkit/services/ethernet/all.hpp"
 #include "silkit/services/ethernet/string_utils.hpp"
 #include "../adapter/Parsing.hpp"
-#include "../adapter/SignalHandler.hpp"
-#include "../adapter/SilKitAdapterTap.hpp"
+
+#include "common/Parsing.hpp"
+#include "common/Cli.hpp"
 
 using namespace SilKit::Services::Ethernet;
 using namespace SilKit::Services::Orchestration;
+using namespace util;
 using namespace adapters;
-using namespace exceptions;
 using namespace std::chrono_literals;
-
-const std::array<const std::string, 4> demoSwitchesWithArgument = {networkArg, regUriArg, logLevelArg,
-                                                                   participantNameArg};
-const std::array<const std::string, 2> demoSwitchesWithoutArgument = {helpArg, vlanTagArg};
-
-void promptForExit()
-{
-    std::promise<int> signalPromise;
-    auto signalValue = signalPromise.get_future();
-    RegisterSignalHandler([&signalPromise](auto sigNum) { signalPromise.set_value(sigNum); });
-
-    std::cout << "Press CTRL + C to stop the process..." << std::endl;
-
-    signalValue.wait();
-
-    std::cout << "\nSignal " << signalValue.get() << " received!" << std::endl;
-    std::cout << "Exiting..." << std::endl;
-}
 
 void print_demo_help(bool userRequested)
 {
@@ -60,45 +43,16 @@ void print_demo_help(bool userRequested)
     // clang-format on
 }
 
-bool thereAreDemoUnknownArguments(int argc, char** argv)
-{
-    //skip the executable calling:
-    argc -= 1;
-    argv += 1;
-    while (argc)
-    {
-        if (strncmp(*argv, "--", 2) != 0)
-            return true;
-        if (std::find(demoSwitchesWithArgument.begin(), demoSwitchesWithArgument.end(), *argv)
-            != demoSwitchesWithArgument.end())
-        {
-            //switches with argument have an argument to ignore, so skip "2"
-            argc -= 2;
-            argv += 2;
-        }
-        else if (std::find(demoSwitchesWithoutArgument.begin(), demoSwitchesWithoutArgument.end(), *argv)
-                 != demoSwitchesWithoutArgument.end())
-        {
-            //switches without argument don't have an argument to ignore, so skip "1"
-            argc -= 1;
-            argv += 1;
-        }
-        else
-            return true;
-    }
-    return false;
-}
-
 /**************************************************************************************************
  * Main Function
  **************************************************************************************************/
 
 int main(int argc, char** argv)
 {
-    if (findArg(argc, argv, "--help", argv) != nullptr)
+    if (findArg(argc, argv, helpArg, argv) != nullptr)
     {
         print_demo_help(true);
-        return NO_ERROR;
+        return CodeSuccess;
     }
 
     const std::string loglevel = getArgDefault(argc, argv, logLevelArg, "Info");
@@ -113,7 +67,8 @@ int main(int argc, char** argv)
 
     try
     {
-        throwInvalidCliIf(thereAreDemoUnknownArguments(argc, argv));
+        throwInvalidCliIf(thereAreUnknownArguments(
+            argc, argv, {&networkArg, &regUriArg, &logLevelArg, &participantNameArg}, {&helpArg, &vlanTagArg}));
 
         auto participantConfiguration =
             SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
@@ -228,19 +183,19 @@ int main(int argc, char** argv)
     catch (const SilKit::ConfigurationError& error)
     {
         std::cerr << "Invalid configuration: " << error.what() << std::endl;
-        return CONFIGURATION_ERROR;
+        return CodeErrorConfiguration;
     }
     catch (const InvalidCli&)
     {
         print_demo_help(false);
         std::cerr << std::endl << "Invalid command line arguments." << std::endl;
-        return CLI_ERROR;
+        return CodeErrorCli;
     }
     catch (const std::exception& error)
     {
         std::cerr << "Something went wrong: " << error.what() << std::endl;
-        return OTHER_ERROR;
+        return CodeErrorOther;
     }
 
-    return NO_ERROR;
+    return CodeSuccess;
 }

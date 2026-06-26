@@ -4,8 +4,9 @@
 
 scriptDir=$( dirname $(realpath $0) )
 
-# Parse optional --vlan-tag argument
+# Parse optional --vlan-tag and --timestamp arguments
 vlanTagArg=""
+timestamp=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --vlan-tag)
@@ -14,6 +15,15 @@ while [ $# -gt 0 ]; do
         shift 2
       else
         echo "[error] --vlan-tag requires a VLAN ID argument"
+        exit 1
+      fi
+      ;;
+    --timestamp)
+      if [ -n "$2" ]; then
+        timestamp="$2"
+        shift 2
+      else
+        echo "[error] --timestamp requires a timestamp argument"
         exit 1
       fi
       ;;
@@ -42,7 +52,18 @@ child_processes=""
 # cleanup function called on exit
 cleanup() {
   echo $child_processes | xargs kill > /dev/null 2>&1
-  
+
+  # wait for the adapter to exit before tearing down the TAP device and its network namespace
+  for pid in $child_processes; do
+    i=0
+    while kill -0 "$pid" 2>/dev/null && [ "$i" -lt 50 ]; do
+      sleep 0.1
+      i=$((i + 1))
+    done
+    # Force kill if it is still alive after the grace period
+    kill -9 "$pid" > /dev/null 2>&1
+  done
+
   if ip netns list | grep -q tap_demo_ns; then
     ip netns delete tap_demo_ns
   fi
@@ -68,14 +89,14 @@ if [ -n "$vlanTagArg" ]; then
     echo "[info] VLAN tagging enabled: $vlanTagArg"
 fi
 
-$scriptDir/../../../bin/sil-kit-adapter-tap --configuration $scriptDir/../SilKitConfig_Adapter.silkit.yaml $vlanTagArg > $logDir/sil-kit-adapter-tap.out &
+$scriptDir/../../../bin/sil-kit-adapter-tap --configuration $scriptDir/../SilKitConfig_Adapter.silkit.yaml $vlanTagArg > $logDir/sil-kit-adapter-tap_$timestamp.out &
 child_processes="$child_processes $!"
 
 sleep 1 # wait 1 second for the creation/existense of the .out file
 
 mkfifo "$fifoPath/temp_fifo"
 
-tail -n +1 -f "$logDir/sil-kit-adapter-tap.out" > "$fifoPath/temp_fifo" &
+tail -n +1 -f "$logDir/sil-kit-adapter-tap_$timestamp.out" > "$fifoPath/temp_fifo" &
 
 timeout --foreground 30s grep -q 'Press CTRL + C to stop the process...' "$fifoPath/temp_fifo" || { echo "[error] Timeout reached while waiting for sil-kit-adapter-tap to start"; exit 1; }
 echo "[info] sil-kit-adapter-tap has been started"

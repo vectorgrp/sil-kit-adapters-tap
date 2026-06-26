@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: Copyright 2025 Vector Informatik GmbH
 // SPDX-License-Identifier: MIT
 
-#include "SilKitAdapterTap.hpp"
+#include "Parsing.hpp"
+#include "TapConnection.hpp"
+#include "EthernetHeader.hpp"
 
 #include <iostream>
 #include <string>
@@ -10,11 +12,10 @@
 #include <cstdint>
 #include <optional>
 
-#include "Exceptions.hpp"
-#include "EthernetHeader.hpp"
-#include "Parsing.hpp"
-#include "SignalHandler.hpp"
-#include "TapConnection.hpp"
+#include "common/Parsing.hpp"
+#include "common/Cli.hpp"
+#include "common/ParticipantCreation.hpp"
+#include "common/Exceptions.hpp"
 
 #include "asio/ts/buffer.hpp"
 #include "asio/ts/io_context.hpp"
@@ -26,31 +27,17 @@
 #include "silkit/services/logging/all.hpp"
 
 using namespace SilKit::Services::Ethernet;
-using namespace exceptions;
 using namespace SilKit::Services::Orchestration;
 using namespace std::chrono_literals;
+using namespace util;
 using namespace adapters;
-
-void promptForExit()
-{
-    std::promise<int> signalPromise;
-    auto signalValue = signalPromise.get_future();
-    RegisterSignalHandler([&signalPromise](auto sigNum) { signalPromise.set_value(sigNum); });
-
-    std::cout << "Press CTRL + C to stop the process..." << std::endl;
-
-    signalValue.wait();
-
-    std::cout << "\nSignal " << signalValue.get() << " received!" << std::endl;
-    std::cout << "Exiting..." << std::endl;
-}
 
 int main(int argc, char** argv)
 {
     if (findArg(argc, argv, versionArg, argv) != NULL)
     {
         print_version();
-        return NO_ERROR;
+        return CodeSuccess;
     }
 
     print_version();
@@ -58,14 +45,10 @@ int main(int argc, char** argv)
     if (findArg(argc, argv, helpArg, argv) != NULL)
     {
         print_help(true);
-        return NO_ERROR;
+        return CodeSuccess;
     }
 
-    const std::string configurationFile = getArgDefault(argc, argv, configurationArg, "");
-    const std::string registryURI = getArgDefault(argc, argv, regUriArg, "silkit://localhost:8501");
-
     const std::string tapDevName = getArgDefault(argc, argv, tapNameArg, "silkit_tap");
-    const std::string participantName = getArgDefault(argc, argv, participantNameArg, "SilKitAdapterTap");
     const std::string ethernetNetworkName = getArgDefault(argc, argv, networkArg, "Ethernet1");
     const std::string ethernetControllerName = "SilKit_ETH_CTRL_1";
 
@@ -79,7 +62,7 @@ int main(int argc, char** argv)
             if (parsedId > 4094)
             {
                 std::cerr << "Error: VLAN ID must be in range 0..4094, got " << parsedId << std::endl;
-                return CLI_ERROR;
+                return CodeErrorCli;
             }
             vlanId = static_cast<std::uint16_t>(parsedId);
         }
@@ -87,7 +70,7 @@ int main(int argc, char** argv)
         {
             std::cerr << "Error: Invalid VLAN ID '" << vlanTagStr << "', expected a number in range 0..4094"
                       << std::endl;
-            return CLI_ERROR;
+            return CodeErrorCli;
         }
     }
 
@@ -95,41 +78,19 @@ int main(int argc, char** argv)
 
     try
     {
-        throwInvalidCliIf(thereAreUnknownArguments(argc, argv));
+        throwInvalidCliIf(thereAreUnknownArguments(
+            argc, argv,
+            {&tapNameArg, &networkArg, &vlanTagArg, &regUriArg, &logLevelArg, &participantNameArg, &configurationArg},
+            {&helpArg, &versionArg}));
 
-        std::shared_ptr<SilKit::Config::IParticipantConfiguration> participantConfiguration;
-        if (!configurationFile.empty())
-        {
-            participantConfiguration = SilKit::Config::ParticipantConfigurationFromFile(configurationFile);
-            static const auto conflictualArguments = {
-                &logLevelArg,
-                /* &participantNameArg, &regUriArg are correctly handled by SilKit if one is overwritten.*/};
-            for (const auto* conflictualArgument : conflictualArguments)
-            {
-                if (findArg(argc, argv, *conflictualArgument, argv) != NULL)
-                {
-                    auto configFileName = configurationFile;
-                    if (configurationFile.find_last_of("/\\") != std::string::npos)
-                    {
-                        configFileName = configurationFile.substr(configurationFile.find_last_of("/\\") + 1);
-                    }
-                    std::cout << "[info] Be aware that argument given with " << *conflictualArgument
-                              << " can be overwritten by a different value defined in the given configuration file "
-                              << configFileName << std::endl;
-                }
-            }
-        }
-        else
-        {
-            const std::string loglevel = getArgDefault(argc, argv, logLevelArg, "Info");
-            const std::string participantConfigurationString =
-                R"({ "Logging": { "Sinks": [ { "Type": "Stdout", "Level": ")" + loglevel + R"("} ] } })";
-            participantConfiguration =
-                SilKit::Config::ParticipantConfigurationFromString(participantConfigurationString);
-        }
+        SilKit::Services::Logging::ILogger* logger;
+        SilKit::Services::Orchestration::ILifecycleService* lifecycleService;
+        std::promise<void> runningStatePromise;
 
-        auto participant = SilKit::CreateParticipant(participantConfiguration, participantName, registryURI);
-        auto logger = participant->GetLogger();
+        std::string participantName = "SilKitAdapterTap";
+        const auto participant =
+            CreateParticipant(argc, argv, logger, &participantName, &lifecycleService, &runningStatePromise);
+
         const bool debugActivated = logger->GetLogLevel() < SilKit::Services::Logging::Level::Info;
 
         logger->Info("Creating ethernet controller '" + ethernetControllerName + "'");
@@ -231,22 +192,6 @@ int main(int argc, char** argv)
             ethController->AddFrameTransmitHandler(onEthAckCallback);
         }
 
-        // Setup lifecycle
-        auto* lifecycleService = participant->CreateLifecycleService({OperationMode::Autonomous});
-        auto* systemMonitor = participant->CreateSystemMonitor();
-        std::promise<void> runningStatePromise;
-
-        systemMonitor->AddParticipantStatusHandler(
-            [&runningStatePromise, participantName](const ParticipantStatus& status) {
-            if (participantName == status.participantName)
-            {
-                if (status.state == ParticipantState::Running)
-                {
-                    runningStatePromise.set_value();
-                }
-            }
-        });
-
         // Called during startup
         lifecycleService->SetCommunicationReadyHandler([&ethController]() { ethController->Activate(); });
 
@@ -256,48 +201,24 @@ int main(int argc, char** argv)
 
         promptForExit();
 
-        ioContext.stop();
-
-        if (t.joinable())
-        {
-            t.join();
-        }
-
-        auto runningStateFuture = runningStatePromise.get_future();
-        auto futureStatus = runningStateFuture.wait_for(15s);
-        if (futureStatus != std::future_status::ready)
-        {
-            std::ostringstream SILKitDebugMessage;
-            SILKitDebugMessage
-                << "Lifecycle Service Stopping: timed out while checking if the participant is currently running.";
-            logger->Debug(SILKitDebugMessage.str());
-        }
-        lifecycleService->Stop("Adapter stopped by the user.");
-
-        auto finalState = finalStateFuture.wait_for(15s);
-        if (finalState != std::future_status::ready)
-        {
-            std::ostringstream SILKitDebugMessage;
-            SILKitDebugMessage << "Lifecycle service stopping: timed out";
-            logger->Debug(SILKitDebugMessage.str());
-        }
+        Stop(ioContext, t, *logger, &runningStatePromise, lifecycleService, &finalStateFuture);
     }
     catch (const SilKit::ConfigurationError& error)
     {
         std::cerr << "Invalid configuration: " << error.what() << std::endl;
-        return CONFIGURATION_ERROR;
+        return CodeErrorConfiguration;
     }
     catch (const InvalidCli&)
     {
         adapters::print_help();
         std::cerr << std::endl << "Invalid command line arguments." << std::endl;
-        return CLI_ERROR;
+        return CodeErrorCli;
     }
     catch (const std::exception& error)
     {
         std::cerr << "Something went wrong: " << error.what() << std::endl;
-        return OTHER_ERROR;
+        return CodeErrorOther;
     }
 
-    return NO_ERROR;
+    return CodeSuccess;
 }

@@ -10,12 +10,33 @@
 #include <linux/if_tun.h>
 #endif
 
-#include "Parsing.hpp"
-#include "SignalHandler.hpp"
-#include "SilKitAdapterTap.hpp"
+#include <cerrno>
 
-using namespace exceptions;
+#include "asio/error.hpp"
+
+#include "common/Cli.hpp"
+
 using namespace adapters;
+
+namespace {
+// returns true when the read error is fatal for the TAP descriptor
+bool IsFatalReadError(const std::error_code& ec)
+{
+    if (ec == asio::error::bad_descriptor // EBADF
+        || ec == asio::error::not_connected // ENOTCONN
+        || ec == asio::error::no_such_device)
+    {
+        return true;
+    }
+#if defined(EBADFD)
+    if (ec.value() == EBADFD) // 77 on Linux: "File descriptor in bad state"
+    {
+        return true;
+    }
+#endif
+    return false;
+}
+} // namespace
 
 TapConnection::TapConnection(asio::io_context& io_context, const std::string& tapDevName,
                              std::function<void(std::vector<std::uint8_t>)> onNewFrameHandler,
@@ -38,6 +59,11 @@ void TapConnection::ReceiveEthernetFrameFromTapDevice()
 {
     _tapDeviceStream.async_read_some(asio::buffer(_ethernetFrameBuffer.data(), _ethernetFrameBuffer.size()),
                                      [this](const std::error_code ec, const std::size_t bytes_received) {
+        if (ec == asio::error::operation_aborted)
+        {
+            return;
+        }
+
         try
         {
             if (ec)
@@ -48,6 +74,13 @@ void TapConnection::ReceiveEthernetFrameFromTapDevice()
                                                  "Error category: " + ec.category().name();
                 // clang-format on
                 _logger->Error(SILKitErrorMessage);
+
+                // do not read again, as this would busy-loop and flood the log with the same error
+                if (IsFatalReadError(ec))
+                {
+                    _logger->Error("TAP device descriptor is no longer usable. Stopping reception from TAP device.");
+                    return;
+                }
             }
             else
             {
@@ -101,7 +134,7 @@ auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& w
         KEY_READ, &adapterKey);
 
     if (checkCmdResult("RegOpenKeyExW (open adapter)", rcOpenAdapter) == -1)
-        return FILE_DESCRIPTOR_ERROR;
+        return CodeErrorFileDescriptor;
 
     HKEY connectionKey;
     LONG rcOpenConnection = RegOpenKeyExW(
@@ -109,7 +142,7 @@ auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& w
         KEY_READ, &connectionKey);
 
     if (checkCmdResult("RegOpenKeyExW (open connection)", rcOpenConnection) == -1)
-        return FILE_DESCRIPTOR_ERROR;
+        return CodeErrorFileDescriptor;
 
     DWORD numberOfSubKeys = 0;
     {
@@ -131,7 +164,7 @@ auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& w
             RegEnumKeyExW(adapterKey, keyIndex, adapterSubkey, &keyNameSize, nullptr, nullptr, nullptr, nullptr);
 
         if (checkCmdResult("RegEnumKeyExW", rcEnumKey) == -1)
-            return FILE_DESCRIPTOR_ERROR;
+            return CodeErrorFileDescriptor;
 
         wchar_t value[1024];
         DWORD valueSize = sizeof(value);
@@ -140,7 +173,7 @@ auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& w
             RegGetValueW(adapterKey, adapterSubkey, L"ComponentId", RRF_RT_REG_SZ, &valueType, value, &valueSize);
 
         if (checkCmdResult("RegGetValueW (ComponentId)", rcGetValue) == -1)
-            return FILE_DESCRIPTOR_ERROR;
+            return CodeErrorFileDescriptor;
 
         // The Windows TAP are installed with the devcon.exe tool by specifying the hardware ID tap0901
         if (wcscmp(value, L"tap0901") == 0)
@@ -157,7 +190,7 @@ auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& w
                                             netCfgInstanceId, &value1Size);
 
             if (checkCmdResult("RegGetValueW (NetCfgInstanceIdp)", rcGetValue1) == -1)
-                return FILE_DESCRIPTOR_ERROR;
+                return CodeErrorFileDescriptor;
 
             wchar_t deviceInstanceID[1024];
             DWORD value2Size = sizeof(deviceInstanceID);
@@ -166,7 +199,7 @@ auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& w
                                             deviceInstanceID, &value2Size);
 
             if (checkCmdResult("RegGetValueW (DeviceInstanceID)", rcGetValue2) == -1)
-                return FILE_DESCRIPTOR_ERROR;
+                return CodeErrorFileDescriptor;
 
             wchar_t connectionSubKey[1024];
             wcscpy_s(connectionSubKey, 1024, netCfgInstanceId);
@@ -179,7 +212,7 @@ auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& w
                                             connectionName, &value3Size);
 
             if (checkCmdResult("RegGetValueW (Name)", rcGetValue3) == -1)
-                return FILE_DESCRIPTOR_ERROR;
+                return CodeErrorFileDescriptor;
 
             if (connectionName == ToWString(tapDeviceName))
             {
@@ -208,7 +241,7 @@ auto TapConnection::GetConnection(const char* tapDeviceName, WinTapConnection& w
     }
     else
     {
-        return OTHER_ERROR;
+        return CodeErrorOther;
     }
 }
 
@@ -278,7 +311,7 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> HAN
     LONG errorCode;
 
     const int res = GetConnection(tapDeviceName, mTapConnections, errorCmd, errorCode);
-    if (res == FILE_DESCRIPTOR_ERROR)
+    if (res == CodeErrorFileDescriptor)
     {
         _logger->Error("Failed to execute Windows system call " + errorCmd
                        + ". Error code: " + std::to_string(errorCode) + ", " + extractErrorMessage(errorCode)
@@ -286,7 +319,7 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> HAN
                        + "\" specified in [--tap-name] exists and is operational.");
         return nullptr;
     }
-    else if (res == OTHER_ERROR)
+    else if (res == CodeErrorOther)
     {
         // If no error on Windows registry access but tapDeviceName not found
         _logger->Error(std::string(tapDeviceName) + " not found in Windows network connections."
@@ -332,7 +365,7 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> int
         _logger->Error("Invalid TAP device name used for [--tap-name] arg.\n"
                        "(Hint): Ensure that the name provided is within a valid length between (1 and "
                        + std::to_string(IFNAMSIZ - 1) + ") characters.");
-        return FILE_DESCRIPTOR_ERROR;
+        return CodeErrorFileDescriptor;
     }
 
     // Path to the tap device in network interfaces
@@ -350,7 +383,7 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> int
         _logger->Error("Failed to execute IOCTL system call with error code: " + std::to_string(ioctlError)
                        + extractErrorMessage(ioctlError) + "\n(Hint): Ensure that the network interface \""
                        + std::string(tapDeviceName) + "\" specified in [--tap-name] exists and is operational.");
-        return FILE_DESCRIPTOR_ERROR;
+        return CodeErrorFileDescriptor;
     }
 
     int tapFileDescriptor{-1};
@@ -363,7 +396,7 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> int
         int fdError = errno;
         _logger->Error("File descriptor openning failed with error code: " + std::to_string(fdError)
                        + extractErrorMessage(fdError));
-        return FILE_DESCRIPTOR_ERROR;
+        return CodeErrorFileDescriptor;
     }
 
     struct ifreq ifr;
@@ -380,7 +413,7 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> int
         _logger->Error("Failed to set TUNSETIFF flag to the TAP device: " + std::to_string(fdError)
                        + extractErrorMessage(fdError));
         close(tapFileDescriptor);
-        return FILE_DESCRIPTOR_ERROR;
+        return CodeErrorFileDescriptor;
     }
 #endif
 
@@ -395,7 +428,7 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> int
                        + std::to_string(ioctlError) + extractErrorMessage(ioctlError));
         close(tapFileDescriptor);
         close(sockfd);
-        return OTHER_ERROR;
+        return CodeErrorOther;
     }
 
     ifr.ifr_flags = 0;
@@ -407,7 +440,7 @@ auto TapConnection::GetTapDeviceFileDescriptor(const char* tapDeviceName) -> int
                        + std::string(tapDeviceName) + "\" specified in [--tap-name] exists and is operational.");
         close(tapFileDescriptor);
         close(sockfd);
-        return OTHER_ERROR;
+        return CodeErrorOther;
     }
 
     if ((ifr.ifr_flags & IFF_UP) == 0)

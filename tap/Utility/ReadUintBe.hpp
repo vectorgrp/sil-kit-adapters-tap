@@ -5,11 +5,9 @@
 
 #include <type_traits>
 
-#include "Exceptions.hpp"
+#include "common/Exceptions.hpp"
 
 #include "asio/ts/buffer.hpp"
-
-using namespace exceptions;
 
 namespace demo {
 
@@ -18,7 +16,7 @@ auto ReadUintBe(asio::const_buffer buffer) -> std::enable_if_t<std::is_unsigned<
 {
     if (buffer.size() < sizeof(T))
     {
-        throw InvalidBufferSize{};
+        throw adapters::InvalidBufferSize{};
     }
 
     const auto bytes = static_cast<const unsigned char*>(buffer.data());

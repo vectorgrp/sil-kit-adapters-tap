@@ -4,7 +4,6 @@
 #pragma once
 
 #include "Enums.hpp"
-#include "Exceptions.hpp"
 #include "FormattedBuffer.hpp"
 #include "ReadUintBe.hpp"
 #include "WriteUintBe.hpp"
@@ -28,8 +27,6 @@
 #include <asio/ts/internet.hpp>
 #include <asio/ts/socket.hpp>
 #include "silkit/services/logging/all.hpp"
-
-using namespace exceptions;
 
 namespace demo {
 

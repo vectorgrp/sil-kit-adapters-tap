@@ -5,11 +5,9 @@
 
 #include <type_traits>
 
-#include "Exceptions.hpp"
+#include "common/Exceptions.hpp"
 
 #include "asio/ts/buffer.hpp"
-
-using namespace exceptions;
 
 namespace demo {
 
@@ -19,7 +17,7 @@ auto WriteUintBe(asio::mutable_buffer buffer,
 {
     if (buffer.size() < sizeof(T))
     {
-        throw InvalidBufferSize{};
+        throw adapters::InvalidBufferSize{};
     }
 
     const auto bytes = static_cast<unsigned char*>(buffer.data());

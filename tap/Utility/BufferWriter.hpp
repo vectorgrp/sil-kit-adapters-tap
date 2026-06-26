@@ -8,12 +8,11 @@
 #include <cstdint>
 #include <cstddef>
 
-#include "Exceptions.hpp"
 #include "InternetChecksum.hpp"
 
-#include "asio/ts/buffer.hpp"
+#include "common/Exceptions.hpp"
 
-using namespace exceptions;
+#include "asio/ts/buffer.hpp"
 
 namespace demo {
 
@@ -94,7 +93,7 @@ private:
     {
         if ((_buffer + offset).size() < byteCount)
         {
-            throw InvalidBufferSize{};
+            throw adapters::InvalidBufferSize{};
         }
     }
 

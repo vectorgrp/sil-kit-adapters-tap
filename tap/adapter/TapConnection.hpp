@@ -36,7 +36,7 @@ public:
         auto sizeSent = _tapDeviceStream.write_some(asio::buffer(data.data(), data.size()));
         if (data.size() != sizeSent)
         {
-            throw exceptions::InvalidFrameSizeError{};
+            throw adapters::InvalidFrameSizeError{};
         }
     }
 

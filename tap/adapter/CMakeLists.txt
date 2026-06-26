@@ -5,13 +5,13 @@ add_executable(sil-kit-adapter-tap
     "SilKitAdapterTap.cpp"
     "TapConnection.cpp"
     "Parsing.cpp"
-    "SignalHandler.cpp"
 )
 target_link_libraries(sil-kit-adapter-tap
     PRIVATE
         Utility
         asio
         SilKit::SilKit
+        sil-kit-adapters-common
 )
 set_target_properties(sil-kit-adapter-tap 
     PROPERTIES

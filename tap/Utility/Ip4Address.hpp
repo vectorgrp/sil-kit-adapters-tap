@@ -7,11 +7,9 @@
 #include <iosfwd>
 #include <cstdint>
 
-#include "Exceptions.hpp"
+#include "common/Exceptions.hpp"
 
 #include "asio/ts/buffer.hpp"
-
-using namespace exceptions;
 
 namespace demo {
 
@@ -30,7 +28,7 @@ inline auto ReadIp4Address(asio::const_buffer buffer) -> Ip4Address
     Ip4Address address = {};
     if (asio::buffer_copy(asio::buffer(address.data), buffer) != 4)
     {
-        throw InvalidBufferSize{};
+        throw adapters::InvalidBufferSize{};
     }
     return address;
 }
@@ -39,7 +37,7 @@ inline auto WriteIp4Address(asio::mutable_buffer target, const Ip4Address& ip4Ad
 {
     if (asio::buffer_copy(target, asio::buffer(ip4Address.data)) != 4)
     {
-        throw InvalidBufferSize{};
+        throw adapters::InvalidBufferSize{};
     }
     return 4;
 }

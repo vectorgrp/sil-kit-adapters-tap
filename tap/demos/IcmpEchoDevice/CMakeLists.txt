@@ -6,12 +6,12 @@ add_executable(sil-kit-demo-ethernet-icmp-echo-device
     Device.hpp
     Device.cpp
     ${CMAKE_SOURCE_DIR}/tap/adapter/Parsing.cpp
-    ${CMAKE_SOURCE_DIR}/tap/adapter/SignalHandler.cpp
 )
 target_link_libraries(sil-kit-demo-ethernet-icmp-echo-device
     PRIVATE
         Utility
         SilKit::SilKit
+        sil-kit-adapters-common
 )
 set_target_properties(sil-kit-demo-ethernet-icmp-echo-device 
     PROPERTIES

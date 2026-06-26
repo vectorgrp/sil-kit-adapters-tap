@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.13)
 
-project(VectorSilKitAdapterTap)
+project(SilKitAdapterTap)
 
 option(BUILD_LINUX_PACKAGE "Creates a SIL Kit Adapter TAP build suitable for package managers in Linux Distributions (.deb)" OFF)
 
