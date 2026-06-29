@@ -214,6 +214,11 @@ int main(int argc, char** argv)
         std::cerr << std::endl << "Invalid command line arguments." << std::endl;
         return CodeErrorCli;
     }
+    catch (const InvalidFileDescriptor& error)
+    {
+        std::cerr << "Invalid File descriptor: " << error.what() << std::endl;
+        return CodeErrorFileDescriptor;
+    }
     catch (const std::exception& error)
     {
         std::cerr << "Something went wrong: " << error.what() << std::endl;
