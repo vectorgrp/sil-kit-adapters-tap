@@ -84,3 +84,24 @@ Load the ``Tap_adapter_CANoe.cfg`` from the ``tap/demos/CANoe`` directory and st
 
 ### CANoe4SW Server Edition (Windows)
 You can also run the same test set with ``CANoe4SW SE`` by executing the following PowerShell script ``tap/demos/CANoe4SW_SE/run.ps1``. The test cases are executed automatically and you should see a short test report in PowerShell after execution.
+
+## Using the SIL Kit Dashboard (Optional)
+
+The SIL Kit Dashboard is an optional graphical tool for monitoring and visualizing the activity of the SIL Kit participants. You can use the dashboard to monitor participant status and troubleshoot issues specific to your setup and environment. For general instructions and features, see the documentation in [common/docs/sil-kit-dashboard/README.md](https://github.com/vectorgrp/sil-kit-adapters-common/blob/main/docs/sil-kit-dashboard/README.md).
+
+1. Start the SIL Kit registry with dashboard support:
+    ```
+    \path\to\SilKit-x.y.z-$platform\SilKit\bin\sil-kit-registry.exe --listen-uri 'silkit://0.0.0.0:8501' --dashboard-uri http://localhost:8082
+    ```
+
+2. Launch the ``sil-kit-adapter-tap`` and the ``sil-kit-demo-ethernet-icmp-echo-device`` as described above.
+
+    > With SIL Kit Dashboard version 1.1.0 or newer, you can configure the participant configuration file to enable all available metrics. See the [SIL Kit documentation](https://github.com/vectorgrp/sil-kit/blob/main/docs/troubleshooting/advanced.rst) for details.
+
+3. Open your web browser and navigate to [http://localhost:8080/dashboard](http://localhost:8080/dashboard).
+
+4. In the dashboard, select the registry URI (e.g., `silkit://localhost:8501`).
+
+5. In the participant tab, you should see `SilKitAdapterTap`, `EthernetDevice`, and any other participants (such as CANoe).
+
+6. Click on `Network > Ethernet > tap_demo` to have an overview of the setup.

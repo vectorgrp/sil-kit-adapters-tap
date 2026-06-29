@@ -92,3 +92,24 @@ Alternatively, you can click on the Dev Containers button at the bottom-left cor
 Wait for the Docker image to be built and for the container to start. After that, you can launch the available pre-defined tasks to acheive the demo setup. 
 
 > The Docker container exposes the TCP/IP port 8501 to the host, which means that adding CANoe as a participant in the following steps shall work out-of-the box if you set SIL Kit's registry-uri to `silkit://localhost:8501`.  
+
+## Using the SIL Kit Dashboard (Optional)
+
+The SIL Kit Dashboard is an optional graphical tool for monitoring and visualizing the activity of the SIL Kit participants. You can use the dashboard to monitor participant status and troubleshoot issues specific to your setup and environment. For general instructions and features, see the documentation in [common/docs/sil-kit-dashboard/README.md](https://github.com/vectorgrp/sil-kit-adapters-common/blob/main/docs/sil-kit-dashboard/README.md).
+
+1. Start the SIL Kit registry with dashboard support:
+    ```
+    /path/to/SilKit-x.y.z-$platform/SilKit/bin/sil-kit-registry --listen-uri 'silkit://0.0.0.0:8501' --dashboard-uri http://localhost:8082
+    ```
+
+2. Launch the ``sil-kit-demo-ethernet-icmp-echo-device`` and the ``sil-kit-adapter-tap`` (via ``start_adapter_and_ping_demo.sh``) as described above.
+
+    > With SIL Kit Dashboard version 1.1.0 or newer, you can configure the participant configuration file to enable all available metrics. See the [SIL Kit documentation](https://github.com/vectorgrp/sil-kit/blob/main/docs/troubleshooting/advanced.rst) for details.
+
+3. Open your web browser and navigate to [http://localhost:8080/dashboard](http://localhost:8080/dashboard).
+
+4. In the dashboard, select the registry URI (e.g., `silkit://localhost:8501`).
+
+5. In the participant tab, you should see `SilKitAdapterTap`, `EthernetDevice`, and any other participants (such as CANoe).
+
+6. Click on `Network > Ethernet > tap_demo` to have an overview of the setup.
