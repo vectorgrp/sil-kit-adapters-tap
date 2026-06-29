@@ -137,7 +137,7 @@ At this point, the server executable can be started in the Linux system. For the
 
 ![Errors due to missing execution manager](images/errors_missing_em.png)
 
-## Setup CANoe (CANoe 18 and newer) as a client tester and SIL Kit participant
+## Setup CANoe (CANoe 18 or newer necessary; CANoe 20 or newer recommended) as a client tester and SIL Kit participant
 Finally it is time to setup a CANoe configuration as a SIL Kit participant which serves as a client mockup for our server application under test.
 
 You have to leave out the information which belong to the client executable when using the AUTOSAR Preprocessor in CANoe to merge the system descriptions. Otherwise the client mockup can not be created. There are two common options to achieve this.
@@ -146,15 +146,17 @@ You have to leave out the information which belong to the client executable when
 
 ![Client .arxml files to omit](images/start_app_client_arxml_files.png)
 
-**Option 2:** With CANoe 19 and newer (including AUTOSAR preprocessor version >= 11.0.33) alternatively executables can be removed via their short name in an arxml file with the `RemoveExecutablePatch` applied as a Custom Patch. The default paths are `C:\Program Files\Vector AUTOSAR Preprocessor\CustomPatches\Vector\R20-11\RemoveExecutable\Vector.RemoveExecutable.dll` and `C:\ProgramData\Vector\AUTOSAR Preprocessor\Vector\R20-11\RemoveExecutable\RemoveExecutableTemplate.yaml`.
+**Option 2:** With CANoe 20 and newer (including AUTOSAR preprocessor version >= 12.0.38) alternatively executables can be removed via the `Adjust Database` feature of the AUTOSAR preprocessor.
 
-Specify the executable you want to remove, such as `startapp_cm_client1`, in the `RemoveExecutablePatch` yaml file (see template yaml file) as follows:
+This can be done by activating the feature in the `Parmeter `tab and after that selecting `Remove Executables`:
 
-![RemoveExecutablePatch yaml file](images/remove_executable_yaml.png)
+![RemoveExecutablePatch yaml file](images/Preprocessor_adjust_database.png)
 
-In the AUTOSAR Preprocessor `RemoveExecutablePatch` and `Vector.GenerateVectorSimulationNode` must be added as custom patches to remove the specified executables and generate the necessary elements for the remaining bus simulation. Be aware that you have to deselect the default generation of elements for the remaining bus simulation:
+The next step is to click on `Edit Configuration` icon and select the executable you want to remove:
 
-![Apply Custom Patches](images/apply_custom_patches.png)
+![RemoveExecutablePatch yaml file](images/Preprocessor_exec_removal.png)
+
+Every other option can stay as it is and you can proceed with the processing.
 
 ### CANoe Simulation Setup
 The step-by-step instructions in [this section](readme-sub-sections/interaction_with_CANoe_and_DOs.md) showcase what has to be done to setup the CANoe Simulation Setup.

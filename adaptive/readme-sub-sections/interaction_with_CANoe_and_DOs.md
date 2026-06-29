@@ -53,7 +53,7 @@ A first test could consist of checking the availability of the service provided 
       for (uint number = 201; number < 204; number++)
       {
           Report.TestStep("INVOKE_METHOD", "Transmit request to server provider: StartApplicationMethod1" + number.ToString());
-          var call_handle = StartApplicationEthernetCluster.VectorSimulationNode.ProvidedSomeipStartApplicationCmService1_ServiceInterface.StartApplicationMethod1.CallAsync(number);
+          var call_handle = StartApplicationEthernetCluster.VectorSimulationNode.ProvidedSomeipStartApplicationCmService1_ServiceInterface.StartApplicationMethod1.CallAsync((byte)number);
           // Wait until result received or timeout
           if (Execution.WaitForAnswer(call_handle, 10000).WaitResult == 1)
           {
