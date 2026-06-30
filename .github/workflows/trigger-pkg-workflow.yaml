@@ -7,7 +7,7 @@ on:
 jobs:
   get-tag-name:
     name: Get the release tag name
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       tag_name: ${{ steps.get_tag_name.outputs.tag_name }}
     steps:
@@ -26,7 +26,7 @@ jobs:
     name: Download the package archive and upload it to the release
     needs: call-packaging-workflow
     environment: public-github-runners
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Download the package
         id: download-pkg
