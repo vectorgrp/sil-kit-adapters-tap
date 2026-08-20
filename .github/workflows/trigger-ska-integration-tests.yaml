@@ -26,7 +26,7 @@ concurrency:
 
 jobs:
   trigger-integration-tests:
-    uses: pnd/sil-kit-adapters-ci-testing/.github/workflows/ska-integration-tests.yaml@main
+    uses: ptv/sil-kit-adapters-ci-testing/.github/workflows/ska-integration-tests.yaml@main
     with:
       repository_under_test : 'pnd/sil-kit-adapters-tap'
       branch_under_test: ${{ inputs.branch_under_test != '' && inputs.branch_under_test || (github.event_name == 'pull_request' && github.event.pull_request.head.ref || 'main') }}
