@@ -21,6 +21,7 @@ jobs:
     with:
       adapter_name: tap
       tag_name: ${{ needs.get-tag-name.outputs.tag_name }}
+      silkit_version: 5.0.7
     secrets: inherit
   handle-artifacts:
     name: Download the package archive and upload it to the release
