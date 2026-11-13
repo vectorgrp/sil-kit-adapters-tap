@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  linux-release:
+    name: Build SIL Kit TAP for Linux Release configuration
+    environment: public-github-runners
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Build
+        uses: ./.github/actions/build-cmake-preset
+        with:
+          preset-name: linux-release
+          cmake-args: "-D PACKAGE_FILENAME_SUFFIX=-${{ github.ref_name }}-ubuntu-22.04-x86_64-gcc"
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-release
+          path: build/linux-release/SilKit-Adapter*.zip
+          if-no-files-found: error
+          retention-days: 1
+
+  windows-release:
+    name: Build SIL Kit TAP for Windows Release configuration
+    environment: public-github-runners
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Build
+        uses: ./.github/actions/build-cmake-preset
+        with:
+          preset-name: windows-release
+          cmake-args: "-D PACKAGE_FILENAME_SUFFIX=-${{ github.ref_name }}-Win-x86_64-VS2019 -D SILKIT_FLAVOR=Win-x86_64-VS2019"
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: build/windows-release/SilKit-Adapter*.zip
+          if-no-files-found: error
+          retention-days: 1
+
+  debian-package:
+    name: Build the Debian package
+    uses: ./.github/workflows/trigger-pkg-workflow.yaml
+    secrets: inherit
+
+  publish-release:
+    name: Publish artifacts to the release
+    needs: [linux-release, windows-release, debian-package]
+    environment: public-github-runners
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+      - name: Publish artifacts to the release
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          draft: true
+          fail_on_unmatched_files: true
+          files: |
+            release-assets/SilKit-Adapter*.zip
+            release-assets/sil-kit-adapter-tap_*.deb
