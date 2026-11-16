@@ -84,7 +84,7 @@ sudo apt install ./sil-kit-adapter-tap_*.deb
 ```
 To get more information about this Debian package you can refer to the SIL Kit Adapter Packaging [README](https://github.com/vectorgrp/sil-kit-adapters-pkg).
 
-**Note 1:** To be able to install and run the adapter, you will also need to install the SIL Kit library. This can be done by installing the `libsilkit<major>_*.deb` and `libsilkit-dev_*.deb` packages provided in the SIL Kit releases, where `<major>` corresponds to the SIL Kit major version (e.g., 5).
+**Note 1:** To be able to install and run the adapter, you will also need to install the SIL Kit library. This can be done by installing the `libsilkit<major>_*.deb` package provided in the SIL Kit releases, where `<major>` corresponds to the SIL Kit major version (e.g., 5).
 
 **Note 2:** After installing the adapter on Linux, you can run the ``sil-kit-adapter-tap`` from any location without specifying a path. The default installation path is ``/usr/bin``.
 
